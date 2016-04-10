@@ -4,6 +4,7 @@ $(document).ready(function() {
             url: $('#stripeSettings').val()
             }).done(function(data) {
                 ns = data.settings;
+                ns.template = $('#mailTemplate').val();
                 var handler = StripeCheckout.configure({
                     key: ns.stripe_key,
                     image: '/static/images/qwyre_logo_128pxBW.png',
@@ -32,7 +33,7 @@ $(document).ready(function() {
                                 stripeEmails: ns.user_email,
                                 selfPurchase: true, // Buying for own use
                                 stripeBitcoin: is_bitcoin,
-                                template: 'purchase'
+                                template: ns.template
                             },
                             success: function(data) {
                                 if (data.response == 'success') {

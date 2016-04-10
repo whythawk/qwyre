@@ -49,6 +49,15 @@ $(document).ready(function() {
             });
         e.preventDefault();
         });
+    $('#token_preorder_reminder').on('click', function (e) {
+        $.ajax({
+            url: $('#preorderReminder').val(),
+            type: 'post',
+            data: { }
+            }).done(function(data) {
+            });
+        e.preventDefault();
+        });    
     $('#set_structure').on('click', function (e) {
         var len = $('#structureLength').val();
         var response = {

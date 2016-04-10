@@ -3,6 +3,7 @@
 {% load novel_tags %}
 {% load widget_tweaks %}
 {% load staticfiles %}
+{% load humanize %}
 
 {% block content %}
 <div class="container">
@@ -15,6 +16,7 @@
                 <li class="active"><a href="#tab-price" data-toggle="tab">Price</a></li>
                 <li><a href="#tab-structure" data-toggle="tab">Structure</a></li>
                 <li><a href="#tab-market" data-toggle="tab">Market</a></li>
+                <li><a href="#tab-manage" data-toggle="tab">Manage</a></li>
             </ul>
             <div id="share-tab-content" class="tab-content">
                 <div id="tab-price" class="tab-pane active">
@@ -46,7 +48,7 @@
                     <small>
                     <form action="" method="POST" class="inline">
                         {% csrf_token %}
-                        <input type="hidden" value="{% url 'set_chapters' novel_object.surl %}"
+                        <input type="hidden" value="{% url 'set_contents' novel_object.surl %}"
                                name="chapterFormat" id="chapterFormat" />
                         {% for form in formset|orderchapters %}
                         <div class="form-group"  id="structureForm_{{forloop.counter0}}">
@@ -109,6 +111,34 @@
                         <button type="submit" class="btn btn-default" name="market_tokens"
                                 id="market_tokens" value="save">Send</button>
                     </form>
+                </div>
+                <div id="tab-manage" class="tab-pane">
+                    <p></p>
+                    {% if novel_object.was_preorder and not novel_object.is_preorder and token_valid_purchased_count %}
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="{% url 'preorder_reminder' novel_object.surl %}"
+                               name="preorderReminder" id="preorderReminder" />
+                        <small>Send reminder to {{ token_valid_purchased_count }} unclaimed
+                        preorders?</small>
+                        <button type="submit" class="btn btn-default" name="token_preorder_reminder"
+                                id="token_preorder_reminder" value="save">Send</button>
+                    </form>
+                    <small>{{ novel_object.is_live_from|naturalday:"l, d F Y" }}</small>
+                    {% endif %}
+                    <p></p>
+                    <table style="width:30%">
+                        <tr>
+                            <th style="text-align:left">Total</th>
+                            <th style="text-align:left">Count</th>
+                        </tr>
+                    {% for r in token_purchased_list %}
+                        <tr>
+                            <td>{{ r.symbol|safe}} {{ r.total.price__sum }}</td>
+                            <td>{{ r.count }}</td>
+                        </tr>
+                    {% endfor %}
+                    </table>
                 </div>
             </div>
         </div>

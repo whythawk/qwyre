@@ -71,9 +71,7 @@ READ_IF_CHOICE = (("open","Open"),
                   ("login","Login"),
                   ("own","Own"))
 
-CURRENCY_CHOICE = (("gbp","&pound;"),
-    ("usd","$"),
-    ("eur","&euro;"))
+CURRENCY_CHOICE = settings.CURRENCY_CHOICE
 
 #########################################################################################################################################
 # Main Wiqi Class
@@ -293,6 +291,10 @@ class Wiqi(models.Model):
         if usr.is_authenticated() and usr.has_perm(permission, self):
             return True
         return False
+
+    @property
+    def is_preorder(self):
+        return self.is_live_from > pytz.UTC.localize(datetime.now())
         
     def assign_all_perm(self, usr):
         for perm, perm_text in self._meta.permissions:

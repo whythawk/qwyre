@@ -10,41 +10,48 @@ from qwyre.sqwyre.models import Novel
 from jsonfield import JSONField
 from decimal import Decimal
 
-#http://character-code.com/currency-html-codes.php
-CURRENCY_CHOICE = (("gbp","&pound;"),
-    ("usd","$"),
-    ("eur","&euro;"))
+CURRENCY_CHOICE = settings.CURRENCY_CHOICE
 
 class TokenQuerySet(QuerySet):
     # https://docs.djangoproject.com/en/dev/topics/db/managers/#calling-custom-queryset-methods-from-the-manager
-    def issued_list(self, user, novel_object):
+    def issued_list(self, novel_object):
         """
         Return filtered list of active and valid tokens.
         """
         deadline = pytz.UTC.localize(datetime.now()) - timedelta(days=novel_object.lenddays)
-        return self.filter(Q(creator=user) &
-                           Q(is_purchased=False) &
-                           (Q(is_valid=True) |
-                           Q(redeemed_on__gt=deadline))
+        return self.filter(
+            Q(is_purchased=False) &
+            (Q(is_valid=True) |
+            Q(redeemed_on__gt=deadline))
         )
-    def valid_purchased(self, user, valid=True):
+    def valid_purchased(self, valid=True):
         """
         Return filtered list of valid purchased tokens.
         For use in potentially resending or changing, or requesting refund.
         Can set valid=False to get a list of purchased tokens already redeemed.
         """
-        return self.filter(Q(creator=user) &
-                           Q(is_valid=valid) &
-                           Q(is_purchased=True)
+        return self.filter(
+            Q(is_valid=valid) &
+            Q(is_purchased=True)
+        )
+    def for_novel_and_reader(self, user, novel_object):
+        """
+        Return filtered list only for a particular user and a particular novel.
+        """
+        return self.filter(
+            Q(novel=novel_object) &
+            Q(creator=user)
         )
 
 class TokenManager(models.Manager):
     def get_queryset(self):
         return TokenQuerySet(self.model, using=self._db)
-    def issued_list(self, user, novel_object):
-        return self.get_queryset().issued_list(user, novel_object)
-    def valid_purchased(self, user, valid=True):
-        return self.get_queryset().valid_purchased(user, valid)
+    def issued_list(self, novel_object):
+        return self.get_queryset().issued_list(novel_object)
+    def valid_purchased(self, valid=True):
+        return self.get_queryset().valid_purchased(valid)
+    def for_novel_and_reader(self, user, novel_object):
+        return self.get_queryset().for_novel_and_reader(user, novel_object)
 
 class Token(models.Model):
     surl = models.CharField(max_length=25, unique=True, verbose_name="Short URL")
@@ -67,7 +74,7 @@ class Token(models.Model):
     query = TokenManager()
 
     class Meta:
-        app_label = "qwyre"
+        app_label = "sqwyre"
         verbose_name_plural = "Tokens"
 
     def get_token_redemption_url(self):
@@ -102,7 +109,11 @@ class Token(models.Model):
         self.is_preorder = kwargs.get("is_preorder", False)
         # if purchased, and the creator and recipient are the same, then the person is buying this themselves
         # (i.e.) not a gift, the person is logged in and they will automatically take ownership...
-        if kwargs["creator"] and kwargs.get("is_purchased", False) and kwargs["creator"].email == kwargs["recipient"]:
+        if (kwargs["creator"] and
+            kwargs.get("is_purchased", False) and
+            kwargs["creator"].email == kwargs["recipient"] and
+            not kwargs.get("is_preorder", False)):
+            # This is for automatic redemption, so must be careful
             self.is_valid = False
             self.redeemer = kwargs["creator"]
             self.redeemer_ip = kwargs.get("creator_ip", None)

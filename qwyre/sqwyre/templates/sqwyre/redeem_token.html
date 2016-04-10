@@ -2,6 +2,7 @@
 
 {% load mathfilters %}
 {% load staticfiles %}
+{% load humanize %}
 
 {% block content %}
 <div class="container-fluid page-background">
@@ -17,21 +18,41 @@
         <div class="row text-center col-md-10 col-md-push-1">
         {% if not token_object.is_valid and not request.user.is_authenticated %}
             <p>This token has already been redeemed.</p>
-        {% elif request.user.is_authenticated %}
-            <p>{{ page_message }}</p>
+        {% elif user_has_purchased and token_object.is_preorder %}
+            <p>Thank you for preordering {{ token_object.novel.title }}.</p>
         {% elif token_object.is_valid %}
             {% if token_object.creator %}
-            <p>{{ token_object.creator.facebook_name }} has {% if token_object.is_purchased %}purchased
-            {{ token_object.novel.title }} for you.{% else %}loaned you a copy of {{ token_object.novel.title }} for
-            {{ days }} days.{% endif %}</p>
+            <p>{{ token_object.creator.facebook_name }} has
+            {% if token_object.is_preorder %}preordered {{ token_object.novel.title }} for you.
+            {% elif token_object.is_purchased %}purchased {{ token_object.novel.title }} for you.
+            {% else %}loaned you a copy of {{ token_object.novel.title }} for {{ days }} days.{% endif %}</p>
+            {% endif %}
         {% elif token_object.is_purchased  %}
             <p>Thank you for your purchase of {{ token_object.novel.title }} (or, if someone bought it for you, they
             have chosen to remain anonymous).</p>
         {% endif %}
         </div>
+        {% if token_object.novel.is_preorder %}
+        <div class="row text-center col-md-10 col-md-push-1">
+            <p><b>Note:</b> you will not be able to download until {{ token_object.novel.is_live_from|naturalday:"l, d F Y" }}
+            although this link will remain active. I'll send you a friendly reminder when
+            downloads go live.</p>
+            {% if not request.user.is_authenticated %}
+            <form action="{% url 'facebook_connect' %}?next={{ request.path }}&facebook_login=1" method="post">
+                {% csrf_token %}
+                <input type="hidden" value="1" name="connect" />
+                <input type="hidden" value="{{ request.path }}" name="next" />
+                <input type="hidden" value="{{ request.path }}" name="register_next" />
+                <input type="hidden" value="{{ request.path }}" name="error_next" />
+                <a onclick="F.connect(this.parentNode); return false;" href="javascript:void(0);"
+                       id="facebookButton" class="btn btn-lg btn-buy-dropdown inverse"
+                       role="button">Join our mailing list with Facebook</a> 
+            </form>
+            {% endif %}
+        </div>
+        {% else %}
         <div id="download_ebook">
             <div class="row text-center col-md-10 col-md-push-1">
-                {% comment "Facebookout" %}
                 <form action="{% url 'facebook_connect' %}?next={{ request.path }}&facebook_login=1" method="post">
                     {% csrf_token %}
                     <input type="hidden" value="1" name="connect" />
@@ -43,7 +64,6 @@
                            role="button">{% if token_object.is_purchased %}Own{% else %}Read{% endif %}
                         with Facebook</a> 
                 </form>
-                {% endcomment %}
             </div>
             {% if token_object.is_purchased %}
             <div class="row text-center col-md-10 col-md-push-1">
@@ -73,20 +93,23 @@
                 </form>
                 <button id="downloadButton" class="btn btn-lg btn-buy-dropdown inverse" >One-Time Download</button>
             </div>
-        {% endif %}
+            {% endif %}
         </div>
+        {% endif %}
         <div class="row col-md-10 col-md-push-1">
             <small><p><br/></p>
             <dl><dt><strong>How this works (the fine print):</strong></dt>
             <dd>
             <ul>
+                {% if not request.user.is_authenticated %}
                 <li>Facebook dedicates tremendous resources to ensuring the majority of their users are real people.
                 This is a good thing for small sites like this one. Unfortunately, this does mean that - if you don't
                 have a Facebook account - you will need to create one in order to manage your copy of 
                 {{ token_object.novel.title }}.</li>
                 <li>The only information we require from your Facebook account is your email address. We don't ask
                 for any other rights or content.</li>
-                {% if token_object.is_purchased  and not request.user.is_authenticated %}
+                {% endif %}
+                {% if token_object.is_purchased  and not request.user.is_authenticated and not token_object.novel.is_preorder %}
                 <li><strong>Should you choose "One-Time Download" and not create an account</strong> then, after you
                 click the "Download" button:
                     <ul>
@@ -98,8 +121,10 @@
                 <li>For as long as this token is valid you will be able to visit this page.</li>
                 {% endif %}
                 {% if token_object.is_purchased %}
+                {% if not token_object.novel.is_preorder %}
                 <li>Guidance for reading <a href="https://www.amazon.com/gp/sendtokindle">Kindle/.mobi</a> and
                 <a href="http://www.kobobooks.com/ade">Kobo/Nook/.epub</a>.</li>
+                {% endif %}
                 <li><strong>Bonuses for creating an account to manage your copy of {{ token_object.novel.title }}:</strong>
                     <ul>
                         <li>Download different ebook versions whenever you want;</li>
@@ -121,7 +146,7 @@
             {% if show_refund %}
             <form class="form-horizontal" id="refundForm">
                 <div class="form-group">
-                    <label for="refundToken" class="col-sm-5 control-label">This is also your last chance for
+                    <label for="refundToken" class="col-sm-5 control-label">This is also your chance for
                     an immediate refund:</label>
                     {% if show_bitcoin_refund %}
                     <div class="col-sm-3">
@@ -138,7 +163,6 @@
             </form>
             {% endif %}
             </small>
-            {% endif %}
         </div>
     </div>
 </div>

@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, get_list_or_404, render, redirec
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.forms.models import modelformset_factory
+from django.db.models import Sum
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -18,7 +19,7 @@ from ..sqwyre.forms import NovelForm, TokenForm, BulkBuyForm
 from ..wiqi.models import Wiqi
 from ..wiqi.forms import WiqiPriceForm
 from ..wiqi import wiqi as wiqid
-from ..qwyre import qwyre as sqwyd
+from ..sqwyre import qwyre as sqwyd
 from ..snippets.diff2merge import docxtract, xtractemail
 from ..snippets.mailem import send_email
 from ..snippets.forex import get_forex
@@ -27,11 +28,13 @@ EMAIL_SUBJECT = {'gift_lend': ' has lent you a copy of ',
                  'gift_purchase': ' has sent you a copy of ',
                  'issue_lend': 'You have lent out copies of ',
                  'issue_purchase': 'Your purchase of ',
+                 'preorder': 'Your preorder of ',
                  'purchase': 'Your purchase of ',
-                 'refund': 'Your refund for '
+                 'refund': 'Your refund for ',
+                 'preorder_reminder': 'Download your copy of '
                  }
 
-def view_novel(request, novel_surl=None, template_name="qwyre/index.html"):
+def view_novel(request, novel_surl=None, template_name="sqwyre/index.html"):
     if novel_surl:
         novel_object = get_object_or_404(Novel, surl=novel_surl)
     else:
@@ -59,7 +62,7 @@ def view_novel(request, novel_surl=None, template_name="qwyre/index.html"):
             page_price = request.user.reader.current_price
     return render(request, template_name, locals())
 
-def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="qwyre/view_chapter.html",
+def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_chapter.html",
                  nav_type="view", permission=None):
     """
     Return chapter view, or the view of the stack (item or list) from the wiqi.
@@ -67,9 +70,7 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="qwyre/view_c
     wiqi_object = wiqid.get_wiqi_object_or_404(wiqi_surl, request.user, wiqi_type, permission,
                                                nav_type)
     if wiqi_object:
-        # If no wiqi object, user has no rights to view, and must login or buy...
-        # nav_set = wiqid.get_wiqi_nav(request, nav_type, wiqi_object)
-        template_name = "qwyre/view_%s.html" % wiqi_object.get_class
+        template_name = "sqwyre/view_%s.html" % wiqi_object.get_class
         try:
             chapter_title = wiqi_object.stack.title
             # Kludge for novel title
@@ -79,6 +80,9 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="qwyre/view_c
             chapter_title = wiqi_object.title
             novel_object = wiqi_object.wiqi.novel_chapterlist.all()[0]
             nav_title = "stack"
+        # Now test if the reader has the right to see novel, or if it is still preorder
+        if not request.user.is_superuser and novel_object.is_preorder:
+            return redirect('view_preorder', novel_surl=novel_object.surl)
         user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
         page_title = novel_object.title
         page_subtitle = chapter_title
@@ -123,17 +127,7 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="qwyre/view_c
     else:
         return render(request, template_name, locals())
 
-@login_required
-def test_novel(request, novel_surl, template_name="qwyre/test_novel.html"):
-    if not request.user.is_superuser:
-        return Http404
-    novel_object = get_object_or_404(Novel, surl=novel_surl)
-    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
-    page_title = novel_object.title
-    data = request.META
-    return render(request, template_name, locals())
-
-def view_chapters(request, novel_surl, template_name="qwyre/view_chapters.html"):
+def view_contents(request, novel_surl, template_name="sqwyre/view_contents.html"):
     novel_object = get_object_or_404(Novel, surl=novel_surl)
     user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     page_title = novel_object.title
@@ -156,7 +150,16 @@ def view_chapters(request, novel_surl, template_name="qwyre/view_chapters.html")
         can_read = True
     return render(request, template_name, locals())
 
-def buy_novel(request, novel_surl, template_name="qwyre/buy_novel.html"):
+def view_legal(request, novel_surl, template_name="sqwyre/legal.html"):
+    novel_object = get_object_or_404(Novel, surl=novel_surl)
+    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
+    page_title = novel_object.title
+    return render(request, template_name, locals())
+
+def view_preorder(request, novel_surl, template_name="sqwyre/view_preorder.html"):
+    return render(request, template_name, locals())
+
+def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
     novel_object = get_object_or_404(Novel, surl=novel_surl)
     page_title = novel_object.title
     buy_response = {'response': 'failed'}
@@ -196,7 +199,6 @@ def buy_novel(request, novel_surl, template_name="qwyre/buy_novel.html"):
             if request.is_ajax():
                 return HttpResponse(json.dumps(buy_response), content_type="application/json")
             return render(request, template_name, locals())
-
         # Create a Token and associate this charge with it for each email recipient
         kwargs = {}
         kwargs["creator_ip"] = sqwyd.get_user_ip(request)
@@ -215,7 +217,11 @@ def buy_novel(request, novel_surl, template_name="qwyre/buy_novel.html"):
         send_list = []
         send_subject = EMAIL_SUBJECT[data['template']] + novel_object.title
         if data['template'] == 'gift_purchase':
-            send_subject = request.user.username + send_subject #request.user.facebook_name + send_subject
+            if request.user.facebook_name:
+                usr_name = request.user.facebook_name
+            else:
+                usr_name = request.user.username
+            send_subject = usr_name + send_subject
         for e in stripe_emails:
             kwargs["recipient"] = e
             kwargs["price"] = Decimal(str(data["stripePrice"]))/len(stripe_emails)/100
@@ -238,6 +244,11 @@ def buy_novel(request, novel_surl, template_name="qwyre/buy_novel.html"):
                          'link': token_object.get_token_redemption_url()}
         # if logged in and buying for self (and we, therefore, know there is only one token)
         if request.user.is_authenticated() and data.get("selfPurchase", False) == "true":
+            # If preorder, even if authenticated, send them to the redemption page...
+            if novel_object.is_preorder:
+                if request.is_ajax():
+                    return HttpResponse(json.dumps(buy_response), content_type="application/json")
+                return redirect('redeem_token', token_surl=token_object.surl)
             kwargs["redeemer"] = request.user
             kwargs["redeemer_ip"] = sqwyd.get_user_ip(request)
             token_object.redeem(**kwargs)
@@ -273,24 +284,23 @@ def novel_settings(request, novel_surl):
         return HttpResponse(json.dumps(response_dict), content_type="application/json")
     return Http404
 
-def set_chapters(request, novel_surl):
-    if request.is_ajax():
+def set_contents(request, novel_surl):
+    if request.is_ajax() and request.user.is_superuser:
         novel_object = get_object_or_404(Novel, surl=novel_surl)
-        chapter_response = {'response': 'failed'}
+        content_response = {'response': 'failed'}
         if request.method == "POST":
-            if request.user.is_authenticated():
-                data = request.POST
-                novel_object.chapterformat = data['chapterformat']
-                novel_object.save()
-                chapter_response = {'response': 'success'}
+            data = request.POST
+            novel_object.chapterformat = data['chapterformat']
+            novel_object.save()
+            content_response = {'response': 'success'}
         else:
-            chapter_response = {'response': 'success',
+            content_response = {'response': 'success',
                                 'chapterformat': novel_object.chapterformat}
-        return HttpResponse(json.dumps(chapter_response), content_type="application/json")
+        return HttpResponse(json.dumps(content_response), content_type="application/json")
     return Http404
 
 @login_required
-def resend_token(request, token_surl, template_name="qwyre/issue_tokens.html"):
+def resend_token(request, token_surl, template_name="sqwyre/issue_tokens.html"):
     """
     Resend a valid token (and update recepient if that data is provided)
     """
@@ -303,8 +313,12 @@ def resend_token(request, token_surl, template_name="qwyre/issue_tokens.html"):
             try:    
                 resend_response = {'response': 'success',
                                    'recipient': data["recipient"]}
+                if request.user.facebook_name:
+                    usr_name = request.user.facebook_name
+                else:
+                    usr_name = request.user.username
                 email_kwargs = {'to': token_object.recipient,
-                                'subject': request.user.username + EMAIL_SUBJECT[data['template']] + token_object.novel.title,
+                                'subject': usr_name + EMAIL_SUBJECT[data['template']] + token_object.novel.title,
                                 'template': 'gift_purchase',
                                 'context': {'token_object': token_object,
                                             'website': request.META['HTTP_HOST'],
@@ -319,7 +333,7 @@ def resend_token(request, token_surl, template_name="qwyre/issue_tokens.html"):
     return render(request, template_name, locals())
 
 @login_required
-def issue_tokens(request, novel_surl, template_name="qwyre/issue_tokens.html"):
+def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
     """
     Issue and manage a list of tokens to users identified by book owner:
         - Lend up to TOKEN_LIMIT copies of novel;
@@ -327,17 +341,29 @@ def issue_tokens(request, novel_surl, template_name="qwyre/issue_tokens.html"):
         - Resend, reallocate and rename valid tokens;
     """
     novel_object = get_object_or_404(Novel, surl=novel_surl)
-    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     if request.user.is_superuser:
         return redirect('price_novel', novel_surl=novel_object.surl)
+    if novel_object.is_preorder:
+        return redirect('view_preorder', novel_surl=novel_object.surl)
+    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     if not request.user.reader.can_read(novel_object) == "purchased":
         return render(request, '404.html', status=403)
     page_title = novel_object.title
     page_subtitle = "Share and Manage"
     # Where 'issue' is actually 'lent' ... 
-    token_issued_list = Token.query.issued_list(request.user, novel_object)
-    token_refund_list = Token.query.valid_purchased(request.user, True)
-    token_purchased_list = Token.query.valid_purchased(request.user, False).all()
+    token_issued_list = (
+        Token.query.issued_list(novel_object)
+        .for_novel_and_reader(request.user, novel_object)
+    )
+    token_refund_list = (
+        Token.query.valid_purchased(True)
+        .for_novel_and_reader(request.user, novel_object)
+    )
+    token_purchased_list = (
+        Token.query.valid_purchased(False)
+        .for_novel_and_reader(request.user, novel_object)
+        .all()
+    )
     # only need one if intend to download, doesn't matter which since they did buy
     token_download = request.user.reader.current_token(purchased=True)
     tokens_remaining = novel_object.lendnumber - len(token_issued_list)
@@ -389,8 +415,12 @@ def issue_tokens(request, novel_surl, template_name="qwyre/issue_tokens.html"):
                             do_send = True
                         if do_send:
                             try:
+                                if request.user.facebook_name:
+                                    usr_name = request.user.facebook_name
+                                else:
+                                    usr_name = request.user.username
                                 email_kwargs = {'to': token_object.recipient,
-                                                'subject': request.user.username + EMAIL_SUBJECT['gift_lend'] +
+                                                'subject': usr_name + EMAIL_SUBJECT['gift_lend'] +
                                                 novel_object.title,
                                                 'template': 'gift_lend',
                                                 'context': {'token_object': token_object,
@@ -415,13 +445,13 @@ def issue_tokens(request, novel_surl, template_name="qwyre/issue_tokens.html"):
         refund_token_formset = RefundFormSet(queryset=token_refund_list.all(), prefix='refund')
     return render(request, template_name, locals())
 
-def redeem_token(request, token_surl, template_name="qwyre/redeem_token.html"):
+def redeem_token(request, token_surl, template_name="sqwyre/redeem_token.html"):
     token_object = get_object_or_404(Token, surl=token_surl)
-    user_has_purchased = sqwyd.user_has_purchased(request, token_object.novel)
+    user_has_purchased = request.user == token_object.creator
     if not token_object.is_purchased:
         days = token_object.novel.lenddays
     show_refund = False
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and not token_object.novel.is_preorder:
         # check if user already purchased this item and ignore redemption if they do
         if request.user.reader.can_read(token_object.novel) == "purchased":
             return redirect("issue_tokens", novel_surl=token_object.novel.surl)
@@ -435,9 +465,10 @@ def redeem_token(request, token_surl, template_name="qwyre/redeem_token.html"):
             return redirect("view_wiqi", wiqi_surl=token_object.novel.sentinal.surl)
     else:
         expiry = settings.S3_TIMER
-        if token_object.is_valid and \
-            token_object.is_purchased and \
-            not token_object.creator:
+        if (token_object.is_valid and
+            token_object.is_purchased and
+            (not token_object.creator or
+             user_has_purchased)):
             show_refund = True
             show_bitcoin_refund = False
         if show_refund and not token_object.charge["card"]:
@@ -452,58 +483,7 @@ def redeem_token(request, token_surl, template_name="qwyre/redeem_token.html"):
     pro_days = novel_object.lenddays
     return render(request, template_name, locals())
 
-def download_novel(request, token_surl, template_name="qwyre/download_novel.html"):
-    """
-    Return download links valid for S3_TIMER to all files in the appropriate S3 bucket.
-    Only return links if:
-        1. token is purchased and valid (for anonymous download, disable it);
-        2. token is purchased and user is authenticated;
-    Links will be valid for a specific amount of time.
-    """
-    token_object = get_object_or_404(Token, surl=token_surl)
-    can_download = False
-    cancel_token = False
-    downloads = {'response': 'failure'}
-    if token_object.is_purchased and token_object.is_valid:
-        kwargs = {}
-        kwargs["redeemer"] = None
-        if request.user.is_authenticated():
-            kwargs["redeemer"] = request.user
-        kwargs["redeemer_ip"] = sqwyd.get_user_ip(request)
-        can_download = True
-    if token_object.is_purchased and request.user.is_authenticated():
-        can_download = True
-    if can_download:
-        # Generate the time-limited AWS S3 link/s
-        # http://boto.readthedocs.org/en/latest/ref/s3.html#boto.s3.key.Key.generate_url
-        # http://ceph.com/docs/next/radosgw/s3/python/
-        # http://boto.readthedocs.org/en/latest/boto_config_tut.html may need is_secure=False, validate_certs=False
-        try:
-            conn = S3Connection(settings.S3_ACCESS_KEY_ID, settings.S3_SECRET_ACCESS_KEY, is_secure=False)
-            bucket = conn.get_bucket(settings.S3_EBOOK_BUCKET)
-            # prepare response
-            downloads = {'response': 'success',
-                         'timer': str(settings.S3_TIMER),
-                         'links': {}
-            }
-            # https://code.google.com/p/boto/wiki/GetAllKeys
-            for k in bucket.list(settings.S3_EBOOK_DOWNLOAD_FOLDER):
-                ky = k.key.replace(settings.S3_EBOOK_DOWNLOAD_FOLDER + "/", "")
-                if ky:
-                    downloads['links'][ky] = k.generate_url(settings.S3_TIMER)
-            if token_object.is_purchased and token_object.is_valid:
-                cancel_token = True
-        except (AWSConnectionError, S3DataError, S3ResponseError) as e:
-            cancel_token = False
-            downloads = {'response': 'failure'}
-        if cancel_token:
-            # i.e. only do this after the download links have been generated in case this whole thing crashes
-            token_object.redeem(**kwargs)
-    if request.is_ajax():
-        return HttpResponse(json.dumps(downloads), content_type="application/json")
-    return render(request, template_name, locals())
-
-def refund_token(request, token_surl, template_name="qwyre/refund_token.html"):
+def refund_token(request, token_surl, template_name="sqwyre/refund_token.html"):
     """
     Refund a valid token (even where part of a bulk-buy).
     If the user is not logged in, then only refund if the creator is anonymous.
@@ -564,7 +544,7 @@ def refund_token(request, token_surl, template_name="qwyre/refund_token.html"):
     return render(request, template_name, locals())
 
 @login_required
-def create_novel(request, template_name="qwyre/create_novel.html"):
+def create_novel(request, template_name="sqwyre/create_novel.html"):
     """
     Create the novel but does not yet populate the chapters.
     """
@@ -587,7 +567,7 @@ def create_novel(request, template_name="qwyre/create_novel.html"):
     return render(request, template_name, locals())
 
 @login_required
-def upload_docx(request, template_name="qwyre/create_novel.html"):
+def upload_docx(request, template_name="sqwyre/create_novel.html"):
     """
     Receive a file and return the components necessary for the user to organise and save it.
     """
@@ -604,7 +584,7 @@ def upload_docx(request, template_name="qwyre/create_novel.html"):
 
 # Next too https://docs.djangoproject.com/en/dev/topics/auth/default/#the-permission-required-decorator
 @login_required
-def organise_novel(request, novel_surl, template_name="qwyre/create_novel.html", permission="can_edit"):
+def organise_novel(request, novel_surl, template_name="sqwyre/create_novel.html", permission="can_edit"):
     """
     By default, permits the review of the Book wiqi, reorganising of chapter order,
     rights management and that sort of thing. With time, perhaps, this can be
@@ -631,7 +611,7 @@ def organise_novel(request, novel_surl, template_name="qwyre/create_novel.html",
     return render(request, template_name, locals())
 
 @login_required
-def price_novel(request, novel_surl, template_name="qwyre/price_novel.html", permission="can_edit"):
+def price_novel(request, novel_surl, template_name="sqwyre/price_novel.html", permission="can_edit"):
     """
     Set the price and view permissions required for each chapter.
     """
@@ -650,6 +630,25 @@ def price_novel(request, novel_surl, template_name="qwyre/price_novel.html", per
             formset.save()
     else:
         formset = WiqiPriceFormSet(queryset=novel_object.chapterlist.all())
+    # Get count of all unredeemed tokens related to novel
+    tokens_for_novel = (
+        Token.query.filter(novel=novel_object)
+        .valid_purchased(True)
+        .all()
+    )
+    token_valid_purchased_count = tokens_for_novel.count()
+    # Sales for each of the currencies
+    # https://docs.djangoproject.com/en/1.9/topics/db/aggregation/
+    # Dictionary comprehension: http://stackoverflow.com/a/14507637/295606
+    currency_dict = {k: v for (k, v) in settings.CURRENCY_CHOICE}
+    token_purchased_list = []
+    for c in currency_dict.keys():
+        tokens_for_currency = tokens_for_novel.filter(currency=c)
+        token_purchased_list.append({
+            'total': tokens_for_currency.aggregate(Sum('price')),
+            'count': tokens_for_currency.count(),
+            'symbol': currency_dict[c],
+        })
     return render(request, template_name, locals())
 
 @login_required
@@ -667,7 +666,11 @@ def market_tokens(request, novel_surl):
             data = request.POST
             # Process and test emails
             recipients = xtractemail(data["recipients"])
-            from_address = "%s <%s>" % (request.user.username, request.user.email)
+            if request.user.facebook_name:
+                usr_name = request.user.facebook_name
+            else:
+                usr_name = request.user.username
+            from_address = "%s <%s>" % (usr_name, request.user.email)
             kwargs = {}
             kwargs["creator"] = request.user
             kwargs["creator_ip"] = sqwyd.get_user_ip(request)
@@ -699,10 +702,45 @@ def market_tokens(request, novel_surl):
                 send_email(**email_kwargs)
                 market_response = {'response': 'success'}
             return HttpResponse(json.dumps(market_response), content_type="application/json")
+    raise Http404
+
+@login_required
+def preorder_reminder(request, novel_surl):
+    """
+    Email the list of readers who preordered the novel and who have yet to claim them.
+    """
+    if not request.user.is_superuser:
+        return render(request, '404.html', status=403)
+    novel_object = get_object_or_404(Novel, surl=novel_surl)
+    if request.method == "POST":
+        if request.is_ajax():
+            reminder_response = {'response': 'failure'}
+            # Get count of all unredeemed tokens related to novel
+            tokens_for_reminder= (
+                Token.query.filter(novel=novel_object)
+                .valid_purchased(True)
+                .all()
+            )
+            # Process emails
+            if request.user.facebook_name:
+                usr_name = request.user.facebook_name
+            else:
+                usr_name = request.user.username
+            from_address = "%s <%s>" % (usr_name, request.user.email)
+            for token_object in tokens_for_reminder:
+                email_kwargs = {'to': token_object.recipient,
+                                'from': from_address,
+                                'subject': EMAIL_SUBJECT['preorder_reminder'] + novel_object.title,
+                                'template': 'preorder_reminder',
+                                'context': {'token_object': token_object}
+                                }
+                send_email(**email_kwargs)
+            reminder_response = {'response': 'success'}
+            return HttpResponse(json.dumps(reminder_response), content_type="application/json")
     raise Http404 
 
 @login_required
-def administer_novel(request, template_name="qwyre/administer_novel.html", permission="can_edit"):
+def administer_novel(request, template_name="sqwyre/administer_novel.html", permission="can_edit"):
     """
     Present a list of novels and permit actions.
     """
@@ -712,10 +750,58 @@ def administer_novel(request, template_name="qwyre/administer_novel.html", permi
     page_title = "Qwyre List"
     return render(request, template_name, locals())
 
-def view_legal(request, novel_surl, template_name="qwyre/legal.html"):
-    novel_object = get_object_or_404(Novel, surl=novel_surl)
-    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
-    page_title = novel_object.title
+def download_novel(request, token_surl, template_name="sqwyre/download_novel.html"):
+    """
+    Return download links valid for S3_TIMER to all files in the appropriate S3 bucket.
+    Only return links if:
+        1. token is purchased and valid (for anonymous download, disable it);
+        2. token is purchased and user is authenticated;
+    Links will be valid for a specific amount of time.
+    """
+    token_object = get_object_or_404(Token, surl=token_surl)
+    can_download = False
+    cancel_token = False
+    downloads = {'response': 'failure'}
+    if token_object.is_purchased and token_object.is_valid:
+        kwargs = {}
+        kwargs["redeemer"] = None
+        if request.user.is_authenticated():
+            kwargs["redeemer"] = request.user
+        kwargs["redeemer_ip"] = sqwyd.get_user_ip(request)
+        can_download = True
+    if token_object.is_purchased and request.user.is_authenticated():
+        can_download = True
+    # Special case ... last chance to block if the novel has yet to be released
+    if token_object.novel.is_preorder:
+        can_download = False
+    if can_download:
+        # Generate the time-limited AWS S3 link/s
+        # http://boto.readthedocs.org/en/latest/ref/s3.html#boto.s3.key.Key.generate_url
+        # http://ceph.com/docs/next/radosgw/s3/python/
+        # http://boto.readthedocs.org/en/latest/boto_config_tut.html may need is_secure=False, validate_certs=False
+        try:
+            conn = S3Connection(settings.S3_ACCESS_KEY_ID, settings.S3_SECRET_ACCESS_KEY, is_secure=False)
+            bucket = conn.get_bucket(settings.S3_EBOOK_BUCKET)
+            # prepare response
+            downloads = {'response': 'success',
+                         'timer': str(settings.S3_TIMER),
+                         'links': {}
+            }
+            # https://code.google.com/p/boto/wiki/GetAllKeys
+            for k in bucket.list(settings.S3_EBOOK_DOWNLOAD_FOLDER):
+                ky = k.key.replace(settings.S3_EBOOK_DOWNLOAD_FOLDER + "/", "")
+                if ky:
+                    downloads['links'][ky] = k.generate_url(settings.S3_TIMER)
+            if token_object.is_purchased and token_object.is_valid:
+                cancel_token = True
+        except (AWSConnectionError, S3DataError, S3ResponseError) as e:
+            cancel_token = False
+            downloads = {'response': 'failure'}
+        if cancel_token:
+            # i.e. only do this after the download links have been generated in case this whole thing crashes
+            token_object.redeem(**kwargs)
+    if request.is_ajax():
+        return HttpResponse(json.dumps(downloads), content_type="application/json")
     return render(request, template_name, locals())
 
 @login_required
@@ -732,7 +818,7 @@ def reader_update(request):
             usr_name = data["name"]
             if usr_email and usr_name:
                 request.user.email = usr_email
-                request.user.username = usr_name
+                request.user.facebook_name = usr_name
                 request.user.optout = False
                 if data["optout"] == "true":
                     request.user.optout = True
@@ -741,5 +827,15 @@ def reader_update(request):
             return HttpResponse(json.dumps(usr_response), content_type="application/json")
     raise Http404
 
-def testing_novel(request, template_name="qwyre/testing_novel.html"):
+def testing_novel(request, template_name="sqwyre/testing_novel.html"):
+    return render(request, template_name, locals())
+
+@login_required
+def test_novel(request, novel_surl, template_name="sqwyre/test_novel.html"):
+    if not request.user.is_superuser:
+        return Http404
+    novel_object = get_object_or_404(Novel, surl=novel_surl)
+    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
+    page_title = novel_object.title
+    data = request.META
     return render(request, template_name, locals())

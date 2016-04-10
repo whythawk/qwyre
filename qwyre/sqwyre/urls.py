@@ -1,85 +1,111 @@
 from django.conf.urls import patterns, include, url
 
 # Django 1.9 url patterns
-from ..qwyre import views
+from ..sqwyre import views
 
 urlpatterns = [
+                ###########################################
+                ### Testing                             ###
+                ###########################################
                 url(r"^testing/", views.testing_novel,
-                    {"template_name": "qwyre/testing_novel.html"},
+                    {"template_name": "sqwyre/testing_novel.html"},
                     name="testing_novel"),
+                url(r"^(?P<novel_surl>[-\w]+)/test/", views.test_novel,
+                    {"template_name": "sqwyre/test_novel.html"},
+                    name="test_novel"),
+                ###########################################
+                ### Author Administration Views         ###
+                ###########################################
                 # Create / Edit Novel
                 url(r"^create/", views.create_novel,
-                    {"template_name": "qwyre/create_novel.html"},
+                    {"template_name": "sqwyre/create_novel.html"},
                     name="create_novel"),
                 # Organise the novel
                 url(r"^(?P<novel_surl>[-\w]+)/organise/", views.organise_novel,
-                    {"template_name": "qwyre/create_novel.html", "permission":"can_edit"},
+                    {"template_name": "sqwyre/create_novel.html", "permission":"can_edit"},
                     name="organise_novel"),
-                # View the chapters
-                url(r"^(?P<novel_surl>[-\w]+)/contents/", views.view_chapters,
-                    {"template_name": "qwyre/view_chapters.html"},
-                    name="view_chapters"),
                 # Set novel chapter pricing
                 url(r"^(?P<novel_surl>[-\w]+)/pricing/", views.price_novel,
-                    {"template_name": "qwyre/price_novel.html", "permission":"can_edit"},
+                    {"template_name": "sqwyre/price_novel.html", "permission":"can_edit"},
                     name="price_novel"),
-                # Issue and Redeem tokens
-                url(r"^(?P<novel_surl>[-\w]+)/tokens/issue/", views.issue_tokens,
-                    {"template_name": "qwyre/issue_tokens.html"},
-                    name="issue_tokens"),
-                url(r"^tokens/redeem/(?P<token_surl>[-\w]+)/", views.redeem_token,
-                    {"template_name": "qwyre/redeem_token.html"},
-                    name="redeem_token"),
-                url(r"^tokens/refund/(?P<token_surl>[-\w]+)/", views.refund_token,
-                    {"template_name": "qwyre/refund_token.html"},
-                    name="refund_token"),
-                url(r"^(?P<novel_surl>[-\w]+)/tokens/market/", views.market_tokens,
-                    name="market_tokens"),
-                # Email token link to user
-                url(r"^tokens/resend/(?P<token_surl>[-\w]+)/", views.resend_token,
-                    {"template_name": "qwyre/issue_tokens.html"},
-                    name="resend_token"),
-                # Buy and bulk-buy novel
-                url(r"^(?P<novel_surl>[-\w]+)/buy/", views.buy_novel,
-                    {"template_name": "qwyre/buy_novel.html"},
-                    name="buy_novel"),
-                # Download books based on one-time link
-                url(r"^download/(?P<token_surl>[-\w]+)/", views.download_novel,
-                    {"template_name": "qwyre/download_novel.html"},
-                    name="download_novel"),
+                ## Administer novel
+                # url(r"^sortit/", "administer_novel",
+                #    {"template_name": "sqwyre/administer_novel.html", "permission":"can_edit"},
+                #    name="administer_novel"),
+                ###########################################
+                ### Javascript Automation               ###
+                ###########################################
                 # JSONResponse settings
                 url(r"^(?P<novel_surl>[-\w]+)/settings/", views.novel_settings,
                     name="novel_settings"),
-                url(r"^(?P<novel_surl>[-\w]+)/setcontents/", views.set_chapters,
-                    name="set_chapters"),
+                url(r"^(?P<novel_surl>[-\w]+)/setcontents/", views.set_contents,
+                    name="set_contents"),
                 # Upload Docx
                 url(r"^docxtract/", views.upload_docx,
-                    {"template_name": "qwyre/docxtract.html"},
+                    {"template_name": "sqwyre/docxtract.html"},
                     name="upload_docx"),
-                ## Administer novel
-                # url(r"^sortit/", "administer_novel",
-                #    {"template_name": "qwyre/administer_novel.html", "permission":"can_edit"},
-                #    name="administer_novel"),
+                ###########################################
+                ### Purchase and Manage Tokens          ###
+                ###########################################
+                # Issue and Redeem tokens
+                url(r"^(?P<novel_surl>[-\w]+)/tokens/issue/", views.issue_tokens,
+                    {"template_name": "sqwyre/issue_tokens.html"},
+                    name="issue_tokens"),
+                url(r"^tokens/redeem/(?P<token_surl>[-\w]+)/", views.redeem_token,
+                    {"template_name": "sqwyre/redeem_token.html"},
+                    name="redeem_token"),
+                url(r"^tokens/refund/(?P<token_surl>[-\w]+)/", views.refund_token,
+                    {"template_name": "sqwyre/refund_token.html"},
+                    name="refund_token"),
+                url(r"^(?P<novel_surl>[-\w]+)/tokens/market/", views.market_tokens,
+                    name="market_tokens"),
+                url(r"^(?P<novel_surl>[-\w]+)/sendreminder/", views.preorder_reminder,
+                    name="preorder_reminder"),
+                # Email token link to user
+                url(r"^tokens/resend/(?P<token_surl>[-\w]+)/", views.resend_token,
+                    {"template_name": "sqwyre/issue_tokens.html"},
+                    name="resend_token"),
+                # Buy and bulk-buy novel
+                url(r"^(?P<novel_surl>[-\w]+)/buy/", views.buy_novel,
+                    {"template_name": "sqwyre/buy_novel.html"},
+                    name="buy_novel"),             
+                ###########################################
+                ### Reader Purchase Views               ###
+                ###########################################
+                # Download books based on one-time link
+                url(r"^download/(?P<token_surl>[-\w]+)/", views.download_novel,
+                    {"template_name": "sqwyre/download_novel.html"},
+                    name="download_novel"),
+                # Update reader details if logged in
+                url(r"^update/", views.reader_update, name="reader_update"),
+                ###########################################
+                ### Reader Views                        ###
+                ###########################################
                 # View Novel
                 url(r"^(?P<novel_surl>[-\w]+)/$", views.view_novel,
-                   {"template_name": "qwyre/index.html"},
+                   {"template_name": "sqwyre/index.html"},
                    name="view_novel"),
-                url(r"^(?P<novel_surl>[-\w]+)/test/", views.test_novel,
-                    {"template_name": "qwyre/test_novel.html"},
-                    name="test_novel"),
+                # Static pages
                 url(r"^(?P<novel_surl>[-\w]+)/about/", views.view_novel,
-                    {"template_name": "qwyre/about.html"},
+                    {"template_name": "sqwyre/about.html"},
                     name="about"),
                 url(r"^(?P<novel_surl>[-\w]+)/legal/", views.view_legal,
-                    {"template_name": "qwyre/legal.html"},
+                    {"template_name": "sqwyre/legal.html"},
                     name="legal"),
-                url(r"^update/", views.reader_update, name="reader_update"),
+                # View the chapters
+                url(r"^(?P<novel_surl>[-\w]+)/contents/", views.view_contents,
+                    {"template_name": "sqwyre/view_contents.html"},
+                    name="view_contents"),
+                # Still on preorder
+                url(r"^(?P<novel_surl>[-\w]+)/soon/", views.view_preorder,
+                    {"template_name": "sqwyre/view_preorder.html"},
+                    name="view_preorder"),
                 # url(r"^(?P<novel_surl>[-\w]+)/(?P<wiqi_surl>[-\w]+)/$", views.view_chapter,
-                #    {"template_name": "qwyre/view_chapter.html"},
+                #    {"template_name": "sqwyre/view_chapter.html"},
                 #    name="view_novel_chapter"),
                 url(r"^w/(?P<wiqi_surl>[-\w]+)/", views.view_chapter,
-                    {"template_name": "qwyre/view_text.html", "nav_type":"view"},
+                    {"template_name": "sqwyre/view_text.html", "nav_type":"view"},
                     name="view_wiqi"),
-                url(r'^$', views.view_novel, {"template_name": "qwyre/index.html"},
+                url(r'^$', views.view_novel, {"template_name": "sqwyre/index.html"},
                     name='index'),
                 ]

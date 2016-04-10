@@ -11,7 +11,7 @@
             <ul id="nav-user" class="nav navbar-nav">
             {% if novel_object %}
                 <li><a href="{% url 'index' %}">Cover</a></li>
-                <li><a href="{% url 'view_chapters' novel_object.surl %}">Contents</a></li>
+                <li><a href="{% url 'view_contents' novel_object.surl %}">Contents</a></li>
                 <li><a href="{% url 'about' novel_object.surl %}">About</a></li>
                 <li><a href="{% url 'legal' novel_object.surl %}">Legal</a></li>
                 {% if user_has_purchased or user.is_superuser %}
@@ -21,7 +21,6 @@
             </ul>
             <ul id="nav-login" class="nav navbar-nav pull-right">
             {% if not user.is_authenticated %}
-                {% comment "Facebookout" %}
                 <li><form action="{% url 'facebook_connect' %}?next={{ request.path }}&facebook_login=1"
                           class="navbar-form" method="post">
                     {% csrf_token %}
@@ -32,7 +31,6 @@
                     <a onclick="F.connect(this.parentNode); return false;"
                        href="javascript:void(0);"><span class="icon-facebook-square"></span> Login</a>
                 </form></li>
-                {% endcomment %}
             {% elif user.is_superuser %}
                 <li><a href="{% url 'usr_logout' %}">
                     {% if user.first_name or user.last_name %}

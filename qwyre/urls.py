@@ -25,6 +25,8 @@ from django.contrib.auth import views as dviews
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', views.serve),
     url(r'^admin/', admin.site.urls),
+    url(r'^facebook/', include('django_facebook.urls')),
+    url(r'^accounts/', include('django_facebook.auth_urls')),
     url(r'^logout/$', dviews.logout, {'next_page': '/'}, name='usr_logout'),
     url(r'^w/', include('qwyre.wiqi.urls')),
     url(r'^', include('qwyre.sqwyre.urls')),

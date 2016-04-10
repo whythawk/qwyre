@@ -23,10 +23,7 @@ LICENSE_CHOICE = (("(c)","All Rights Reserved"),
                   ("CC BY-NC-ND","CC Attribution + Noncommercial + NoDerivatives"),
                   ("CC BY-NC-SA","CC Attribution + Noncommercial + ShareAlike"))
 
-#http://character-code.com/currency-html-codes.php
-CURRENCY_CHOICE = (("gbp","&pound;"),
-    ("usd","$"),
-    ("eur","&euro;"))
+CURRENCY_CHOICE = settings.CURRENCY_CHOICE
 
 #http://stackoverflow.com/a/1190866
 def get_covername(self, filename):
@@ -94,7 +91,7 @@ class Novel(models.Model):
 
     class Meta:
         # http://www.nomadjourney.com/2009/11/splitting-up-django-models/
-        app_label = "qwyre"
+        app_label = "sqwyre"
         verbose_name_plural = "Novels"
         permissions = (
                        ("can_create", "Can create new novels."),
@@ -239,14 +236,19 @@ class Novel(models.Model):
 
     @property
     def is_preorder(self):
-        return self.is_live_from < pytz.UTC.localize(datetime.now())
+        return self.is_live_from > pytz.UTC.localize(datetime.now())
     
     @property
     def is_preorder_text(self):
-        if self.is_live_from < pytz.UTC.localize(datetime.now()):
+        if self.is_preorder:
             return "Preorder"
         else:
             return "Buy"
+
+    @property
+    def was_preorder(self):
+        # Quick check if this was ever a preorder ...
+        return abs((self.is_live_from - self.created_on).days) > 1
 
     @property
     def is_valid_isbn13(self):

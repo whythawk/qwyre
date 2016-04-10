@@ -39,35 +39,6 @@ def user_has_purchased(request, novel_object):
         return request.user.has_perm("purchased", novel_object)
     else:
         return False
-
-def save_user_view(usr, wiqi_object):
-    if usr.is_authenticated():
-        usr.current_view = wiqi_object.surl
-        usr.save()
-
-def get_user_view_rights(usr, wiqi_object):
-    """
-    Test the user viewing rights and update the current view for later reference;
-    If viewing free while logged in, update price to current maximum;
-    :param usr:
-    :param wiqi_object:
-    :return:
-    """
-    if wiqi_object.read_if == "open":
-        save_user_view(usr, wiqi_object)
-        return wiqi_object
-    if usr.is_authenticated():
-        can_read = usr.can_read(wiqi_object)
-        if wiqi_object.read_if == "login" \
-                or (wiqi_object.read_if == "own" and can_read):
-            if wiqi_object.price > usr.current_price and can_read != "borrowed":
-                # Leave the price as is if borrowed.
-                usr.current_price = wiqi_object.price
-            save_user_view(usr, wiqi_object)
-            return wiqi_object
-    # If user is not authenticated, or has no viewing rights,
-    # return False to force redirect to register/login, or to buy
-    return False
     
 def closeness(a, b):
     """

@@ -10,14 +10,14 @@ from qwyre.sqwyre.models import Novel
 from decimal import Decimal
 
 class Reader(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE) #settings.AUTH_USER_MODEL is changed
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     current_view = models.CharField(max_length=32, blank=True, verbose_name="Current chapter view.")
     current_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     optout = models.BooleanField(default=False)
 
     class Meta:
         # http://www.nomadjourney.com/2009/11/splitting-up-django-models/
-        app_label = "qwyre"
+        app_label = "sqwyre"
         verbose_name_plural = "Readers"
 
     def take_ownership(self, novel_object, view_perm):

@@ -11,7 +11,7 @@
             <ul id="nav-user" class="nav navbar-nav">
             {% if novel_object %}
                 <li><a href="{% url 'index' %}">Cover</a></li>
-                <li><a href="{% url 'view_chapters' novel_object.surl %}">Contents</a></li>
+                <li><a href="{% url 'view_contents' novel_object.surl %}">Contents</a></li>
                 <li><a href="{% url 'about' novel_object.surl %}">About</a></li>
                 <li><a href="{% url 'legal' novel_object.surl %}">Legal</a></li>
                 {% if user_has_purchased or user.is_superuser %}

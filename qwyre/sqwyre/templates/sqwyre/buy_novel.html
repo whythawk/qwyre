@@ -28,6 +28,11 @@
                id="stripePrice" name="stripePrice" />
         <input type="hidden" value="{% url 'novel_settings' novel_object.surl %}"
                id="stripeSettings" name="stripeSettings" />
+        {% if novel_object.is_preorder %}
+        <input type="hidden" value="preorder" id="mailTemplate" name="mailTemplate" />
+        {% else %}
+        <input type="hidden" value="purchase" id="mailTemplate" name="mailTemplate" />
+        {% endif %}
         <input type="hidden" value="{% url 'buy_novel' novel_object.surl %}" name="stripeBuy" id="stripeBuy" />
         <input type="hidden" value="{{ novel_object.is_preorder_text }}"
                id="novelPreorder" name="novelPreorder" />
@@ -48,14 +53,15 @@
             <li id="forex_btc" data-value="{{ fx.btc }}"><a href="#">BTC</a></li>
         </ul>
     </div>
-    <div class="row col-xs-12 text-center" id="buynowresponse"><span class="smallprint">For Kindle & ePub readers.
-    Payments securely processed by Stripe. Select BTC or USD from <span class="caret"></span> for
-    <em>Bitcoin</em>. This site never has access to your credit card number. Please review our
-    <a href="{% url 'legal' novel_object.surl %}">Terms of Service</a></span>
-    {% if novel_object.is_preorder %}
-    <span class="smallprint"><b>Note:</b> {{ novel_object.title }}
-    will be released on {{ novel_object.is_live_from|date:"d F Y" }}. If you preorder now, you will
-    receive your download token immediately, but it will only be active after release.</span>
-    {% endif %}
+    <div class="row col-xs-12 text-center" id="buynowresponse">
+        <span class="smallprint">For Kindle & ePub readers.
+        Payments securely processed by Stripe. Select BTC or USD from <span class="caret"></span> for
+        <em>Bitcoin</em>. This site never has access to your credit card number. Please review our
+        <a href="{% url 'legal' novel_object.surl %}">Terms of Service</a></span>
+        {% if novel_object.is_preorder %}
+        <span class="smallprint"><b>Note:</b> {{ novel_object.title }}
+        will be released on {{ novel_object.is_live_from|date:"d F Y" }}. If you preorder now, you will
+        receive your download token immediately, but it will only be active after release.</span>
+        {% endif %}
     </div>
 </div>
