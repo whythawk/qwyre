@@ -7,7 +7,7 @@ class NovelForm(forms.ModelForm):
         self.fields['is_live_from'].widget.attrs['class'] = 'datepicker'
     class Meta:
         model = Novel
-        fields = ('title', 'pitch', 'defaultprice', 'is_live_from')
+        fields = ('title', 'pitch', 'is_live_from')
         # https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#overriding-the-default-fields
         widgets = {
             'pitch': forms.Textarea(attrs={'cols': 120, 'rows': 5}),

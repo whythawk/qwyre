@@ -14,7 +14,7 @@ from decimal import Decimal
 from guardian.shortcuts import get_objects_for_user
 from bs4 import BeautifulSoup
 
-from ..sqwyre.models import Novel, Token, Reader
+from ..sqwyre.models import Novel, Token, Reader, GlobalPrice
 from ..sqwyre.forms import NovelForm, TokenForm, BulkBuyForm
 from ..wiqi.models import Wiqi
 from ..wiqi.forms import WiqiPriceForm
@@ -42,6 +42,7 @@ def view_novel(request, novel_surl=None, template_name="sqwyre/index.html"):
         if not novel_object:
             return redirect("create_novel")
         novel_object = novel_object[0]
+    price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
     user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     page_title = novel_object.title
     page_subtitle = "Start Reading"
@@ -50,7 +51,7 @@ def view_novel(request, novel_surl=None, template_name="sqwyre/index.html"):
     # forex and pricing settings
     fx = get_forex()
     fxd = novel_object.defaultcurrency
-    page_price = novel_object.sentinal.price
+    page_price = price_object.price
     show_buy = False
     if novel_object.show_buy:
         show_buy = True
@@ -71,6 +72,7 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
                                                nav_type)
     if wiqi_object:
         template_name = "sqwyre/view_%s.html" % wiqi_object.get_class
+        price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
         try:
             chapter_title = wiqi_object.stack.title
             # Kludge for novel title
@@ -102,10 +104,10 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
         fx = get_forex()
         fxd = novel_object.defaultcurrency
         try:
-            page_price = wiqi_object.price
+            page_price = (wiqi_object.price + 1) * price_object.price
         except:
             # It's a wiqi_object
-            page_price = wiqi_object.wiqi.price
+            page_price = (wiqi_object.wiqi.price + 1) * price_object.price
         show_buy = False
         if novel_object.show_buy:
             show_buy = True
@@ -114,12 +116,12 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
             if can_read == "purchased":
                 show_buy = False
             elif can_read == "borrowed":
-                page_price = novel_object.sentinal.price
+                page_price = price_object.price
             elif request.user.reader.current_price > page_price:
                 page_price = request.user.reader.current_price
-        if show_buy and next_wiqi and page_price < next_wiqi.price:
+        if show_buy and next_wiqi and page_price < (next_wiqi.price+1)*price_object.price:
             # Only appears if the next page price > than user current price
-            next_price = next_wiqi.price
+            next_price = (next_wiqi.price + 1) * price_object.price
     else:
         return redirect('index')
     if request.is_ajax():
@@ -129,14 +131,15 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
 
 def view_contents(request, novel_surl, template_name="sqwyre/view_contents.html"):
     novel_object = get_object_or_404(Novel, surl=novel_surl)
+    price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
     user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     page_title = novel_object.title
     page_subtitle = "Chapters"
     chapter_objects = json.loads(novel_object.chapterformat)
     # forex and pricing settings
     fx = get_forex()
-    fxd = novel_object.defaultcurrency
-    page_price = novel_object.sentinal.price
+    fxd = price_object.currency
+    page_price = price_object.price
     show_buy = True
     can_read = False
     if request.user.is_authenticated():
@@ -268,13 +271,14 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
 def novel_settings(request, novel_surl):
     if request.is_ajax():
         novel_object = get_object_or_404(Novel, surl=novel_surl)
+        price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
         a = sqwyd.get_user_ip(request)
         response_dict = {'settings': {
             'stripe_key': settings.STRIPE_PUBLISHABLE_KEY,
             'bulk_discount': novel_object.discountpercent,
             'bulk_volume': novel_object.discountvolume,
-            'bulk_price': novel_object.sentinal.price,
-            'novel_price': novel_object.sentinal.price,
+            'bulk_price': price_object.price,
+            'novel_price': price_object.price,
             'novel_title': novel_object.title,
             'user_email': ''
             }
@@ -350,6 +354,7 @@ def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
         return render(request, '404.html', status=403)
     page_title = novel_object.title
     page_subtitle = "Share and Manage"
+    price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
     # Where 'issue' is actually 'lent' ... 
     token_issued_list = (
         Token.query.issued_list(novel_object)
@@ -375,8 +380,8 @@ def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
     RefundFormSet = modelformset_factory(Token, form=TokenForm, extra=0)
     # forex settings
     fx = get_forex()
-    fxd = novel_object.defaultcurrency
-    fxp = int(novel_object.sentinal.price*100)
+    fxd = price_object.currency
+    fxp = int(price_object.price*100)
     if request.method == "POST":
         send_list = []
         # http://stackoverflow.com/questions/1395807/proper-way-to-handle-multiple-forms-on-one-page-in-django
@@ -603,7 +608,6 @@ def organise_novel(request, novel_surl, template_name="sqwyre/create_novel.html"
             kwargs["common"] = {"creator": request.user,
                                 "creator_ip": sqwyd.get_user_ip(request),
                                 "WiqiStack": wiqid.get_wiqi_or_404('text'),
-                                "price": novel_object.defaultprice,
                                 "is_live_from": novel_object.is_live_from,
                                 }
             novel_object = novel_object.add_chapters(**kwargs)

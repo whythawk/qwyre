@@ -40,7 +40,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.query import QuerySet
 from django.db.models import Q
 # Allowing generic relations - https://docs.djangoproject.com/en/1.9/ref/contrib/contenttypes/#generic-relations
-#         content_type = models.ForeignKey(ContentType)
+#         content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
 #         object_id = models.PositiveIntegerField()
 #         content_object = GenericForeignKey("content_type", "object_id")
 from django.conf import settings
@@ -58,20 +58,9 @@ from decimal import Decimal
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import assign_perm, get_objects_for_user, get_perms
 
-LICENCE_CHOICE = (("(c)","All Rights Reserved"),
-                  ("CC0","No Rights Reserved"),
-                  ("CC BY","CC Attribution"),
-                  ("CC BY-ND","CC Attribution + NoDerivatives"),
-                  ("CC BY-SA","CC Attribution + ShareAlike"),
-                  ("CC BY-NC","CC Attribution + Noncommercial"),
-                  ("CC BY-NC-ND","CC Attribution + Noncommercial + NoDerivatives"),
-                  ("CC BY-NC-SA","CC Attribution + Noncommercial + ShareAlike"))
-
 READ_IF_CHOICE = (("open","Open"),
                   ("login","Login"),
                   ("own","Own"))
-
-CURRENCY_CHOICE = settings.CURRENCY_CHOICE
 
 #########################################################################################################################################
 # Main Wiqi Class
@@ -97,21 +86,27 @@ class Wiqi(models.Model):
     is_active = models.BooleanField(default=True)
     is_searchable = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
-    stack_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_base", null=True)
+    stack_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_base",
+                                           null=True, on_delete=models.CASCADE)
     stack_object_id = models.PositiveIntegerField(null=True)
     stack = GenericForeignKey("stack_content_type", "stack_object_id")
-    branched_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_branched", null=True)
-    branched_object_id = models.PositiveIntegerField(null=True)
+    branched_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_branched",
+                                              null=True, blank=True, on_delete=models.CASCADE)
+    branched_object_id = models.PositiveIntegerField(null=True, blank=True)
     branched = GenericForeignKey("branched_content_type", "branched_object_id")
     branchlist = models.ManyToManyField("self", blank=True)
-    merged_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_merged", null=True)
-    merged_object_id = models.PositiveIntegerField(null=True)
+    merged_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_merged",
+                                            null=True, blank=True, on_delete=models.CASCADE)
+    merged_object_id = models.PositiveIntegerField(null=True, blank=True)
     merged = GenericForeignKey("merged_content_type", "merged_object_id")
-    next_wiqi = models.ForeignKey("self", related_name="%(app_label)s_%(class)s_next", null=True)
-    previous_wiqi = models.ForeignKey("self", related_name="%(app_label)s_%(class)s_previous", null=True)
-    currency = models.CharField(max_length=7, choices=CURRENCY_CHOICE, default="gbp")
+    next_wiqi = models.ForeignKey("self", related_name="%(app_label)s_%(class)s_next",
+                                  null=True, blank=True, on_delete=models.CASCADE)
+    previous_wiqi = models.ForeignKey("self", related_name="%(app_label)s_%(class)s_previous",
+                                      null=True, blank=True, on_delete=models.CASCADE)
     read_if = models.CharField(max_length=5, choices=READ_IF_CHOICE, default="own")
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    currency = models.CharField(max_length=7, choices=settings.CURRENCY_CHOICE,
+                                default=settings.CURRENCY_DEFAULT)
     wiqi_objects = WiqiManager() # To extend QuerySet in derived classes
 
     class QuerySet(QuerySet):
@@ -337,8 +332,9 @@ class WiqiStack(models.Model):
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="%(app_label)s_%(class)s_creator")
     creator_ip = models.GenericIPAddressField(blank=True, null=True, default="255.255.255.255")
     created_on = models.DateTimeField(auto_now_add=True)
-    licence = models.CharField(max_length=50, choices=LICENCE_CHOICE, default="All Rights Reserved", 
-                               verbose_name="Release Licence", help_text="What form of copyright do you offer?")
+    licence = models.CharField(max_length=50, choices=settings.LICENCE_CHOICE,
+                               default=settings.LICENCE_DEFAULT, verbose_name="Release Licence",
+                               help_text="What form of copyright do you offer?")
     citation = models.CharField(max_length=150, blank=True, default="",
                                 help_text="Please reference the original creator, if it wasn't you.")
     jsonresponse = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict}, blank=True, null=True)

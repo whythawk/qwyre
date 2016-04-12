@@ -31,6 +31,16 @@ def get_user_country(request):
     # https://support.cloudflare.com/hc/en-us/articles/205072537-What-are-the-two-letter-country-codes-for-the-Access-Rules-
     return request.META.get('HTTP_CF_IPCOUNTRY', 'GB')
 
+def get_price_object(novel_object, country_code):
+    """
+    Return only one price. If the queryset returns > 1, return the default price for
+    this novel_object. If there's a complete glitch, that's a human-error clusterfuck.
+    """
+    pricelist = GlobalPrice.query.country_price(country_code, novel_object).all()
+    if len(pricelist) > 1:
+        pricelist = GlobalPrice.query.country_price(settings.COUNTRY_DEFAULT, novel_object).all()
+    return pricelist[0]
+
 def user_has_purchased(request, novel_object):
     """
     We need to return whether or not the user has purchased a copy of the novel being viewed.
@@ -61,9 +71,9 @@ def check_fraud(user, novel_object, data_object, data_length):
     data_object is the data received from the user
     """
     try:
-        check_price = novel_object.sentinal.price * 100
+        check_price = novel_object.get_price_object.price * 100
         if data_object.get("selfPurchase", False) == "true" and user.is_authenticated():
-            if user.reader.current_price > novel_object.sentinal.price:
+            if user.reader.current_price > novel_object.get_price_object.price:
                 check_price = user.reader.current_price * 100
         received_price = int(data_object["stripePrice"])
         fx = get_forex().get(data_object["stripeCurrency"].lower(), False)

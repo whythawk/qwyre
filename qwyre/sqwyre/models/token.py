@@ -10,8 +10,6 @@ from qwyre.sqwyre.models import Novel
 from jsonfield import JSONField
 from decimal import Decimal
 
-CURRENCY_CHOICE = settings.CURRENCY_CHOICE
-
 class TokenQuerySet(QuerySet):
     # https://docs.djangoproject.com/en/dev/topics/db/managers/#calling-custom-queryset-methods-from-the-manager
     def issued_list(self, novel_object):
@@ -55,20 +53,23 @@ class TokenManager(models.Manager):
 
 class Token(models.Model):
     surl = models.CharField(max_length=25, unique=True, verbose_name="Short URL")
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="%(class)s_creator")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                related_name="%(class)s_creator", on_delete=models.CASCADE)
     creator_ip = models.GenericIPAddressField(blank=True, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
     country_code = models.CharField(max_length=2, default="GB") # For the purchaser
-    redeemer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="%(class)s_redeemer")
+    redeemer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                 related_name="%(class)s_redeemer", on_delete=models.CASCADE)
     redeemer_ip = models.GenericIPAddressField(blank=True, null=True)
     redeemed_on = models.DateTimeField(blank=True, null=True)
     stripe_id = models.CharField(max_length=30, verbose_name="Stripe ID", null=True, blank=True)
-    novel = models.ForeignKey(Novel, blank=True, null=True)
+    novel = models.ForeignKey(Novel, blank=True, null=True, on_delete=models.CASCADE)
     is_valid = models.BooleanField(default=True)
     is_purchased = models.BooleanField(default=False)
     is_preorder = models.BooleanField(default=False)
     charge = JSONField(blank=True, null=True)
-    currency = models.CharField(max_length=7, choices=CURRENCY_CHOICE, default="gbp")
+    currency = models.CharField(max_length=7, choices=settings.CURRENCY_CHOICE,
+                                default=settings.CURRENCY_DEFAULT)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     recipient = models.EmailField(blank=True, null=True, verbose_name="Email")
     query = TokenManager()

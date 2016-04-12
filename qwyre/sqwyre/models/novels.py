@@ -1,6 +1,7 @@
 from django.db import models, IntegrityError
 from django.core.urlresolvers import reverse
 from qwyre.wiqi.models import Wiqi
+from qwyre.sqwyre import qwyre as sqwyd
 
 from django.conf import settings
 from guardian.shortcuts import assign_perm
@@ -11,83 +12,60 @@ from bs4 import BeautifulSoup
 from jsonfield import JSONField
 from decimal import Decimal
 import collections
-import shortuuid as shrtn
+#import shortuuid as shrtn
+from django.utils.text import slugify
 import re
-
-LICENSE_CHOICE = (("(c)","All Rights Reserved"),
-                  ("CC0","No Rights Reserved"),
-                  ("CC BY","CC Attribution"),
-                  ("CC BY-ND","CC Attribution + NoDerivatives"),
-                  ("CC BY-SA","CC Attribution + ShareAlike"),
-                  ("CC BY-NC","CC Attribution + Noncommercial"),
-                  ("CC BY-NC-ND","CC Attribution + Noncommercial + NoDerivatives"),
-                  ("CC BY-NC-SA","CC Attribution + Noncommercial + ShareAlike"))
-
-CURRENCY_CHOICE = settings.CURRENCY_CHOICE
-
-#http://stackoverflow.com/a/1190866
-def get_covername(self, filename):
-    return '/'.join([self.creator.username, 'covers', filename])
-def get_ebookname(self, filename):
-    return '/'.join([self.creator.username, 'ebooks', filename])
 
 class Novel(models.Model):
     """
-    Fixed point for wiqistack with methods for editing and listing history.
-    Access to the stack must come from the reverse relationship..
+    The novel contains a list of chapters links (wiqis) and all data required for managing
+    and distributing sales.
+    Since there can be multiple ISBNs and multiple sales channels, it may be necessary to
+    spin these fields out into their own models at some point.
     """
-    surl = models.CharField(max_length=16, unique=True, verbose_name="Short URL")
+    # Core fields
+    surl = models.CharField(max_length=30, unique=True, verbose_name="Short URL")
+    slug = models.SlugField(unique=True, verbose_name="Slugified URL")
     title = models.CharField(blank=True, max_length=250, verbose_name="Title",
                              help_text="This may be used as a title, section or figure heading.")
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="%(class)s_creator")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
+                                related_name="%(class)s_creator", on_delete=models.CASCADE)
     creator_ip = models.GenericIPAddressField(blank=True, null=True, default="255.255.255.255")
     created_on = models.DateTimeField(auto_now_add=True)
     is_live_from = models.DateTimeField(blank=True, null=True, default=datetime.now, verbose_name="Publish from", 
                                         help_text="Leave blank to publish immediately, otherwise select a future publication date.")
-    licensing = models.CharField(max_length=50, choices=LICENSE_CHOICE, default="(c)",
-                               verbose_name="Release License", help_text="What form of copyright do you offer?")
+    # Chapters and content
     jsonresponse = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict}, blank=True, null=True)
-    authors = models.CharField(max_length=250, blank=True,
-                               verbose_name="Author names",
-                               help_text="Comma-separated list of all authors.")
-    authorsort = models.CharField(max_length=250, blank=True,
-                                  verbose_name="Sortable author list",
-                                  help_text="Author list by 'surname, name'; for listing.")
-    pitch = models.CharField(max_length=503, blank=True,
-                               verbose_name="Elevator Pitch",
-                               help_text="You have 503 characters. Sell it to me.")
-    summary = models.TextField(blank=True, verbose_name="Summary",
-                               help_text="The back cover of your book.")
-    language = models.CharField(max_length=50, blank=True,
-                                verbose_name="Published language",
-                                help_text="The language you're writing in.")
-    series = models.CharField(max_length=150, blank=True,
-                              verbose_name="Book series",
-                              help_text="Is the book part of a series?")
-    series_index = models.CharField(max_length=10, blank=True,
-                                    verbose_name="Series index",
-                                    help_text="What number in the series?")
-    ISBN = models.CharField(max_length=40, blank=True,
-                            verbose_name="13-digit ISBN for your book.",
-                            help_text="Enter the 13-digit ISBN for your book. Can include dashes or spaces.")
-    cover_image = models.ImageField(upload_to=get_covername, blank=True)
     chapterlist = models.ManyToManyField(Wiqi, related_name="%(class)s_chapterlist", blank=True)
     chapterformat = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict}, blank=True, null=True)
     sentinal = models.OneToOneField(Wiqi, related_name="%(class)s_sentinal", blank=True, null=True)
     word_count = models.IntegerField(blank=True, null=True)
-    cover_banner = models.ImageField(upload_to=get_covername, blank=True)
-    cover_thumbnail = models.ImageField(upload_to=get_covername, blank=True)
-    ebook_epub = models.FileField(upload_to=get_ebookname, blank=True)
-    ebook_mobi = models.FileField(upload_to=get_ebookname, blank=True)
-    ebook_pdf = models.FileField(upload_to=get_ebookname, blank=True)
-    ebook_azw = models.FileField(upload_to=get_ebookname, blank=True)
+    # Managing sales and distribution
     show_buy = models.BooleanField(default=True)
-    defaultcurrency = models.CharField(max_length=7, choices=CURRENCY_CHOICE, default="gbp")
-    defaultprice = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     discountvolume = models.IntegerField(default=0)
     discountpercent = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     lendnumber = models.IntegerField(default=0)
     lenddays = models.IntegerField(default=0)
+    defaultcurrency = models.CharField(max_length=7, choices=settings.CURRENCY_CHOICE,
+                                       default=settings.CURRENCY_DEFAULT)
+    # Novel info
+    pitch = models.CharField(max_length=503, blank=True, null=True,
+                               verbose_name="Elevator Pitch",
+                               help_text="You have 503 characters. Sell it to me.")
+    summary = models.TextField(blank=True, null=True, verbose_name="Summary",
+                               help_text="The back cover of your book.")
+    authors = models.CharField(max_length=250, blank=True, null=True,
+                               verbose_name="Author names",
+                               help_text="Comma-separated list of all authors.")
+    authorsort = models.CharField(max_length=250, blank=True, null=True,
+                                  verbose_name="Sortable author list",
+                                  help_text="Author list by 'surname, name'; for listing.")
+    licensing = models.CharField(max_length=50, choices=settings.LICENCE_CHOICE,
+                                 default=settings.LICENCE_DEFAULT,
+                               verbose_name="Release License", help_text="What form of copyright do you offer?")
+    language = models.CharField(max_length=50, blank=True, null=True,
+                                verbose_name="Published language",
+                                help_text="The language you're writing in.")
 
     class Meta:
         # http://www.nomadjourney.com/2009/11/splitting-up-django-models/
@@ -139,16 +117,21 @@ class Novel(models.Model):
             #     break
         # From Stackoverflow: http://stackoverflow.com/a/5775791
         title = BeautifulSoup(kwargs.get("title", "")[:250], "html.parser").get_text().strip()
-        self.surl = "".join(item[0].lower() for item in re.findall("\w+", title))
+        self.surl = slugify(title)
+        self.slug = slugify(title) # leaves open the future in which we have a surl and slug
+        #self.surl = "".join(item[0].lower() for item in re.findall("\w+", title))
         self.save()
         self.title = BeautifulSoup(kwargs.get("title", "")[:250], "html.parser").get_text().strip()
         self.creator = kwargs["creator"]
         self.creator_ip = kwargs.get("creator_ip",None)
         self.licensing = kwargs.get("licensing","(c)")
         self.pitch = BeautifulSoup(kwargs.get("pitch", "")[:503], "html.parser").get_text().strip()
-        self.defaultprice = kwargs.get("defaultprice", "0.00")
         self.is_live_from = kwargs.get("is_live_from", pytz.UTC.localize(datetime.now()))
         self.save()
+        # Now set the default price for this novel
+        self.set_defaultprice(kwargs.get("defaultprice", "0.00"),
+                              kwargs.get("defaultcurrency", settings.CURRENCY_DEFAULT)
+                              )
 
     def assign_all_perm(self, usr):
         for perm, perm_text in self._meta.permissions:
@@ -250,10 +233,20 @@ class Novel(models.Model):
         # Quick check if this was ever a preorder ...
         return abs((self.is_live_from - self.created_on).days) > 1
 
-    @property
-    def is_valid_isbn13(self):
+    def set_defaultprice(self, price, currency):
+        """
+        This is only called when a novel is created. If it exists (i.e. there is a price
+        associated with this novel) ignore this.
+        """
+        price_object, created = GlobalPrice.objects.get_or_create(novel=self)
+        if created:
+            price_object.price = price
+            price_object.currency = currency
+            price_object.save()
+
+    def is_valid_isbn13(self, test_isbn):
         # http://stackoverflow.com/a/1249424
-        isbn = re.sub("[^0-9]", "", self.ISBN)
+        isbn = re.sub("[^0-9]", "", test_isbn)
         # http://en.wikipedia.org/wiki/International_Standard_Book_Number
         check = (10 - (sum(int(digit) * (3 if idx % 2 else 1) for idx, digit in enumerate(isbn[:12])) % 10)) % 10
         return check == int(isbn[-1])

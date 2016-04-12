@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib import admin
-from ..sqwyre.models import Novel, Token, Reader
+from ..sqwyre.models import Novel, Token, Reader, CountryCode
 from django_facebook import models
 from guardian.admin import GuardedModelAdmin
 from django.conf import settings
@@ -46,3 +46,12 @@ class UserAdmin(BaseUserAdmin):
 # Re-register UserAdmin
 admin.site.unregister(models.FacebookCustomUser)
 admin.site.register(models.FacebookCustomUser, UserAdmin)
+
+class CountryCodeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name',)
+    list_display_links = ('code',)
+    list_per_page = 50
+    ordering = ['code']
+    search_fields = ['code', 'name']
+
+admin.site.register(CountryCode, CountryCodeAdmin)
