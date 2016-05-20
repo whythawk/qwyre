@@ -8,16 +8,15 @@ import simplejson as json         # Allows the data to be decoded
 CURRENCY_CHOICE = ("gbp", "usd", "eur", "btc")
 BASE_CURRENCY = "gbp"
 
-def get_forex():
+def get_forex(currency=BASE_CURRENCY):
     # https://openexchangerates.org/quick-start
-    fx = cache.get('forex_key', 'has expired')
-    if fx == 'has expired':
+    full_fx = cache.get('full_forex_key', 'has expired')
+    if full_fx == 'has expired':
         # Get the latest currency rates from the API
         latest = urllib2.urlopen(settings.OPEXRATE_API_URL)
         full_fx = json.loads(latest.read())
-        fx = {}
-        for c in CURRENCY_CHOICE:
-            fx[c] = full_fx['rates'][c.upper()]/full_fx['rates'][BASE_CURRENCY.upper()]
         cache.set('full_forex_key', full_fx)
-        cache.set('forex_key', fx)
+    fx = {}
+    for c in CURRENCY_CHOICE:
+        fx[c] = full_fx['rates'][c.upper()]/full_fx['rates'][currency.upper()]
     return fx

@@ -58,17 +58,15 @@ def get_user_view_rights(usr, wiqi_object):
     :param wiqi_object:
     :return:
     """
+    save_user_view(usr, wiqi_object)
     if wiqi_object.read_if == "open":
-        save_user_view(usr, wiqi_object)
         return wiqi_object
     if usr.is_authenticated():
+        if wiqi_object.read_if == "logfree":
+            return wiqi_object
         can_read = usr.reader.can_read(wiqi_object)
         if wiqi_object.read_if == "login" \
                 or (wiqi_object.read_if == "own" and can_read):
-            if wiqi_object.price > usr.reader.current_price and can_read != "borrowed":
-                # Leave the price as is if borrowed.
-                usr.reader.current_price = wiqi_object.price
-            save_user_view(usr, wiqi_object)
             return wiqi_object
     # If user is not authenticated, or has no viewing rights,
     # return False to force redirect to register/login, or to buy

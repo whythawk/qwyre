@@ -47,7 +47,7 @@
                 <div class="col-md-6 col-md-push-3">
                     <div id="buyresponse" >
                         <div class="col-xs-12 text-center">
-                            {% if show_buy %}
+                            {% if can_buy %}
                             {% block buynovel %}
                                 {% include 'sqwyre/buy_novel.html' %}
                             {% endblock buynovel %}
@@ -62,7 +62,7 @@
 {% endblock content %}
 
 {% block extrascripts %}
-{% if show_buy %}
+{% if can_buy %}
 <script src="https://checkout.stripe.com/checkout.js"></script>
 <script src="{% static 'js/jquery.whyqd.buy.js' %}"></script>
 {% endif %}

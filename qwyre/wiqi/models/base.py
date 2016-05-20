@@ -58,9 +58,11 @@ from decimal import Decimal
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import assign_perm, get_objects_for_user, get_perms
 
-READ_IF_CHOICE = (("open","Open"),
-                  ("login","Login"),
-                  ("own","Own"))
+READ_IF_CHOICE = (
+    ("open","Open"),
+    ("logfree", "Login (Free)"),
+    ("login","Login (Buy)"),
+    ("own","Own"))
 
 #########################################################################################################################################
 # Main Wiqi Class
@@ -103,7 +105,7 @@ class Wiqi(models.Model):
                                   null=True, blank=True, on_delete=models.CASCADE)
     previous_wiqi = models.ForeignKey("self", related_name="%(app_label)s_%(class)s_previous",
                                       null=True, blank=True, on_delete=models.CASCADE)
-    read_if = models.CharField(max_length=5, choices=READ_IF_CHOICE, default="own")
+    read_if = models.CharField(max_length=10, choices=READ_IF_CHOICE, default="own")
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     currency = models.CharField(max_length=7, choices=settings.CURRENCY_CHOICE,
                                 default=settings.CURRENCY_DEFAULT)

@@ -13,13 +13,39 @@
         </div>
         <div class="row col-md-10 col-md-push-1 tabs-block">
             <ul id="share-tabs" class="nav nav-tabs" role="tablist">
-                <li class="active"><a href="#tab-price" data-toggle="tab">Price</a></li>
+                <li class="active"><a href="#tab-pricing" data-toggle="tab">Pricing</a></li>
+                <li><a href="#tab-paging" data-toggle="tab">Paging</a></li>
                 <li><a href="#tab-structure" data-toggle="tab">Structure</a></li>
                 <li><a href="#tab-market" data-toggle="tab">Market</a></li>
-                <li><a href="#tab-manage" data-toggle="tab">Manage</a></li>
+                <li><a href="#tab-sales" data-toggle="tab">Sales</a></li>
             </ul>
             <div id="share-tab-content" class="tab-content">
-                <div id="tab-price" class="tab-pane active">
+                <div id="tab-pricing" class="tab-pane active">
+                    <p></p>
+                    <p>This is a list of global pricing patterns. Create or edit based on templates
+                    or create your own.</p>
+                    <form action="" method="POST" class="inline">
+                        {% csrf_token %}
+                        {% for region, action, link, delete, dlink in show_price_list %}
+                             <div class="row">
+                                <div class="col-xs-6">
+                                {{ region }}
+                                </div>
+                                <div class="col-xs-6">
+                                    <button type="submit" class="btn btn-refund"
+                                            id="globalpricing_{{forloop.counter0}}"
+                                            value="{{ link }}">{{ action }}</button>
+                                    {% if delete != "False" %}
+                                    <button type="submit" class="btn btn-refund"
+                                            id="pricedelete_{{forloop.counter0}}"
+                                            value="{{ dlink }}">{{ delete }}</button>
+                                    {% endif %}
+                                </div>
+                             </div>
+                        {% endfor %}
+                    </form>
+                </div>
+                <div id="tab-paging" class="tab-pane">
                     <p></p>
                     <form action="" method="POST" class="inline">
                         {% csrf_token %}
@@ -112,7 +138,7 @@
                                 id="market_tokens" value="save">Send</button>
                     </form>
                 </div>
-                <div id="tab-manage" class="tab-pane">
+                <div id="tab-sales" class="tab-pane">
                     <p></p>
                     {% if novel_object.was_preorder and not novel_object.is_preorder and token_valid_purchased_count %}
                     <form action="" method="POST">
@@ -127,18 +153,23 @@
                     <small>{{ novel_object.is_live_from|naturalday:"l, d F Y" }}</small>
                     {% endif %}
                     <p></p>
-                    <table style="width:30%">
-                        <tr>
-                            <th style="text-align:left">Total</th>
-                            <th style="text-align:left">Count</th>
-                        </tr>
-                    {% for r in token_purchased_list %}
-                        <tr>
-                            <td>{{ r.symbol|safe}} {{ r.total.price__sum }}</td>
-                            <td>{{ r.count }}</td>
-                        </tr>
+                    {% for key, r_dict in token_purchased_dict.items %}
+                        <p>{{ key }}</p>
+                        {% for k, regions in r_dict.items %}
+                            <table>
+                                <tr>
+                                    <th style="text-align:left; width: 150px">{{ k }}</th>
+                                    <th style="text-align:left; width: 100px">Count</th>
+                                </tr>
+                            {% for r in regions %}
+                                <tr>
+                                    <td>{{ r.symbol|safe}} {{ r.total.price__sum }}</td>
+                                    <td>{{ r.count }}</td>
+                                </tr>
+                            {% endfor %}
+                            </table>
+                        {% endfor %}
                     {% endfor %}
-                    </table>
                 </div>
             </div>
         </div>

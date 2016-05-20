@@ -10,12 +10,12 @@ import stripe
 import simplejson as json #Decimal value support
 from boto.s3.connection import S3Connection
 from boto.exception import AWSConnectionError, S3DataError, S3ResponseError
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from guardian.shortcuts import get_objects_for_user
 from bs4 import BeautifulSoup
 
 from ..sqwyre.models import Novel, Token, Reader, GlobalPrice
-from ..sqwyre.forms import NovelForm, TokenForm, BulkBuyForm
+from ..sqwyre.forms import NovelForm, TokenForm, BulkBuyForm, GlobalPriceForm
 from ..wiqi.models import Wiqi
 from ..wiqi.forms import WiqiPriceForm
 from ..wiqi import wiqi as wiqid
@@ -42,23 +42,24 @@ def view_novel(request, novel_surl=None, template_name="sqwyre/index.html"):
         if not novel_object:
             return redirect("create_novel")
         novel_object = novel_object[0]
-    price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
-    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     page_title = novel_object.title
     page_subtitle = "Start Reading"
     page_class = "home"
     nav_set = None
-    # forex and pricing settings
-    fx = get_forex()
-    fxd = novel_object.defaultcurrency
-    page_price = price_object.price
-    show_buy = False
-    if novel_object.show_buy:
-        show_buy = True
+    price_object = sqwyd.get_price_object(novel_object, request)
+    can_buy = False
+    page_price = False
+    if price_object and price_object.can_buy:
+        # forex and pricing settings
+        fx = get_forex(price_object.currency)
+        fxd = price_object.currency
+        page_price = price_object.price
+        can_buy = price_object.can_buy
+    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     if request.user.is_authenticated():
         can_read = request.user.reader.can_read(novel_object)
         if can_read == "purchased":
-            show_buy = False
+            can_buy = False
         elif can_read != "borrowed" and request.user.reader.current_price > page_price:
             page_price = request.user.reader.current_price
     return render(request, template_name, locals())
@@ -72,7 +73,6 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
                                                nav_type)
     if wiqi_object:
         template_name = "sqwyre/view_%s.html" % wiqi_object.get_class
-        price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
         try:
             chapter_title = wiqi_object.stack.title
             # Kludge for novel title
@@ -83,7 +83,8 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
             novel_object = wiqi_object.wiqi.novel_chapterlist.all()[0]
             nav_title = "stack"
         # Now test if the reader has the right to see novel, or if it is still preorder
-        if not request.user.is_superuser and novel_object.is_preorder:
+        price_object = sqwyd.get_price_object(novel_object, request)
+        if not request.user.is_superuser and price_object.is_preorder:
             return redirect('view_preorder', novel_surl=novel_object.surl)
         user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
         page_title = novel_object.title
@@ -100,28 +101,36 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
                 can_read_next = request.user.reader.can_read(next_wiqi)
             if not can_read_next:
                 can_read_next = next_wiqi.read_if
-        # forex and pricing settings
-        fx = get_forex()
-        fxd = novel_object.defaultcurrency
-        try:
-            page_price = (wiqi_object.price + 1) * price_object.price
-        except:
-            # It's a wiqi_object
-            page_price = (wiqi_object.wiqi.price + 1) * price_object.price
-        show_buy = False
-        if novel_object.show_buy:
-            show_buy = True
+        can_buy = False
+        page_price = False
+        if price_object and price_object.can_buy:
+            # forex and pricing settings
+            fx = get_forex(price_object.currency)
+            fxd = price_object.currency
+            page_price = price_object.price
+            can_buy = price_object.can_buy
+            try:
+                page_price = (wiqi_object.price + 1) * price_object.price
+            except:
+                # It's a wiqi_object
+                page_price = (wiqi_object.wiqi.price + 1) * price_object.price
+            # https://gist.github.com/jackiekazil/6201722
+            page_price = Decimal(page_price.quantize(Decimal('.01'), rounding=ROUND_HALF_UP))
         if request.user.is_authenticated():
             can_read = request.user.reader.can_read(novel_object)
+            if request.user.reader.current_price < page_price and can_read != "borrowed":
+                request.user.reader.current_price = page_price
+                request.user.reader.save()
             if can_read == "purchased":
-                show_buy = False
+                can_buy = False
             elif can_read == "borrowed":
                 page_price = price_object.price
             elif request.user.reader.current_price > page_price:
                 page_price = request.user.reader.current_price
-        if show_buy and next_wiqi and page_price < (next_wiqi.price+1)*price_object.price:
+        if can_buy and next_wiqi and page_price < (next_wiqi.price+1)*price_object.price:
             # Only appears if the next page price > than user current price
             next_price = (next_wiqi.price + 1) * price_object.price
+            next_price = Decimal(next_price.quantize(Decimal('.01'), rounding=ROUND_HALF_UP))
     else:
         return redirect('index')
     if request.is_ajax():
@@ -131,26 +140,31 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
 
 def view_contents(request, novel_surl, template_name="sqwyre/view_contents.html"):
     novel_object = get_object_or_404(Novel, surl=novel_surl)
-    price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
     user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     page_title = novel_object.title
     page_subtitle = "Chapters"
     chapter_objects = json.loads(novel_object.chapterformat)
-    # forex and pricing settings
-    fx = get_forex()
-    fxd = price_object.currency
-    page_price = price_object.price
-    show_buy = True
-    can_read = False
+    price_object = sqwyd.get_price_object(novel_object, request)
+    can_buy = False
+    page_price = False
+    if price_object and price_object.can_buy:
+        # forex and pricing settings
+        fx = get_forex(price_object.currency)
+        fxd = price_object.currency
+        page_price = price_object.price
+        can_buy = price_object.can_buy
     if request.user.is_authenticated():
         can_read = request.user.reader.can_read(novel_object)
+        if request.user.reader.current_price < page_price and can_read != "borrowed":
+            request.user.reader.current_price = page_price
+            request.user.reader.save()
         if can_read == "purchased":
-            show_buy = False
+            can_buy = False
         elif can_read != "borrowed" and request.user.reader.current_price > page_price:
             page_price = request.user.reader.current_price
-    if not novel_object.show_buy:
-        show_buy = False
-        can_read = True
+    # if not novel_object.can_buy:
+    #     can_buy = False
+    #     can_read = True
     return render(request, template_name, locals())
 
 def view_legal(request, novel_surl, template_name="sqwyre/legal.html"):
@@ -174,7 +188,8 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
         data = request.POST
         # Process and test emails
         stripe_emails = xtractemail(data["stripeEmails"])
-        if sqwyd.check_fraud(request.user, novel_object, data, len(stripe_emails)):
+        price_object = sqwyd.get_price_object(novel_object, request)
+        if sqwyd.check_fraud(request.user, price_object, data, len(stripe_emails)):
             # Fraudulent or a problem
             return HttpResponse(json.dumps(buy_response), content_type="application/json")
         # Create the charge on Stripe's servers - this will charge the user's card
@@ -212,7 +227,7 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
         kwargs["currency"] = data["stripeCurrency"].lower()
         kwargs["stripe_id"] = charge["id"]
         kwargs["is_purchased"] = True
-        kwargs["is_preorder"] = novel_object.is_preorder
+        kwargs["is_preorder"] = price_object.is_preorder
         if request.user.is_authenticated():
             kwargs["creator"] = request.user
         else:
@@ -248,7 +263,7 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
         # if logged in and buying for self (and we, therefore, know there is only one token)
         if request.user.is_authenticated() and data.get("selfPurchase", False) == "true":
             # If preorder, even if authenticated, send them to the redemption page...
-            if novel_object.is_preorder:
+            if price_object.is_preorder:
                 if request.is_ajax():
                     return HttpResponse(json.dumps(buy_response), content_type="application/json")
                 return redirect('redeem_token', token_surl=token_object.surl)
@@ -271,13 +286,12 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
 def novel_settings(request, novel_surl):
     if request.is_ajax():
         novel_object = get_object_or_404(Novel, surl=novel_surl)
-        price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
-        a = sqwyd.get_user_ip(request)
+        price_object = sqwyd.get_price_object(novel_object, request)
         response_dict = {'settings': {
             'stripe_key': settings.STRIPE_PUBLISHABLE_KEY,
-            'bulk_discount': novel_object.discountpercent,
-            'bulk_volume': novel_object.discountvolume,
-            'bulk_price': price_object.price,
+            'bulk_discount': price_object.discountpercent,
+            'bulk_volume': price_object.discountvolume,
+            'bulk_price': price_object.price  / (1 + Decimal(str(price_object.discountpercent))),
             'novel_price': price_object.price,
             'novel_title': novel_object.title,
             'user_email': ''
@@ -347,17 +361,17 @@ def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
     novel_object = get_object_or_404(Novel, surl=novel_surl)
     if request.user.is_superuser:
         return redirect('price_novel', novel_surl=novel_object.surl)
-    if novel_object.is_preorder:
+    price_object = sqwyd.get_price_object(novel_object, request)
+    if price_object and price_object.is_preorder:
         return redirect('view_preorder', novel_surl=novel_object.surl)
     user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     if not request.user.reader.can_read(novel_object) == "purchased":
         return render(request, '404.html', status=403)
     page_title = novel_object.title
     page_subtitle = "Share and Manage"
-    price_object = sqwyd.get_price_object(novel_object, get_user_country(request))
     # Where 'issue' is actually 'lent' ... 
     token_issued_list = (
-        Token.query.issued_list(novel_object)
+        Token.query.issued_list(price_object)
         .for_novel_and_reader(request.user, novel_object)
     )
     token_refund_list = (
@@ -371,17 +385,18 @@ def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
     )
     # only need one if intend to download, doesn't matter which since they did buy
     token_download = request.user.reader.current_token(purchased=True)
-    tokens_remaining = novel_object.lendnumber - len(token_issued_list)
-    total_duration = novel_object.lenddays
-    total_tokens = novel_object.lendnumber
-    pro_disc = novel_object.discountpercent
-    pro_bulk = novel_object.discountvolume
+    tokens_remaining = price_object.lendnumber - len(token_issued_list)
+    total_duration = price_object.lenddays
+    total_tokens = price_object.lendnumber
+    pro_disc = price_object.discountpercent
+    pro_bulk = price_object.discountvolume
     TokenFormSet = modelformset_factory(Token, form=TokenForm, extra=tokens_remaining)
     RefundFormSet = modelformset_factory(Token, form=TokenForm, extra=0)
-    # forex settings
-    fx = get_forex()
-    fxd = price_object.currency
-    fxp = int(price_object.price*100)
+    if price_object:
+        # forex settings
+        fx = get_forex(price_object.currency)
+        fxd = price_object.currency
+        fxp = int(price_object.price*100)
     if request.method == "POST":
         send_list = []
         # http://stackoverflow.com/questions/1395807/proper-way-to-handle-multiple-forms-on-one-page-in-django
@@ -400,6 +415,7 @@ def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
                 kwargs["creator"] = request.user
                 kwargs["creator_ip"] = sqwyd.get_user_ip(request)
                 kwargs["country_code"] = sqwyd.get_user_country(request)
+                kwargs["price_region"] = price_object.region
                 kwargs["novel"] = novel_object
                 for form in issue_token_formset.cleaned_data:
                     do_send = False
@@ -453,11 +469,15 @@ def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
 def redeem_token(request, token_surl, template_name="sqwyre/redeem_token.html"):
     token_object = get_object_or_404(Token, surl=token_surl)
     user_has_purchased = request.user == token_object.creator
+    price_object = sqwyd.get_price_object(token_object.novel, request)
     if not token_object.is_purchased:
-        days = token_object.novel.lenddays
+        if price_object:
+            days = price_object.lenddays
     show_refund = False
-    if request.user.is_authenticated() and not token_object.novel.is_preorder:
+    if request.user.is_authenticated() and price_object and not price_object.is_preorder:
         # check if user already purchased this item and ignore redemption if they do
+        # note, if a price_object does not exist, then no "ownership" is possible
+        # otherwise, a price_object can exist, with price at 0.00, so ownership possible
         if request.user.reader.can_read(token_object.novel) == "purchased":
             return redirect("issue_tokens", novel_surl=token_object.novel.surl)
         if token_object.is_valid:
@@ -482,10 +502,15 @@ def redeem_token(request, token_surl, template_name="sqwyre/redeem_token.html"):
     novel_object = token_object.novel
     page_subtitle = "Redemption"
     page_class = "home"
-    pro_disc = novel_object.discountpercent
-    pro_bulk = novel_object.discountvolume
-    pro_lend = novel_object.lendnumber
-    pro_days = novel_object.lenddays
+    can_buy = False
+    page_price = False
+    if price_object and price_object.can_buy:
+        pro_disc = price_object.discountpercent
+        pro_bulk = price_object.discountvolume
+        pro_lend = price_object.lendnumber
+        pro_days = price_object.lenddays
+        page_price = price_object.price
+        can_buy = price_object.can_buy
     return render(request, template_name, locals())
 
 def refund_token(request, token_surl, template_name="sqwyre/refund_token.html"):
@@ -634,25 +659,115 @@ def price_novel(request, novel_surl, template_name="sqwyre/price_novel.html", pe
             formset.save()
     else:
         formset = WiqiPriceFormSet(queryset=novel_object.chapterlist.all())
+    # Get the list of existing GlobalPrices and set up the list of items based on difference
+    # between existing and settings.DEFAULT_REGION_PRICING
+    price_list = GlobalPrice.query.novel_price(novel_object).all()
+    show_price_list = []
+    for key in settings.DEFAULT_REGION_PRICING:
+        included = False
+        for p in price_list:
+            if settings.DEFAULT_REGION_PRICING[key]["REGION"] == p.region:
+                # append in format: region name, link, create/edit, delete
+                link = reverse('global_pricing', kwargs={'novel_surl': novel_object.surl,
+                                                         'from_db': 'i',
+                                                         'region_slug': key.lower()})
+                dlink = reverse('global_pricing', kwargs={'novel_surl': novel_object.surl,
+                                                          'from_db': 'd',
+                                                          'region_slug': key.lower()})
+                show_price_list.append([p.region, "Edit", link, "Delete", dlink])
+                included = True
+                break
+        if not included:
+            if not (len(price_list) and settings.DEFAULT_REGION_PRICING[key]["GLOBAL"]):
+                link = reverse('global_pricing', kwargs={'novel_surl': novel_object.surl,
+                                                         'from_db': 'o',
+                                                         'region_slug': key.lower()})
+                key = settings.DEFAULT_REGION_PRICING[key]["REGION"]
+                show_price_list.append([key, "Create", link, "False", "False"])
+    show_price_list.sort()
+    link = reverse('global_pricing', kwargs={'novel_surl': novel_object.surl,
+                                             'from_db': 'o',
+                                             'region_slug': 'custom'})
+    show_price_list.append(["Create custom", "Create", link, "False", "False"])
     # Get count of all unredeemed tokens related to novel
-    tokens_for_novel = (
-        Token.query.filter(novel=novel_object)
-        .valid_purchased(True)
-        .all()
-    )
-    token_valid_purchased_count = tokens_for_novel.count()
+    regions_for_price_list = [p.region for p in price_list]
+    tokens_for_novel = Token.query.filter(novel=novel_object)
+    token_purchased_dict = {"Redeemed": False,
+                            "Unredeemed": True}
     # Sales for each of the currencies
     # https://docs.djangoproject.com/en/1.9/topics/db/aggregation/
     # Dictionary comprehension: http://stackoverflow.com/a/14507637/295606
     currency_dict = {k: v for (k, v) in settings.CURRENCY_CHOICE}
-    token_purchased_list = []
-    for c in currency_dict.keys():
-        tokens_for_currency = tokens_for_novel.filter(currency=c)
-        token_purchased_list.append({
-            'total': tokens_for_currency.aggregate(Sum('price')),
-            'count': tokens_for_currency.count(),
-            'symbol': currency_dict[c],
-        })
+    for key, value in token_purchased_dict.items():
+        token_purchased_dict[key] = {}
+        tokens_for_loop = tokens_for_novel.valid_purchased(value).all()
+        if value:
+            token_valid_purchased_count = tokens_for_loop.count()
+        for region in regions_for_price_list:
+            token_purchased_dict[key][region] = []
+            for c in currency_dict.keys():
+                tokens_for_currency = tokens_for_loop.filter(currency=c).filter(pricing_region=region)
+                token_purchased_dict[key][region].append({
+                    'total': tokens_for_currency.aggregate(Sum('price')),
+                    'count': tokens_for_currency.count(),
+                    'symbol': currency_dict[c],
+                })
+    return render(request, template_name, locals())
+
+@login_required
+def set_global_pricing(request, novel_surl, from_db, region_slug,
+                       template_name="sqwyre/global_pricing.html", permission="can_edit"):
+    """
+    Set the global pricing for the novel. Note that the user is offered the choice of the
+    defaults from settings, and a blank one to start from scratch. No error checking at this stage.
+    """
+    if not request.user.is_superuser:
+        return render(request, '404.html', status=403)
+    novel_object = get_object_or_404(Novel, surl=novel_surl)
+    page_title = novel_object.title
+    page_subtitle = "Manage Global Pricing"
+    if not request.user.has_perm(permission, novel_object):
+        return render(request, '404.html', status=403)
+    if from_db in ['i', 'd']:
+        price_object = GlobalPrice.objects.get(novel=novel_object, slug=region_slug)
+    if request.method == "POST":
+        if request.is_ajax():
+            if from_db == 'd':
+                price_object.delete()
+                return HttpResponse(json.dumps({'response': 'success'}),
+                                    content_type="application/json")
+        if from_db == 'i':
+            pricingform = GlobalPriceForm(request.POST, instance=price_object)
+        else:
+            pricingform = GlobalPriceForm(request.POST)
+        if pricingform.is_valid():
+            if from_db == 'i':
+                pricingform.save()
+            else:
+                kwargs = pricingform.cleaned_data
+                kwargs['novel'] = novel_object
+                if not GlobalPrice.query.novel_price(novel_object).count():
+                    # i.e. this is the first price, default is automatically true
+                    kwargs['default'] = True
+                price_object = GlobalPrice()
+                price_object.set(**kwargs)
+            return redirect('price_novel', novel_surl=novel_object.surl)
+    else:
+        if from_db == 'i':
+            pricingform = GlobalPriceForm(instance=price_object)
+        elif region_slug == 'custom':
+            pricingform = GlobalPriceForm()
+        else:
+            numberlist = []
+            for v in settings.DEFAULT_REGION_PRICING[region_slug]['COUNTRIES']:
+                numberlist.append(settings.ALL_COUNTRY_DICT[v])
+            price_object = {
+                'region': settings.DEFAULT_REGION_PRICING[region_slug]['REGION'],
+                'price': settings.DEFAULT_REGION_PRICING[region_slug]['PRICE'],
+                'currency': settings.DEFAULT_REGION_PRICING[region_slug]['CURRENCY'],
+                'countrylist': numberlist,
+            }
+            pricingform = GlobalPriceForm(initial=price_object)
     return render(request, template_name, locals())
 
 @login_required
@@ -776,7 +891,8 @@ def download_novel(request, token_surl, template_name="sqwyre/download_novel.htm
     if token_object.is_purchased and request.user.is_authenticated():
         can_download = True
     # Special case ... last chance to block if the novel has yet to be released
-    if token_object.novel.is_preorder:
+    price_object = sqwyd.get_price_object(token_object.novel, request)
+    if price_object.is_preorder:
         can_download = False
     if can_download:
         # Generate the time-limited AWS S3 link/s

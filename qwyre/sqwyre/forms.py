@@ -1,5 +1,16 @@
 from django import forms
-from ..sqwyre.models import Novel, Token
+from ..sqwyre.models import Novel, Token, GlobalPrice, CountryCode
+
+class GlobalPriceForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(GlobalPriceForm, self).__init__(*args, **kwargs)
+        self.fields['is_live_from'].widget.attrs['class'] = 'datepicker'
+        # http://chase-seibert.github.io/blog/2010/05/20/django-manytomanyfield-on-modelform-as-checkbox-widget.html
+        self.fields['countrylist'].widget = forms.widgets.CheckboxSelectMultiple()
+        self.fields['countrylist'].queryset = CountryCode.objects.all().order_by('name')
+    class Meta:
+        model = GlobalPrice
+        exclude = ('slug', 'novel', 'created_on', 'objects', 'query')
 
 class NovelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

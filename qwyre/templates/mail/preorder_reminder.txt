@@ -34,4 +34,4 @@ Thank you once again and I hope you love the book,
 {{ token_object.novel.creator.facebook_name }}
 
 Author - {{ token_object.novel.title }}
-https://qwyre.com/{{ novel_object.surl }}/
+https://qwyre.com{{ token_object.novel.get_absolute_url }}

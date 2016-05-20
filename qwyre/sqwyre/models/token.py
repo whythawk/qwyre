@@ -12,11 +12,11 @@ from decimal import Decimal
 
 class TokenQuerySet(QuerySet):
     # https://docs.djangoproject.com/en/dev/topics/db/managers/#calling-custom-queryset-methods-from-the-manager
-    def issued_list(self, novel_object):
+    def issued_list(self, price_object):
         """
         Return filtered list of active and valid tokens.
         """
-        deadline = pytz.UTC.localize(datetime.now()) - timedelta(days=novel_object.lenddays)
+        deadline = pytz.UTC.localize(datetime.now()) - timedelta(days=price_object.lenddays)
         return self.filter(
             Q(is_purchased=False) &
             (Q(is_valid=True) |
@@ -44,8 +44,8 @@ class TokenQuerySet(QuerySet):
 class TokenManager(models.Manager):
     def get_queryset(self):
         return TokenQuerySet(self.model, using=self._db)
-    def issued_list(self, novel_object):
-        return self.get_queryset().issued_list(novel_object)
+    def issued_list(self, price_object):
+        return self.get_queryset().issued_list(price_object)
     def valid_purchased(self, valid=True):
         return self.get_queryset().valid_purchased(valid)
     def for_novel_and_reader(self, user, novel_object):
@@ -57,7 +57,8 @@ class Token(models.Model):
                                 related_name="%(class)s_creator", on_delete=models.CASCADE)
     creator_ip = models.GenericIPAddressField(blank=True, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
-    country_code = models.CharField(max_length=2, default="GB") # For the purchaser
+    country_code = models.CharField(max_length=2, default=settings.COUNTRY_DEFAULT) # For the purchaser
+    pricing_region = models.CharField(max_length=50, default=settings.DEFAULT_REGION)
     redeemer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
                                  related_name="%(class)s_redeemer", on_delete=models.CASCADE)
     redeemer_ip = models.GenericIPAddressField(blank=True, null=True)
@@ -99,7 +100,8 @@ class Token(models.Model):
                 break
         self.creator = kwargs["creator"]
         self.creator_ip = kwargs.get("creator_ip", None)
-        self.country_code = kwargs.get("country_code", "GB")
+        self.country_code = kwargs.get("country_code", settings.COUNTRY_DEFAULT)
+        self.price_region = kwargs.get("price_region", settings.DEFAULT_REGION)
         self.novel = kwargs["novel"]
         self.recipient = kwargs["recipient"]
         self.is_purchased = kwargs.get("is_purchased", False)
@@ -167,4 +169,3 @@ class Token(models.Model):
                     - pytz.UTC.localize(datetime.now()).date()).days
         except:
             return False
-    

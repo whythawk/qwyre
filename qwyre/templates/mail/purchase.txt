@@ -23,12 +23,12 @@ If you choose to login with Facebook, your online access allows you to:
 - Long-term, this site will offer more features and I will write more novels.
   You get to be part of that.
 
-If you have had second thoughts, then the redemption page also permits you to
-reverse the transaction for a full refund.
+{% if not token_object.creator %}If you have had second thoughts, then the redemption page also permits you to
+reverse the transaction for a full refund.{% endif %}
 
 Thank you once again and I hope you love the book,
 
 {{ token_object.novel.creator.facebook_name }}
 
 Author - {{ token_object.novel.title }}
-https://qwyre.com{{ novel_object.surl }}/
+https://qwyre.com{{ token_object.novel.get_absolute_url }}

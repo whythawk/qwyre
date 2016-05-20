@@ -140,7 +140,7 @@
                         {% csrf_token %}
                         <input type="hidden" value="{% url 'reader_update' %}" name="reader_update" id="reader_update" />
                         <input type="text" id="facebookname" class="form-control"
-                               placeholder="Enter name" value="{{ request.user.username }}"/>
+                               placeholder="Enter name" value="{{ request.user.facebook_name }}"/>
                         <input type="email" class="form-control" id="user_email" placeholder="Enter email"
                                value="{{ request.user.email }}"/>
                         <div class="checkbox">

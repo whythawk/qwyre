@@ -53,11 +53,28 @@ $(document).ready(function() {
         $.ajax({
             url: $('#preorderReminder').val(),
             type: 'post',
-            data: { }
+            data: { },
             }).done(function(data) {
             });
         e.preventDefault();
-        });    
+        });
+    $('[id^=globalpricing_]').on('click', function (e) {
+        var pid = this;
+        window.location = pid.value;
+        e.preventDefault();
+        });
+    $('[id^=pricedelete_]').on('click', function (e) {
+        var pid = this;
+        $.ajax({
+            url: pid.value,
+            type: 'post',
+            }).done(function(data) {
+                if (data.response == 'success') {
+                    document.location.reload(true);
+                }
+            });
+        e.preventDefault();
+        });
     $('#set_structure').on('click', function (e) {
         var len = $('#structureLength').val();
         var response = {
@@ -75,10 +92,9 @@ $(document).ready(function() {
                 id: i,
                 is_section: is_section,
                 is_callout: is_callout,
-            }
+            };
             response.len++;
         }
-        console.log(JSON.stringify(response));
         $.ajax({
             url: $('#chapterFormat').val(),
             type: 'post',

@@ -9,7 +9,7 @@
     <div class="col-md-10 col-md-push-1">
         <div class="row text-center">
             <h1>{{ novel_object.title }} - Chapters</h1>
-            {% if show_buy %}
+            {% if can_buy %}
             <div id="buynowtext">
                 {% if request.user.is_authenticated %}
                 {% if can_read == "borrowed" %}
@@ -60,7 +60,7 @@
             {% endif %}
         {% endfor %}
     </div>
-    {% if show_buy %}
+    {% if can_buy %}
     <div class="row col-md-10 col-md-push-1 text-center">
     {% block buynovel %}
     {% include 'sqwyre/buy_novel.html' %}
@@ -71,7 +71,7 @@
 {% endblock content %}
 
 {% block extrascripts %}
-{% if show_buy %}
+{% if can_buy %}
 <script src="https://checkout.stripe.com/checkout.js"></script>
 <script src="{% static 'js/jquery.whyqd.buy.js' %}"></script>
 {% endif %}

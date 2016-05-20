@@ -40,14 +40,6 @@ class Novel(models.Model):
     chapterformat = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict}, blank=True, null=True)
     sentinal = models.OneToOneField(Wiqi, related_name="%(class)s_sentinal", blank=True, null=True)
     word_count = models.IntegerField(blank=True, null=True)
-    # Managing sales and distribution
-    show_buy = models.BooleanField(default=True)
-    discountvolume = models.IntegerField(default=0)
-    discountpercent = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    lendnumber = models.IntegerField(default=0)
-    lenddays = models.IntegerField(default=0)
-    defaultcurrency = models.CharField(max_length=7, choices=settings.CURRENCY_CHOICE,
-                                       default=settings.CURRENCY_DEFAULT)
     # Novel info
     pitch = models.CharField(max_length=503, blank=True, null=True,
                                verbose_name="Elevator Pitch",
@@ -85,8 +77,8 @@ class Novel(models.Model):
         # http://stackoverflow.com/a/4863504/295606
         return reverse('view_novel', kwargs={'novel_surl': self.surl})
 
-    def get_prices_url(self):
-        return reverse('price_novel', kwargs={'novel_surl': self.surl})
+    # def get_prices_url(self):
+    #     return reverse('price_novel', kwargs={'novel_surl': self.surl})
 
     def get_manage_tokens_url(self):
         return reverse('issue_tokens', kwargs={'novel_surl': self.surl})
@@ -128,10 +120,6 @@ class Novel(models.Model):
         self.pitch = BeautifulSoup(kwargs.get("pitch", "")[:503], "html.parser").get_text().strip()
         self.is_live_from = kwargs.get("is_live_from", pytz.UTC.localize(datetime.now()))
         self.save()
-        # Now set the default price for this novel
-        self.set_defaultprice(kwargs.get("defaultprice", "0.00"),
-                              kwargs.get("defaultcurrency", settings.CURRENCY_DEFAULT)
-                              )
 
     def assign_all_perm(self, usr):
         for perm, perm_text in self._meta.permissions:
@@ -216,37 +204,3 @@ class Novel(models.Model):
                     wiqi_object.stack.save()
             return self.refresh_chapters(first_wiqi_object)
         return self
-
-    @property
-    def is_preorder(self):
-        return self.is_live_from > pytz.UTC.localize(datetime.now())
-    
-    @property
-    def is_preorder_text(self):
-        if self.is_preorder:
-            return "Preorder"
-        else:
-            return "Buy"
-
-    @property
-    def was_preorder(self):
-        # Quick check if this was ever a preorder ...
-        return abs((self.is_live_from - self.created_on).days) > 1
-
-    def set_defaultprice(self, price, currency):
-        """
-        This is only called when a novel is created. If it exists (i.e. there is a price
-        associated with this novel) ignore this.
-        """
-        price_object, created = GlobalPrice.objects.get_or_create(novel=self)
-        if created:
-            price_object.price = price
-            price_object.currency = currency
-            price_object.save()
-
-    def is_valid_isbn13(self, test_isbn):
-        # http://stackoverflow.com/a/1249424
-        isbn = re.sub("[^0-9]", "", test_isbn)
-        # http://en.wikipedia.org/wiki/International_Standard_Book_Number
-        check = (10 - (sum(int(digit) * (3 if idx % 2 else 1) for idx, digit in enumerate(isbn[:12])) % 10)) % 10
-        return check == int(isbn[-1])

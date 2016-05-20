@@ -29,17 +29,24 @@ def get_user_ip(request):
 def get_user_country(request):
     # Specific to using CloudFlare
     # https://support.cloudflare.com/hc/en-us/articles/205072537-What-are-the-two-letter-country-codes-for-the-Access-Rules-
-    return request.META.get('HTTP_CF_IPCOUNTRY', 'GB')
+    return request.META.get('HTTP_CF_IPCOUNTRY', settings.COUNTRY_DEFAULT)
 
-def get_price_object(novel_object, country_code):
+def get_price_object(novel_object, request):
     """
-    Return only one price. If the queryset returns > 1, return the default price for
-    this novel_object. If there's a complete glitch, that's a human-error clusterfuck.
+    Return only one price for each country. If the queryset returns > 1, return the default
+    price for this novel_object. If there's a complete glitch, that's a human-error clusterfuck.
     """
-    pricelist = GlobalPrice.query.country_price(country_code, novel_object).all()
-    if len(pricelist) > 1:
-        pricelist = GlobalPrice.query.country_price(settings.COUNTRY_DEFAULT, novel_object).all()
-    return pricelist[0]
+    # country_code = get_user_country(request)
+    # Testing
+    country_code = 'US'
+    from ..sqwyre.models import GlobalPrice
+    price_object = GlobalPrice.query.country_price(country_code, novel_object).all()
+    if len(price_object) > 1:
+        # Any problem, get the One-True-Price(TM)
+        return GlobalPrice.objects.get(novel=novel_object, default=True)
+    if price_object:
+        return price_object[0]
+    return False # In case no price_object associated with novel...
 
 def user_has_purchased(request, novel_object):
     """
@@ -63,7 +70,7 @@ def closeness(a, b):
     avg = (a + b)/2
     return math.log10( avg / difference )
 
-def check_fraud(user, novel_object, data_object, data_length):
+def check_fraud(user, price_object, data_object, data_length):
     """
     Very basic fraud protection / detection.
     Anyone who wants to spend time defrauding me of a few pounds
@@ -71,17 +78,17 @@ def check_fraud(user, novel_object, data_object, data_length):
     data_object is the data received from the user
     """
     try:
-        check_price = novel_object.get_price_object.price * 100
+        check_price = price_object.price * 100
         if data_object.get("selfPurchase", False) == "true" and user.is_authenticated():
-            if user.reader.current_price > novel_object.get_price_object.price:
+            if user.reader.current_price > price_object.price:
                 check_price = user.reader.current_price * 100
         received_price = int(data_object["stripePrice"])
-        fx = get_forex().get(data_object["stripeCurrency"].lower(), False)
+        fx = get_forex(price_object.currency).get(data_object["stripeCurrency"].lower(), False)
         if not fx:
             return True
         check_price = check_price * Decimal(str(fx)) * data_length
-        if data_length >= novel_object.discountvolume:
-            check_price = check_price / (1 + Decimal(str(novel_object.discountpercent)))
+        if data_length >= price_object.discountvolume:
+            check_price = check_price / (1 + Decimal(str(price_object.discountpercent)))
         if closeness(int(check_price), received_price) < 1.8:
             return True
         return False

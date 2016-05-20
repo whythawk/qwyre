@@ -25,9 +25,13 @@ urlpatterns = [
                     {"template_name": "sqwyre/create_novel.html", "permission":"can_edit"},
                     name="organise_novel"),
                 # Set novel chapter pricing
-                url(r"^(?P<novel_surl>[-\w]+)/pricing/", views.price_novel,
+                url(r"^(?P<novel_surl>[-\w]+)/managing/", views.price_novel,
                     {"template_name": "sqwyre/price_novel.html", "permission":"can_edit"},
                     name="price_novel"),
+                url(r"^(?P<novel_surl>[-\w]+)/(?P<from_db>[-\w]+)/(?P<region_slug>[-\w]+)/pricing/",
+                    views.set_global_pricing,
+                    {"template_name": "sqwyre/global_pricing.html", "permission":"can_edit"},
+                    name="global_pricing"),
                 ## Administer novel
                 # url(r"^sortit/", "administer_novel",
                 #    {"template_name": "sqwyre/administer_novel.html", "permission":"can_edit"},
