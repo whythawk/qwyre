@@ -24,7 +24,7 @@ function setprice() {
     $("#stripePrice").val(bulk_price.toFixed());
 }
 function getcurrencysymbol() {
-    var forex_currency = $("#stripeCurrency").val();
+    var forex_currency = $("#stripeCurrency").val().toUpperCase();
     switch (forex_currency) {
         case 'GBP':
             return '&pound;';

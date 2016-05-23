@@ -151,7 +151,7 @@ class GlobalPrice(models.Model):
     @property
     def was_preorder(self):
         # Quick check if this was ever a preorder ...
-        return abs((self.is_live_from - self.created_on).days) > 1
+        return abs((self.is_live_from - self.novel.created_on).days) > 1
     
     @property
     def currency_verbose(self):

@@ -67,7 +67,6 @@ class Token(models.Model):
     novel = models.ForeignKey(Novel, blank=True, null=True, on_delete=models.CASCADE)
     is_valid = models.BooleanField(default=True)
     is_purchased = models.BooleanField(default=False)
-    is_preorder = models.BooleanField(default=False)
     charge = JSONField(blank=True, null=True)
     currency = models.CharField(max_length=7, choices=settings.CURRENCY_CHOICE,
                                 default=settings.CURRENCY_DEFAULT)
@@ -109,10 +108,11 @@ class Token(models.Model):
         self.price = kwargs.get("price", Decimal("0.00"))
         self.currency = kwargs.get("currency", "gbp")
         self.stripe_id = kwargs.get("stripe_id", None)
-        self.is_preorder = kwargs.get("is_preorder", False)
         # if purchased, and the creator and recipient are the same, then the person is buying this themselves
         # (i.e.) not a gift, the person is logged in and they will automatically take ownership...
+        # if reader.can_read == "purchased" then they already own
         if (kwargs["creator"] and
+            kwargs["creator"].reader.can_read(kwargs["novel"]) != "purchased" and
             kwargs.get("is_purchased", False) and
             kwargs["creator"].email == kwargs["recipient"] and
             not kwargs.get("is_preorder", False)):

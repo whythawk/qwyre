@@ -46,6 +46,10 @@ class Novel(models.Model):
                                help_text="You have 503 characters. Sell it to me.")
     summary = models.TextField(blank=True, null=True, verbose_name="Summary",
                                help_text="The back cover of your book.")
+    playlist = models.TextField(blank=True, null=True, verbose_name="Playlist",
+                               help_text="The musical playlist for your book.")
+    retailers = models.TextField(blank=True, null=True, verbose_name="Retailers",
+                               help_text="Other retailers for your book.")
     authors = models.CharField(max_length=250, blank=True, null=True,
                                verbose_name="Author names",
                                help_text="Comma-separated list of all authors.")

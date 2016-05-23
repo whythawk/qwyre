@@ -35,7 +35,7 @@ Derived classes:
 """
 from base import *
 from bs4 import BeautifulSoup
-from whyqd.snippets.diff2merge import mergediff
+from qwyre.snippets.diff2merge import mergediff
 
 #########################################################################################################################################
 # Derived Classes 

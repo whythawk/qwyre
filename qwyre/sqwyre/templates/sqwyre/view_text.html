@@ -61,10 +61,10 @@
                               role="button">Buy to continue reading</a>
                     {% endif %}
                 {% else %}
-                    {% if can_read_next == "logfree" %}
+                    {# Subtlety here ... if "purchased" then purchased the book, if "own" then still has to buy #}
+                    {% if can_read_next == "logfree" or can_read_next == "purchased" %}
                         <a href="{{ next_wiqi.get_url }}" class="btn btn-md btn-read pull-right"
                                   role="button">Next chapter</a>               
-                    {# Subtlety here ... if "purchased" then purchased the book, if "own" then still has to buy #}
                     {% elif can_buy and can_read_next != "own" %}<a id="nextbutton" href="{{ next_wiqi.get_url }}"
                                                       class="btn btn-md btn-read pull-right"
                                                       role="button">Next chapter
@@ -78,7 +78,8 @@
                                                     the end.<br/><small>Buy {{ page_title }} and keep
                                                     reading.</small></button>
                     {% else %}
-                    <a href="{% url 'about' novel_object.surl %}" class="btn btn-md btn-read pull-right"
+                    {# The user has logged in and has reached the end of the logfree section #}
+                    <a href="{% url 'view_retailers' novel_object.surl %}" class="btn btn-md btn-read pull-right"
                               role="button">This isn't the end.<br/><small>Buy
                               {{ page_title }} and keep reading.</small></a>
                     {% endif %}

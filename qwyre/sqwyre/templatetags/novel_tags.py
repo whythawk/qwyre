@@ -55,3 +55,8 @@ def listsort(value):
     else:
         return value
     listsort.is_safe = True
+    
+@register.filter
+def get_item(dictionary, key):
+    # http://stackoverflow.com/a/8000091/295606
+    return dictionary.get(key)

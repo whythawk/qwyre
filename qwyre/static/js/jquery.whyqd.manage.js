@@ -49,11 +49,15 @@ $(document).ready(function() {
             });
         e.preventDefault();
         });
-    $('#token_preorder_reminder').on('click', function (e) {
+    $('[id^=token_preorder_reminder_]').on('click', function (e) {
+        var pid = this;
+        var rid = pid.id.replace("token_preorder_reminder_", "");
         $.ajax({
             url: $('#preorderReminder').val(),
             type: 'post',
-            data: { },
+            data: {
+                region: rid,
+                },
             }).done(function(data) {
             });
         e.preventDefault();

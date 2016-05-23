@@ -7,12 +7,12 @@ urlpatterns = [
                 ###########################################
                 ### Testing                             ###
                 ###########################################
-                url(r"^testing/", views.testing_novel,
-                    {"template_name": "sqwyre/testing_novel.html"},
-                    name="testing_novel"),
-                url(r"^(?P<novel_surl>[-\w]+)/test/", views.test_novel,
-                    {"template_name": "sqwyre/test_novel.html"},
-                    name="test_novel"),
+                # url(r"^testing/", views.testing_novel,
+                #     {"template_name": "sqwyre/testing_novel.html"},
+                #     name="testing_novel"),
+                # url(r"^(?P<novel_surl>[-\w]+)/test/", views.test_novel,
+                #     {"template_name": "sqwyre/test_novel.html"},
+                #     name="test_novel"),
                 ###########################################
                 ### Author Administration Views         ###
                 ###########################################
@@ -100,10 +100,18 @@ urlpatterns = [
                 url(r"^(?P<novel_surl>[-\w]+)/contents/", views.view_contents,
                     {"template_name": "sqwyre/view_contents.html"},
                     name="view_contents"),
+                # Novel retailers for other version
+                url(r"^(?P<novel_surl>[-\w]+)/retailers/", views.view_special,
+                    {"template_name": "sqwyre/retailers.html"},
+                    name="view_retailers"),
+                # Music playlist
+                url(r"^(?P<novel_surl>[-\w]+)/playlist/", views.view_special,
+                    {"template_name": "sqwyre/playlist.html"},
+                    name="view_playlist"),
                 # Still on preorder
-                url(r"^(?P<novel_surl>[-\w]+)/soon/", views.view_preorder,
-                    {"template_name": "sqwyre/view_preorder.html"},
-                    name="view_preorder"),
+                # url(r"^(?P<novel_surl>[-\w]+)/soon/", views.view_preorder,
+                #     {"template_name": "sqwyre/view_preorder.html"},
+                #     name="view_preorder"),
                 # url(r"^(?P<novel_surl>[-\w]+)/(?P<wiqi_surl>[-\w]+)/$", views.view_chapter,
                 #    {"template_name": "sqwyre/view_chapter.html"},
                 #    name="view_novel_chapter"),

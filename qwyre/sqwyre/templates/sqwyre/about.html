@@ -20,11 +20,12 @@
                         I am Gavin Chait, an open data software consultant and development economist
                         for <a href="http://www.whythawk.com/">Whythawk</a> in the UK. My work and
                         travels have taken me across Africa, Latin America, Europe, and Asia.</p>
-                        <p>Born in Cape Town in 1974, Gavin Chait emigrated to the UK eight years ago.
+                        <p>Born in Cape Town in 1974, I emigrated to the UK in 2008.
                         I have degrees in Microbiology & Biochemistry, and Electrical Engineering.</p>
                         <p>{{ novel_object.title }}- my first novel - has its origins in a story I
                         attempted to write when I was a science fiction-obsessed twelve year old.</p>
-                        <p>{{ novel_object.title }} is published and distributed on
+                        <p>{{ novel_object.title }} is {% if can_buy %}published and distributed
+                        {% else %}presented{% endif %} on
                         <a href="https://github.com/turukawa/whyqd">Whyqd</a>, an open-source and extensible
                         object-based wiki bringing revision control, content presentation, branching and embedding to
                         any type of digital object. I developed the current simplified implementation of the software
@@ -46,9 +47,11 @@
                             <li>Online conversion of HTML pages into epub, mobi and pdf ebooks;</li>
                             <li>Readers can branch, change and re-release books they buy;</li>
                         </ul>
+                        {% if can_buy %}
                         <p>You can choose to buy {{ novel_object.title }} instantly and anonymously with Stripe, or
                         read the first 35 chapters for free... <em>with one catch</em>. After chapter four, the further
                         you read the higher the eventual purchase price.</p>
+                        {% endif %}
                         <p>I appreciate your time and I hope you love {{ novel_object.title }}.</p>
                     </div>
                 </div>

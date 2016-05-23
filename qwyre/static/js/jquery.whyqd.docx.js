@@ -168,7 +168,7 @@
                         localStorage.removeItem('dlist');
                         localStorage.removeItem('bookstructure');
                         $.post('/' + localStorage.getItem('book') + '/organise/', bookstructure, function(data) {
-                            window.location.href = '/' + localStorage.getItem('book') + '/pricing/';
+                            window.location.href = '/' + localStorage.getItem('book') + '/managing/';
                         });
                     });
                     break;

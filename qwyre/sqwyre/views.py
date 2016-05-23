@@ -85,7 +85,7 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
         # Now test if the reader has the right to see novel, or if it is still preorder
         price_object = sqwyd.get_price_object(novel_object, request)
         if not request.user.is_superuser and price_object.is_preorder:
-            return redirect('view_preorder', novel_surl=novel_object.surl)
+            return redirect('view_novel', novel_surl=novel_object.surl)
         user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
         page_title = novel_object.title
         page_subtitle = chapter_title
@@ -363,7 +363,7 @@ def issue_tokens(request, novel_surl, template_name="sqwyre/issue_tokens.html"):
         return redirect('price_novel', novel_surl=novel_object.surl)
     price_object = sqwyd.get_price_object(novel_object, request)
     if price_object and price_object.is_preorder:
-        return redirect('view_preorder', novel_surl=novel_object.surl)
+        return redirect('view_novel', novel_surl=novel_object.surl)
     user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
     if not request.user.reader.can_read(novel_object) == "purchased":
         return render(request, '404.html', status=403)
@@ -694,6 +694,7 @@ def price_novel(request, novel_surl, template_name="sqwyre/price_novel.html", pe
     tokens_for_novel = Token.query.filter(novel=novel_object)
     token_purchased_dict = {"Redeemed": False,
                             "Unredeemed": True}
+    token_valid_purchased_dict = {}
     # Sales for each of the currencies
     # https://docs.djangoproject.com/en/1.9/topics/db/aggregation/
     # Dictionary comprehension: http://stackoverflow.com/a/14507637/295606
@@ -701,9 +702,9 @@ def price_novel(request, novel_surl, template_name="sqwyre/price_novel.html", pe
     for key, value in token_purchased_dict.items():
         token_purchased_dict[key] = {}
         tokens_for_loop = tokens_for_novel.valid_purchased(value).all()
-        if value:
-            token_valid_purchased_count = tokens_for_loop.count()
         for region in regions_for_price_list:
+            if value:
+                token_valid_purchased_dict[region] = tokens_for_loop.filter(pricing_region=region).count()
             token_purchased_dict[key][region] = []
             for c in currency_dict.keys():
                 tokens_for_currency = tokens_for_loop.filter(currency=c).filter(pricing_region=region)
@@ -833,22 +834,18 @@ def preorder_reminder(request, novel_surl):
     novel_object = get_object_or_404(Novel, surl=novel_surl)
     if request.method == "POST":
         if request.is_ajax():
+            data = request.POST
             reminder_response = {'response': 'failure'}
             # Get count of all unredeemed tokens related to novel
             tokens_for_reminder= (
                 Token.query.filter(novel=novel_object)
+                .filter(pricing_region=data["region"])
                 .valid_purchased(True)
                 .all()
             )
             # Process emails
-            if request.user.facebook_name:
-                usr_name = request.user.facebook_name
-            else:
-                usr_name = request.user.username
-            from_address = "%s <%s>" % (usr_name, request.user.email)
             for token_object in tokens_for_reminder:
                 email_kwargs = {'to': token_object.recipient,
-                                'from': from_address,
                                 'subject': EMAIL_SUBJECT['preorder_reminder'] + novel_object.title,
                                 'template': 'preorder_reminder',
                                 'context': {'token_object': token_object}
@@ -908,8 +905,8 @@ def download_novel(request, token_surl, template_name="sqwyre/download_novel.htm
                          'links': {}
             }
             # https://code.google.com/p/boto/wiki/GetAllKeys
-            for k in bucket.list(settings.S3_EBOOK_DOWNLOAD_FOLDER):
-                ky = k.key.replace(settings.S3_EBOOK_DOWNLOAD_FOLDER + "/", "")
+            for k in bucket.list(price_object.download_folder):
+                ky = k.key.replace(price_object.download_folder + "/", "")
                 if ky:
                     downloads['links'][ky] = k.generate_url(settings.S3_TIMER)
             if token_object.is_purchased and token_object.is_valid:
@@ -946,6 +943,29 @@ def reader_update(request):
             usr_response = {'response': 'success'}
             return HttpResponse(json.dumps(usr_response), content_type="application/json")
     raise Http404
+
+def view_special(request, novel_surl, template_name="sqwyre/retailers.html"):
+    novel_object = get_object_or_404(Novel, surl=novel_surl)
+    page_title = novel_object.title
+    page_class = "home"
+    nav_set = None
+    price_object = sqwyd.get_price_object(novel_object, request)
+    can_buy = False
+    page_price = False
+    if price_object and price_object.can_buy:
+        # forex and pricing settings
+        fx = get_forex(price_object.currency)
+        fxd = price_object.currency
+        page_price = price_object.price
+        can_buy = price_object.can_buy
+    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
+    if request.user.is_authenticated():
+        can_read = request.user.reader.can_read(novel_object)
+        if can_read == "purchased":
+            can_buy = False
+        elif can_read != "borrowed" and request.user.reader.current_price > page_price:
+            page_price = request.user.reader.current_price
+    return render(request, template_name, locals())
 
 def testing_novel(request, template_name="sqwyre/testing_novel.html"):
     return render(request, template_name, locals())

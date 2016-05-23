@@ -38,7 +38,7 @@ def get_price_object(novel_object, request):
     """
     # country_code = get_user_country(request)
     # Testing
-    country_code = 'US'
+    country_code = 'GB'
     from ..sqwyre.models import GlobalPrice
     price_object = GlobalPrice.query.country_price(country_code, novel_object).all()
     if len(price_object) > 1:

@@ -18,23 +18,23 @@
         <div class="row text-center col-md-10 col-md-push-1">
         {% if not token_object.is_valid and not request.user.is_authenticated %}
             <p>This token has already been redeemed.</p>
-        {% elif user_has_purchased and token_object.is_preorder %}
+        {% elif user_has_purchased and price_object.is_preorder %}
             <p>Thank you for preordering {{ token_object.novel.title }}.</p>
         {% elif token_object.is_valid %}
-            {% if token_object.creator %}
+            {% if not token_object.creator and token_object.is_purchased %}
+            <p>Thank you for your purchase of {{ token_object.novel.title }} (or, if someone bought it for you, they
+            have chosen to remain anonymous).</p>
+            {% elif token_object.creator %}
             <p>{{ token_object.creator.facebook_name }} has
-            {% if token_object.is_preorder %}preordered {{ token_object.novel.title }} for you.
+            {% if price_object.is_preorder %}preordered {{ token_object.novel.title }} for you.
             {% elif token_object.is_purchased %}purchased {{ token_object.novel.title }} for you.
             {% else %}loaned you a copy of {{ token_object.novel.title }} for {{ days }} days.{% endif %}</p>
             {% endif %}
-        {% elif token_object.is_purchased  %}
-            <p>Thank you for your purchase of {{ token_object.novel.title }} (or, if someone bought it for you, they
-            have chosen to remain anonymous).</p>
         {% endif %}
         </div>
-        {% if token_object.novel.is_preorder %}
+        {% if price_object.is_preorder %}
         <div class="row text-center col-md-10 col-md-push-1">
-            <p><b>Note:</b> you will not be able to download until {{ token_object.novel.is_live_from|naturalday:"l, d F Y" }}
+            <p><b>Note:</b> you will not be able to download until {{ price_object.is_live_from|naturalday:"l, d F Y" }}
             although this link will remain active. I'll send you a friendly reminder when
             downloads go live.</p>
             {% if not request.user.is_authenticated %}
@@ -50,7 +50,7 @@
             </form>
             {% endif %}
         </div>
-        {% else %}
+        {% elif token_object.is_valid %}
         <div id="download_ebook">
             <div class="row text-center col-md-10 col-md-push-1">
                 <form action="{% url 'facebook_connect' %}?next={{ request.path }}&facebook_login=1" method="post">
@@ -95,7 +95,6 @@
             </div>
             {% endif %}
         </div>
-        {% endif %}
         <div class="row col-md-10 col-md-push-1">
             <small><p><br/></p>
             <dl><dt><strong>How this works (the fine print):</strong></dt>
@@ -164,6 +163,7 @@
             {% endif %}
             </small>
         </div>
+        {% endif %}
     </div>
 </div>
 {% endblock content %}

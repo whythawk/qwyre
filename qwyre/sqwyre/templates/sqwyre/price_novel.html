@@ -140,18 +140,19 @@
                 </div>
                 <div id="tab-sales" class="tab-pane">
                     <p></p>
-                    {% if novel_object.was_preorder and not novel_object.is_preorder and token_valid_purchased_count %}
-                    <form action="" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" value="{% url 'preorder_reminder' novel_object.surl %}"
-                               name="preorderReminder" id="preorderReminder" />
-                        <small>Send reminder to {{ token_valid_purchased_count }} unclaimed
-                        preorders?</small>
-                        <button type="submit" class="btn btn-default" name="token_preorder_reminder"
-                                id="token_preorder_reminder" value="save">Send</button>
-                    </form>
-                    <small>{{ novel_object.is_live_from|naturalday:"l, d F Y" }}</small>
-                    {% endif %}
+                    {% for p_region in price_list %}
+                        {% if p_region.was_preorder and not p_region.is_preorder and token_valid_purchased_dict|get_item:p_region.region %}
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" value="{% url 'preorder_reminder' novel_object.surl %}"
+                                   name="preorderReminder" id="preorderReminder" />
+                            <small>Send reminder to {{ token_valid_purchased_count.p_region }} unclaimed
+                            preorders in {{ p_region.region }}?</small>
+                            <button type="submit" class="btn btn-default" name="token_preorder_reminder"
+                                    id="token_preorder_reminder_{{ p_region.region }}" value="save">Send</button>
+                        </form>
+                        {% endif %}
+                    {% endfor %}
                     <p></p>
                     {% for key, r_dict in token_purchased_dict.items %}
                         <p>{{ key }}</p>
