@@ -184,6 +184,7 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
         # Set your secret key: remember to change this to your live secret key in production
         stripe_key = settings.STRIPE_PUBLISHABLE_KEY
         stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe.api_version = '2016-03-07'
         # Get the credit card details submitted by the form or via ajax
         data = request.POST
         # Process and test emails
@@ -208,9 +209,9 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
                 charge = stripe.Charge.create(
                     amount=data["stripePrice"], # amount in pence
                     currency=data["stripeCurrency"],
-                    card=data["stripeToken"],
+                    source=data["stripeToken"],
                     description=data["stripeDescription"],
-                    statement_description=novel_object.title,
+                    statement_descriptor=novel_object.title,
                     )
         except stripe.CardError, e:
           # The card has been declined
@@ -496,7 +497,7 @@ def redeem_token(request, token_surl, template_name="sqwyre/redeem_token.html"):
              user_has_purchased)):
             show_refund = True
             show_bitcoin_refund = False
-        if show_refund and not token_object.charge["card"]:
+        if show_refund and not token_object.charge["source"]["object"] == "card":
             show_bitcoin_refund = True
     page_title = token_object.novel.title
     novel_object = token_object.novel
@@ -527,7 +528,9 @@ def refund_token(request, token_surl, template_name="sqwyre/refund_token.html"):
     if token_object.is_valid and token_object.is_purchased:
         if request.user.is_authenticated() or not token_object.creator:
             token_refund = True
-        if not token_object.charge["card"] and (data["bitcoin_refund"] == "false" or data["bitcoin_refund"] == ""):
+        if (token_object.charge["source"]["object"] == "bitcoin_receiver" and
+            (data["bitcoin_refund"] == "false" or
+             data["bitcoin_refund"] == "")):
             token_refund = False # No bitcoin address for refund.
     if token_refund:
         stripe_key = settings.STRIPE_PUBLISHABLE_KEY
@@ -537,7 +540,7 @@ def refund_token(request, token_surl, template_name="sqwyre/refund_token.html"):
         try:
             # Get the token key
             stripe_charge = stripe.Charge.retrieve(token_object.charge["id"])
-            if token_object.charge["card"]:
+            if token_object.charge["source"]["object"] == "card":
                 stripe_refund = stripe_charge.refunds.create(
                     amount = int(token_object.price * 100), # amount in pence / cents
                     reason = "requested_by_customer",

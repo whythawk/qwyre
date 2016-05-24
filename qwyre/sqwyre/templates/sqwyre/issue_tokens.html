@@ -109,7 +109,7 @@
                                 {{ form.id }}
                                 <div class="col-xs-6">
                                 {{ form.recipient|add_class:"form-control" }}
-                                {% if form.instance.is_valid and not form.instance.charge.card %}
+                                {% if form.instance.is_valid and form.instance.charge.source.object == "bitcoin_receiver" %}
                                 <input type="text" class="form-control" placeholder="Enter refund wallet number"
                                        id="refundTokenWallet_{{forloop.counter0}}" />
                                 {% endif %}

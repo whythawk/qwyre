@@ -21,13 +21,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles import views
 from django.contrib.auth import views as dviews
+from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', views.serve),
-    url(r'^admin/', admin.site.urls),
+    url(r'^author/', admin.site.urls),
     url(r'^facebook/', include('django_facebook.urls')),
     url(r'^accounts/', include('django_facebook.auth_urls')),
     url(r'^logout/$', dviews.logout, {'next_page': '/'}, name='usr_logout'),
+    url(r'^robots\.txt/$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     url(r'^w/', include('qwyre.wiqi.urls')),
     url(r'^', include('qwyre.sqwyre.urls')),
 ]

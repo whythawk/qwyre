@@ -36,9 +36,9 @@ def get_price_object(novel_object, request):
     Return only one price for each country. If the queryset returns > 1, return the default
     price for this novel_object. If there's a complete glitch, that's a human-error clusterfuck.
     """
-    # country_code = get_user_country(request)
+    country_code = get_user_country(request)
     # Testing
-    country_code = 'GB'
+    # country_code = 'US'
     from ..sqwyre.models import GlobalPrice
     price_object = GlobalPrice.query.country_price(country_code, novel_object).all()
     if len(price_object) > 1:
