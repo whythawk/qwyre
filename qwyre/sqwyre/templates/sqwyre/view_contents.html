@@ -25,6 +25,18 @@
                 will rise the further into the novel you read.</p>                
                 {% endif %}
             </div>
+            {% else %}
+            <div id="cantbuytext">
+                {% if request.user.is_authenticated %}
+                <p>You'll need to purchase {{ novel_object.title }} from one of our
+                <a href="{% url 'view_retailers' novel_object.surl %}">retailers</a> to read the
+                non-linked chapters.</p>
+                {% else %}
+                <p>Once you login you can read the muted-coloured chapters for free. You'll need to buy
+                {{ novel_object.title }} from one of our
+                <a href="{% url 'view_retailers' novel_object.surl %}">retailers</a> to read the rest.</p>
+                {% endif %}
+            </div>
             {% endif %}
         </div>
     </div>
