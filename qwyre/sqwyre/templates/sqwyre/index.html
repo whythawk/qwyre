@@ -25,6 +25,8 @@
                             {% if request.user.is_authenticated and request.user.reader.current_view %}
                             <a id="read" href="{% url 'view_wiqi' request.user.reader.current_view %}"
                                class="btn btn-md btn-block btn-read" role="button">Continue Reading for Free</a>
+                            {% elif price_object.is_preorder %}
+                            <button class="btn btn-md btn-block btn-read" disabled>Start Reading {{ price_object.is_live_from|date:"d F Y" }}</button>
                             {% else %}
                             <a id="read" href="{{ novel_object.sentinal.get_url }}"
                                class="btn btn-md btn-block btn-read" role="button">Start Reading for Free</a>

@@ -3,3 +3,4 @@ Disallow: /media/
 Disallow: /author/
 Disallow: /facebook/
 Disallow: /accounts/
+Disallow: /rohtua/

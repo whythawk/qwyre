@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^author/', admin.site.urls),
     url(r'^facebook/', include('django_facebook.urls')),
     url(r'^accounts/', include('django_facebook.auth_urls')),
-    #url(r'^logout/$', dviews.logout, {'next_page': '/'}, name='usr_logout'),
+    url(r'^rohtua/$', dviews.logout, {'next_page': '/'}, name='usr_logout'),
     url(r'^robots\.txt/$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     url(r'^w/', include('qwyre.wiqi.urls')),
     url(r'^', include('qwyre.sqwyre.urls')),
