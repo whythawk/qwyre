@@ -25,7 +25,7 @@
                 will rise the further into the novel you read.</p>                
                 {% endif %}
             </div>
-            {% else %}
+            {% elif not can_read %}
             <div id="cantbuytext">
                 {% if request.user.is_authenticated %}
                 <p>You'll need to purchase {{ novel_object.title }} from one of our
@@ -38,6 +38,11 @@
                 {% endif %}
             </div>
             {% endif %}
+            {% if price_object.is_preorder %}
+            <div>
+                <p>Available from {{ price_object.is_live_from|date:"d F Y" }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
     <div class="row col-md-8 col-md-push-2 whyqd-content chapter content text-center">
@@ -45,6 +50,7 @@
         <input type="hidden" value="false" id="buytrigger"/>
         <p></p>
         {% for key, chapter in chapter_objects.chapters.items|sort %}
+            {% can_show_link request.user.is_authenticated chapter.read can_buy can_read as show_link %}
             {% if not forloop.first %}
                 |
             {% endif %}
@@ -53,13 +59,13 @@
             {% elif chapter.is_callout %}
                 <blockquote>
             {% endif %}
-            {% if request.user.is_authenticated or chapter.read != "own" %}
+            {% if show_link %}
                 <a href="{{ chapter.url }}" id="{{ chapter.read }}_{{ forloop.counter }}"
                 {% if not can_read and request.user.is_authenticated and chapter.read == "own" %} class="restricted-read"
                 {% elif not request.user.is_authenticated and chapter.read != "open" %} class="restricted-read"{% endif %}>
             {% endif %}
             {{ chapter.title }}
-            {% if request.user.is_authenticated or chapter.read != "own" %}
+            {% if show_link %}
                 </a>
             {% endif %}
             {% if chapter.is_section %}

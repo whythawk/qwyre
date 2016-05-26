@@ -60,3 +60,25 @@ def listsort(value):
 def get_item(dictionary, key):
     # http://stackoverflow.com/a/8000091/295606
     return dictionary.get(key)
+
+@register.simple_tag
+def can_show_link(is_auth, read_type, can_buy, can_read):
+    '''
+    Where:
+        is_auth = request.user.is_authenticated
+        read_type = open, logfree, login, or own
+        can_buy = T/F
+        can_read = purchased, borrowed, False
+    Based on these, return whether or not to show link.
+    Show if:
+        "open" or "logfree"
+        can_buy and login
+        can_buy and is_auth
+            
+    '''
+    if ((read_type in ["open", "logfree"]) or
+        (can_buy and read_type == "login") or
+        (can_buy and is_auth) or
+        (is_auth and can_read)):
+        return True
+    return False

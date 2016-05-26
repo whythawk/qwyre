@@ -24,12 +24,12 @@
                         <div class="col-md-6 col-md-push-3">
                             {% if request.user.is_authenticated and request.user.reader.current_view %}
                             <a id="read" href="{% url 'view_wiqi' request.user.reader.current_view %}"
-                               class="btn btn-md btn-block btn-read" role="button">Continue Reading for Free</a>
+                               class="btn btn-md btn-block btn-read" role="button">Continue reading for free</a>
                             {% elif price_object.is_preorder %}
-                            <button class="btn btn-md btn-block btn-read" disabled>Start Reading {{ price_object.is_live_from|date:"d F Y" }}</button>
+                            <button class="btn btn-md btn-block btn-read" disabled>Start reading {{ price_object.is_live_from|date:"d F Y" }}</button>
                             {% else %}
                             <a id="read" href="{{ novel_object.sentinal.get_url }}"
-                               class="btn btn-md btn-block btn-read" role="button">Start Reading for Free</a>
+                               class="btn btn-md btn-block btn-read" role="button">Start reading for free</a>
                             {% endif %}
                         </div>
                         <div class="col-xs-12 text-center">
