@@ -84,7 +84,7 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
             nav_title = "stack"
         # Now test if the reader has the right to see novel, or if it is still preorder
         price_object = sqwyd.get_price_object(novel_object, request)
-        if not request.user.is_superuser and price_object.is_preorder:
+        if not request.user.is_superuser and price_object and price_object.is_preorder:
             return redirect('view_novel', novel_surl=novel_object.surl)
         user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
         page_title = novel_object.title
