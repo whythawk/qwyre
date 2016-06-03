@@ -55,7 +55,21 @@
 		{% include 'django_facebook/_facebook_js.html' %}
         <script src="{% static 'js/jquery.whyqd.js' %}"></script>
 		<script src="{% static 'js/jquery.bootstrap-autohidingnavbar.min.js' %}"></script>
-		<script>$("div.navbar-fixed-top").autoHidingNavbar();</script>
+		<script>
+			$("div.navbar-fixed-top").autoHidingNavbar();
+			{% if page_class == "home" %}
+				$(document).ready(function() {
+					var times = 12;
+					var duration = 40;
+					for (var i = 0; i < times; i++)
+						$("#qwyre-logo").animate({
+							left: (i % 2 === 0 ? "-" : "+") + "=3"
+						}, duration);
+					$("#hidden-nav-menu").collapse('show');
+					setTimeout(function(){$("#hidden-nav-menu").collapse('hide');}, 2000);
+				});
+			{% endif %}
+			</script>
     	{% endblock scripts %}
     	{% block extrascripts %}{% endblock extrascripts %}
     </body>
