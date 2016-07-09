@@ -17,7 +17,7 @@ https://qwyre.com{% url 'issue_tokens' token_object.novel.slug %}
 
 Thank you and I hope everyone enjoys your gift,
 
-{{ token_object.novel.creator.facebook_name }}
+{{ token_object.novel.creator.first_name }} {{ token_object.novel.creator.last_name }}
 
 Author - {{ token_object.novel.title }}
 https://qwyre.com{{ token_object.novel.get_absolute_url }}

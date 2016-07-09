@@ -24,7 +24,7 @@ If you choose to login with Facebook, your online access allows you to:
 
 Thank you and I hope you love the book,
 
-{{ token_object.novel.creator.facebook_name }}
+{{ token_object.novel.creator.first_name }} {{ token_object.novel.creator.last_name }}
 
 Author - {{ token_object.novel.title }}
 https://qwyre.com{{ token_object.novel.get_absolute_url }}
