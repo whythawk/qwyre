@@ -36,9 +36,9 @@ def get_price_object(novel_object, request):
     Return only one price for each country. If the queryset returns > 1, return the default
     price for this novel_object. If there's a complete glitch, that's a human-error clusterfuck.
     """
-    country_code = get_user_country(request)
+    # country_code = get_user_country(request)
     # Testing
-    # country_code = 'US'
+    country_code = 'US'
     from ..sqwyre.models import GlobalPrice
     price_object = GlobalPrice.query.country_price(country_code, novel_object).all()
     if len(price_object) > 1:
@@ -57,6 +57,39 @@ def user_has_purchased(request, novel_object):
     else:
         return False
     
+def get_novel_for_user_details(request, novel_object):
+    novel_dict = {}
+    novel_dict['nav_set'] = None
+    price_object = get_price_object(novel_object, request)
+    can_buy = False
+    can_read = False
+    page_price = False
+    if price_object and price_object.can_buy:
+        # forex and pricing settings
+        fx = get_forex(price_object.currency)
+        fxd = price_object.currency
+        page_price = price_object.price
+        can_buy = price_object.can_buy
+    user_purchased = user_has_purchased(request, novel_object)
+    if request.user.is_authenticated():
+        can_read = request.user.reader.can_read(novel_object)
+        if can_read == "purchased":
+            can_buy = False
+        elif can_read != "borrowed" and request.user.reader.current_price > page_price:
+            page_price = request.user.reader.current_price
+    novel_dict = {
+        'novel_object': novel_object,
+        'nav_set': None,
+        'price_object': price_object,
+        'can_buy': can_buy,
+        'page_price': page_price,
+        'fx': fx,
+        'fxd': fxd,
+        'user_has_purchased': user_purchased,
+        'can_read': can_read,
+    }
+    return novel_dict
+        
 def closeness(a, b):
     """
     Returns measure of equality, in unit of decimal significant figures.

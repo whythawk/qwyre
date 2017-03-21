@@ -8,13 +8,8 @@
 <div class="container-fluid page-background">
     <div class="container redeem">
         <div class="col-xs-12">
-            <div class="row">
-                <div class="col-md-10 col-md-push-1">
-                    <div class="content">
-                        <blockquote class="redeem"><small>{{ novel_object.summary }}</small></blockquote>
-                    </div>
-                </div>
-            </div>
+        <br><br><br>
+        <h1 style="text-align:center;">{{ novel_object.title }} - Redeem your purchase</h1>
         <div class="row text-center col-md-10 col-md-push-1">
         {% if not token_object.is_valid and not request.user.is_authenticated %}
             <p>This token has already been redeemed.</p>
@@ -22,7 +17,7 @@
             <p>Thank you for preordering {{ token_object.novel.title }}.</p>
         {% elif token_object.is_valid %}
             {% if not token_object.creator and token_object.is_purchased %}
-            <p>Thank you for your purchase of {{ token_object.novel.title }} (or, if someone bought it for you, they
+            <p>Thank you for your purchase of "{{ token_object.novel.title }}" (or, if someone bought it for you, they
             have chosen to remain anonymous).</p>
             {% elif token_object.creator %}
             <p>{{ token_object.creator.facebook_name }} has

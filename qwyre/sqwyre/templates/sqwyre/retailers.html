@@ -8,14 +8,9 @@
         <div class="col-xs-12 content bio">
             <div class="row">
                 <div class="col-md-10 col-md-push-1">
-                    <div class="content">
-                        <blockquote class="redeem"><small><br></small></blockquote>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-10 col-md-push-1">
                     <div class="redeem">
+                        <br><br><br>
+                        <h1 style="text-align:center;">{{ novel_object.title }} - Retailers</h1>
                         {% if can_buy %}
                         <p>The ebooks you buy from this site are not your ordinary mass-produced digital 
                         products. Each bit is lovingly hand-crafted.</p>
@@ -44,6 +39,10 @@
                                 {% include 'sqwyre/buy_novel.html' %}
                             {% endblock buynovel %}
                             {% endif %}
+                        </div>
+                        <div>
+                            <input type="hidden" value="{{ novel_object.getcover }}"
+                                   id="coverimage" name="coverimage" />
                         </div>
                     </div>
                 </div>

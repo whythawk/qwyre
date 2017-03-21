@@ -34,7 +34,19 @@ EMAIL_SUBJECT = {'gift_lend': ' has lent you a copy of ',
                  'preorder_reminder': 'Download your copy of '
                  }
 
-def view_novel(request, novel_surl=None, template_name="sqwyre/index.html"):
+def view_index(request, template_name="sqwyre/index.html"):
+    novel_objects = Novel.objects.all().order_by('-is_live_from')
+    if not novel_objects:
+        return redirect("create_novel")
+    page_title = "Gavin Chait"
+    page_subtitle = "Start Reading"
+    #page_class = "home"
+    novel_list = []
+    for novel_object in novel_objects:
+        novel_list.append(sqwyd.get_novel_for_user_details(request, novel_object))
+    return render(request, template_name, locals())
+
+def view_novel(request, novel_surl=None, template_name="sqwyre/view_novel.html"):
     if novel_surl:
         novel_object = get_object_or_404(Novel, surl=novel_surl)
     else:
@@ -213,8 +225,8 @@ def buy_novel(request, novel_surl, template_name="sqwyre/buy_novel.html"):
                     description=data["stripeDescription"],
                     statement_descriptor=novel_object.title,
                     )
-        except stripe.CardError, e:
-          # The card has been declined
+        except (stripe.CardError, stripe.SMTPRecipientsRefused) as e:
+            # The card has been declined
             if request.is_ajax():
                 return HttpResponse(json.dumps(buy_response), content_type="application/json")
             return render(request, template_name, locals())

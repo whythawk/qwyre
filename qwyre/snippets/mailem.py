@@ -2,6 +2,8 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
+from smtplib import SMTPRecipientsRefused
+
 def send_email(*args, **kwargs):
     """
     Send email handler; kwargs to include:
@@ -18,7 +20,7 @@ def send_email(*args, **kwargs):
         email.html('{0}/mail/{1}.html'.format(
             settings.TEMPLATES[0]['DIRS'][0], kwargs.get('template')), kwargs.get('context'))
     from_address = kwargs.get('from', None)
-    email.send(from_addr=from_address, fail_silently=False)
+    email.send(from_addr=from_address, fail_silently=True)
     
 #def send_email_text(*args, **kwargs):
 #    from django.template import Context, Template
@@ -58,7 +60,7 @@ class Emailer():
     def text(self, template, context):
         self._text = self._render(template, context)
  
-    def send(self, from_addr=None, fail_silently=False):
+    def send(self, from_addr=None, fail_silently=True):
         if isinstance(self.to, basestring):
             self.to = [self.to]
         if not from_addr:

@@ -1,0 +1,57 @@
+{% load mathfilters %}
+
+{% comment %}
+    Must provide:
+        page_price for the current pricing (user price vs page price)
+        fxd for foreign exchange default currency
+        fx for exchange rates
+        novel_object for the novel this refers to
+    Optional:
+        next_price for next page price beneath the button (means we're on a view page)
+        <input type="hidden" value="false" id="buytrigger"/> will be set true and can
+        triggger a jquery .change() event - put this somewhere on your view page
+    Preorder:
+        if price_object.is_preorder True, then need to manage preorders for user.
+{% endcomment %}
+
+<div id="buynow_{{forloop.counter0}}">
+    <form action="{% url 'buy_novel' novel.novel_object.surl %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" value="{{ novel.page_price|mul:100|floatformat:"0" }}"
+               id="basePrice_{{forloop.counter0}}" name="basePrice_{{forloop.counter0}}" />
+        <input type="hidden" value="{{ novel.fxd }}"
+               id="stripeCurrency_{{forloop.counter0}}" name="stripeCurrency_{{forloop.counter0}}" />
+        <input type="hidden"
+               value="{% if next_price %}{{ next_price|mul:100|floatformat:"0" }}{% endif %}"
+               id="nextPrice_{{forloop.counter0}}" name="nextPrice_{{forloop.counter0}}" />
+        <input type="hidden"  value="{{ novel.page_price|mul:100|floatformat:"0" }}"
+               id="stripePrice_{{forloop.counter0}}" name="stripePrice_{{forloop.counter0}}" />
+        <input type="hidden" value="{% url 'novel_settings' novel.novel_object.surl %}"
+               id="stripeSettings_{{forloop.counter0}}" name="stripeSettings_{{forloop.counter0}}" />
+        {% if novel.price_object.is_preorder %}
+        <input type="hidden" value="preorder" id="mailTemplate_{{forloop.counter0}}" name="mailTemplate_{{forloop.counter0}}" />
+        {% else %}
+        <input type="hidden" value="purchase" id="mailTemplate_{{forloop.counter0}}" name="mailTemplate_{{forloop.counter0}}" />
+        {% endif %}
+        <input type="hidden" value="{% url 'buy_novel' novel.novel_object.surl %}"
+               id="stripeBuy_{{forloop.counter0}}" name="stripeBuy_{{forloop.counter0}}" />
+        <input type="hidden" value="{{ novel.price_object.is_preorder_text }}"
+               id="novelPreorder_{{forloop.counter0}}" name="novelPreorder_{{forloop.counter0}}" />
+    </form>
+    <div class="btn-group">
+        <button id="stripeButton_{{forloop.counter0}}" class="btn btn-lg btn-buy-dropdown inverse" >
+            {{ novel.price_object.is_preorder_text }} for {{ novel.price_object.currency_verbose|safe }} {{ novel.page_price }}
+        </button>
+        <button id="stripeCaret_{{forloop.counter0}}" type="button" data-toggle="dropdown"
+                class="btn btn-lg dropdown-toggle btn-buy-dropdown">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu" role="menu">{# http://stackoverflow.com/a/24654441 #}
+            <li id="forex_usd_{{forloop.counter0}}" data-value="{{ novel.fx.usd }}"><a href="#">USD</a></li>
+            <li id="forex_gbp_{{forloop.counter0}}" data-value="{{ novel.fx.gbp }}"><a href="#">GBP</a></li>
+            <li id="forex_eur_{{forloop.counter0}}" data-value="{{ novel.fx.eur }}"><a href="#">EUR</a></li>
+            <li id="forex_btc_{{forloop.counter0}}" data-value="{{ novel.fx.btc }}"><a href="#">BTC</a></li>
+        </ul>
+    </div>
+</div>

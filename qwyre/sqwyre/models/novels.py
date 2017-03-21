@@ -16,6 +16,10 @@ import collections
 from django.utils.text import slugify
 import re
 
+#http://stackoverflow.com/a/1190866
+def get_filename(self, filename):
+    return '/'.join(['novels', self.slug, filename])
+
 class Novel(models.Model):
     """
     The novel contains a list of chapters links (wiqis) and all data required for managing
@@ -59,9 +63,21 @@ class Novel(models.Model):
     licensing = models.CharField(max_length=50, choices=settings.LICENCE_CHOICE,
                                  default=settings.LICENCE_DEFAULT,
                                verbose_name="Release License", help_text="What form of copyright do you offer?")
+    legal = models.TextField(blank=True, null=True, verbose_name="Legal",
+                               help_text="Any legal requirements on publishing.")
     language = models.CharField(max_length=50, blank=True, null=True,
                                 verbose_name="Published language",
                                 help_text="The language you're writing in.")
+    # Novel covers and images
+    image_cover = models.ImageField(upload_to=get_filename, blank=True)
+    image_mini = models.ImageField(upload_to=get_filename, blank=True)
+    image_caption = models.CharField(max_length=200, blank=True,
+                               verbose_name="Caption", 
+                               help_text="A caption for the image.")
+    image_attribution = models.CharField(max_length=200, blank=True,
+                               verbose_name="Source Attribution", 
+                               help_text="A description of the title.")
+    quote_file = models.FileField(upload_to=get_filename, blank=True)
 
     class Meta:
         # http://www.nomadjourney.com/2009/11/splitting-up-django-models/
@@ -208,3 +224,15 @@ class Novel(models.Model):
                     wiqi_object.stack.save()
             return self.refresh_chapters(first_wiqi_object)
         return self
+    
+    @property
+    def getcover(self):
+        if self.image_cover:
+            return self.image_cover.url
+        return None
+    
+    @property
+    def getminicover(self):
+        if self.imagemini:
+            return self.image_mini.url
+        return None
