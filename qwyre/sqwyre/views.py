@@ -40,7 +40,7 @@ def view_index(request, template_name="sqwyre/index.html"):
         return redirect("create_novel")
     page_title = "Gavin Chait"
     page_subtitle = "Start Reading"
-    #page_class = "home"
+    page_class = "home"
     novel_list = []
     for novel_object in novel_objects:
         novel_list.append(sqwyd.get_novel_for_user_details(request, novel_object))

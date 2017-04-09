@@ -40,7 +40,7 @@
     </form>
     <div class="btn-group">
         <button id="stripeButton_{{forloop.counter0}}" class="btn btn-lg btn-buy-dropdown inverse" >
-            {{ novel.price_object.is_preorder_text }} for {{ novel.price_object.currency_verbose|safe }} {{ novel.page_price }}
+            {{ novel.price_object.is_preorder_text }} for {{ novel.price_object.currency_verbose|safe }}{{ novel.page_price }}
         </button>
         <button id="stripeCaret_{{forloop.counter0}}" type="button" data-toggle="dropdown"
                 class="btn btn-lg dropdown-toggle btn-buy-dropdown">

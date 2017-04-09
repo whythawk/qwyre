@@ -90,9 +90,9 @@ urlpatterns = [
                    {"template_name": "sqwyre/view_novel.html"},
                    name="view_novel"),
                 # Static pages
-                url(r"^(?P<novel_surl>[-\w]+)/about/", views.view_novel,
-                    {"template_name": "sqwyre/about.html"},
-                    name="about"),
+                # url(r"^(?P<novel_surl>[-\w]+)/about/", views.view_novel,
+                #     {"template_name": "sqwyre/about.html"},
+                #     name="about"),
                 url(r"^(?P<novel_surl>[-\w]+)/legal/", views.view_legal,
                     {"template_name": "sqwyre/legal.html"},
                     name="legal"),

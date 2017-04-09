@@ -25,6 +25,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', views.serve),
+    url(r'^about/', TemplateView.as_view(template_name="about.html"), name="about"),
     url(r'^author/', admin.site.urls),
     url(r'^facebook/', include('django_facebook.urls')),
     url(r'^accounts/', include('django_facebook.auth_urls')),

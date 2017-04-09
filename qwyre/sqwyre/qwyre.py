@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from guardian.shortcuts import assign_perm, get_objects_for_user, get_perms
+import requests
 
 from ..wiqi.models import Wiqi, Text, WIQI_TYPE_DICT, DEFAULT_WIQISTACK_TYPE
 from ..wiqi.forms import TextForm, WIQI_FORM_TYPE_DICT
@@ -19,6 +20,7 @@ import math
 from decimal import Decimal
 
 def get_user_ip(request):
+    # http://stackoverflow.com/a/4581997
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
@@ -27,18 +29,27 @@ def get_user_ip(request):
     return ip
 
 def get_user_country(request):
-    # Specific to using CloudFlare
-    # https://support.cloudflare.com/hc/en-us/articles/205072537-What-are-the-two-letter-country-codes-for-the-Access-Rules-
-    return request.META.get('HTTP_CF_IPCOUNTRY', settings.COUNTRY_DEFAULT)
+    try:
+        # Specific to using CloudFlare
+        # https://support.cloudflare.com/hc/en-us/articles/205072537-What-are-the-two-letter-country-codes-for-the-Access-Rules-
+        user_country = request.META.get('HTTP_CF_IPCOUNTRY')
+        if not user_country:
+            # If not using CloudFlare
+            # http://docs.python-requests.org/en/master/user/quickstart/#response-content
+            user_country = requests.get(settings.IPINFO_URL.format(get_user_ip(request)))
+            user_country.raise_for_status()
+        if user_country.text[:2] in settings.ALL_COUNTRIES:
+            return user_country.text[:2]
+        raise requests.exceptions.HTTPError
+    except requests.exceptions.HTTPError:
+        return 'US' # settings.COUNTRY_DEFAULT
 
 def get_price_object(novel_object, request):
     """
     Return only one price for each country. If the queryset returns > 1, return the default
     price for this novel_object. If there's a complete glitch, that's a human-error clusterfuck.
     """
-    # country_code = get_user_country(request)
-    # Testing
-    country_code = 'US'
+    country_code = get_user_country(request)
     from ..sqwyre.models import GlobalPrice
     price_object = GlobalPrice.query.country_price(country_code, novel_object).all()
     if len(price_object) > 1:
@@ -58,36 +69,28 @@ def user_has_purchased(request, novel_object):
         return False
     
 def get_novel_for_user_details(request, novel_object):
-    novel_dict = {}
-    novel_dict['nav_set'] = None
-    price_object = get_price_object(novel_object, request)
-    can_buy = False
-    can_read = False
-    page_price = False
-    if price_object and price_object.can_buy:
-        # forex and pricing settings
-        fx = get_forex(price_object.currency)
-        fxd = price_object.currency
-        page_price = price_object.price
-        can_buy = price_object.can_buy
-    user_purchased = user_has_purchased(request, novel_object)
-    if request.user.is_authenticated():
-        can_read = request.user.reader.can_read(novel_object)
-        if can_read == "purchased":
-            can_buy = False
-        elif can_read != "borrowed" and request.user.reader.current_price > page_price:
-            page_price = request.user.reader.current_price
     novel_dict = {
         'novel_object': novel_object,
         'nav_set': None,
-        'price_object': price_object,
-        'can_buy': can_buy,
-        'page_price': page_price,
-        'fx': fx,
-        'fxd': fxd,
-        'user_has_purchased': user_purchased,
-        'can_read': can_read,
+        'can_buy': False,
+        'can_read': False,
+        'page_price': False,
     }
+    price_object = get_price_object(novel_object, request)
+    if price_object and price_object.can_buy:
+        # forex and pricing settings
+        novel_dict['fx'] = get_forex(price_object.currency)
+        novel_dict['fxd'] = price_object.currency
+        novel_dict['page_price'] = price_object.price
+        novel_dict['can_buy'] = price_object.can_buy
+        novel_dict['price_object'] = price_object
+    novel_dict['user_has_purchased'] = user_has_purchased(request, novel_object)
+    if request.user.is_authenticated():
+        novel_dict['can_read'] = request.user.reader.can_read(novel_object)
+        if novel_dict['can_read'] == "purchased":
+            novel_dict['can_buy'] = False
+        elif novel_dict['can_read'] != "borrowed" and request.user.reader.current_price > novel_dict['page_price']:
+            novel_dict['page_price'] = request.user.reader.current_price
     return novel_dict
         
 def closeness(a, b):
