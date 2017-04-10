@@ -42,7 +42,7 @@ def get_user_country(request):
             return user_country.text[:2]
         raise requests.exceptions.HTTPError
     except requests.exceptions.HTTPError:
-        return 'US' # settings.COUNTRY_DEFAULT
+        return settings.COUNTRY_DEFAULT
 
 def get_price_object(novel_object, request):
     """
