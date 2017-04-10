@@ -251,7 +251,7 @@
 				{% endif %}
 				<span class="smallprint">Please review our Terms of Service<br>for 
 					{% for novel in novel_list %}
-					{% if not forloop.first and not forloop.last %}, {% endif %}{% if forloop.last %}, and {% endif %}<a href="{% url 'legal' novel.novel_object.surl %}">{{ novel.novel_object.title }}</a>{% if forloop.last %}.{% endif %}
+					{% if not forloop.first and not forloop.last %}, {% endif %}{% if not forloop.first and forloop.last %}, and {% endif %}<a href="{% url 'legal' novel.novel_object.surl %}">{{ novel.novel_object.title }}</a>{% if forloop.last %}.{% endif %}
 					{% endfor %}
 				</span>
 			</div>
