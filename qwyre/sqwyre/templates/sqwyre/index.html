@@ -251,8 +251,7 @@
 				{% endif %}
 				<span class="smallprint">Please review our Terms of Service<br>for 
 					{% for novel in novel_list %}
-					{% if novel.can_buy %}{% if not forloop.first and not forloop.last %}, {% endif %}{% if forloop.last %}, and {% endif %}<a href="{% url 'legal' novel.novel_object.surl %}">{{ novel.novel_object.title }}</a>{% if forloop.last %}.{% endif %}
-					{% endif %}
+					{% if not forloop.first and not forloop.last %}, {% endif %}{% if forloop.last %}, and {% endif %}<a href="{% url 'legal' novel.novel_object.surl %}">{{ novel.novel_object.title }}</a>{% if forloop.last %}.{% endif %}
 					{% endfor %}
 				</span>
 			</div>
@@ -273,7 +272,6 @@
 $(document).ready(function() {
 	$.getJSON("/media/reviewquotes.txt",function(result){
 		// return Math.floor(Math.random()*(max-min+1)+min);
-		console.log(result);
 		var num = Math.floor(Math.random() * 4) + 1 + '';
 		$('#quote').html(result[num]['quote']);
 		$('#source').html(result[num]['source']);
