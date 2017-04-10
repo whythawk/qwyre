@@ -38,8 +38,9 @@ def get_user_country(request):
             # http://docs.python-requests.org/en/master/user/quickstart/#response-content
             user_country = requests.get(settings.IPINFO_URL.format(get_user_ip(request)))
             user_country.raise_for_status()
-        if user_country.text[:2] in settings.ALL_COUNTRIES:
-            return user_country.text[:2]
+            user_country = user_country.text[:2]
+        if user_country in settings.ALL_COUNTRIES:
+            return user_country
         raise requests.exceptions.HTTPError
     except requests.exceptions.HTTPError:
         return settings.COUNTRY_DEFAULT
