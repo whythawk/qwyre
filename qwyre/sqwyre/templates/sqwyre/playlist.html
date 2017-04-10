@@ -3,19 +3,14 @@
 {% load staticfiles %}
 
 {% block content %}
-<div class="container-fluid page-background">
+<div id="novelplaylist" class="container-fluid page-background">
     <div class="container redeem">
         <div class="col-xs-12 content bio">
             <div class="row">
                 <div class="col-md-10 col-md-push-1">
-                    <div class="content">
-                        <blockquote class="redeem"><small><br></small></blockquote>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-10 col-md-push-1">
                     <div class="redeem">
+                        <br><br><br>
+                        <h1 style="text-align:center;">{{ novel_object.title }} - Playlist</h1>
                         <p>If you would like to immerse yourself further, here is the music playlist
 						along with the relevant scenes where they belong:</p>
                         {{ novel_object.playlist|safe }}
@@ -33,6 +28,10 @@
                                 {% include 'sqwyre/buy_novel.html' %}
                             {% endblock buynovel %}
                             {% endif %}
+                        </div>
+						<div>
+                            <input type="hidden" value="{{ novel_object.getcover }}"
+                                   id="coverimage" name="coverimage" />
                         </div>
                     </div>
                 </div>

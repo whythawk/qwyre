@@ -6,13 +6,14 @@ from guardian.shortcuts import assign_perm, get_objects_for_user, remove_perm
 from datetime import datetime, timedelta
 import pytz
 from django.conf import settings
+from jsonfield import JSONField
 from qwyre.sqwyre.models import Novel
 from decimal import Decimal
 
 class Reader(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    bookshelf = JSONField(blank=True, null=True)
     current_view = models.CharField(max_length=32, blank=True, verbose_name="Current chapter view.")
-    current_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     optout = models.BooleanField(default=False)
 
     class Meta:
@@ -85,3 +86,43 @@ class Reader(models.Model):
             deadline = self.deadline(token_object).strftime('%d %B %Y')
             return "%s has lent you %s until %s." % (token_object.creator.username, item.title, deadline)
         return "You don't have access to %s." % item.title
+    
+    def get_bookshelf(self, novel_object):
+        """
+        Return the current price and current page for the user for a specific novel_object.
+        If no novel_object has been set, create it and return None for each.
+        Structure of json is: {'novel_surl': {'current_price': 'price', 'current_page': 'page'}}
+        :param kwargs: novel_object
+        :return: dict of current_view and current_price
+        """
+        if not self.bookshelf:
+            self.bookshelf = {}
+        if not self.bookshelf.get(novel_object.slug):
+            self.bookshelf[novel_object.slug] = {
+                'current_price': '0.00',
+                'current_view': None
+            }
+            self.save()
+        return self.bookshelf[novel_object.slug]
+    
+    def current_price(self, novel_object, new_price=None):
+        """
+        Return the current price for the current novel_object.
+        """
+        bookshelf_object = self.get_bookshelf(novel_object)
+        if new_price:
+            self.bookshelf[novel_object.slug]['current_price'] = str(new_price)
+            bookshelf_object['current_price'] = str(new_price)
+            self.save()
+        return Decimal(bookshelf_object['current_price'])
+    
+    # def current_view(self, novel_object, new_view=None):
+    #     """
+    #     Return the current view for the current novel_object.
+    #     """
+    #     bookshelf_object = self.get_bookshelf(novel_object)
+    #     if new_view:
+    #         self.bookshelf[novel_object.slug]['current_view'] = new_view
+    #         bookshelf_object['current_view'] = new_view
+    #         self.save()
+    #     return bookshelf_object['current_view']

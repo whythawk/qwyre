@@ -87,12 +87,12 @@ urlpatterns = [
                 ###########################################
                 # View Novel
                 url(r"^(?P<novel_surl>[-\w]+)/$", views.view_novel,
-                   {"template_name": "sqwyre/index.html"},
+                   {"template_name": "sqwyre/view_novel.html"},
                    name="view_novel"),
                 # Static pages
-                url(r"^(?P<novel_surl>[-\w]+)/about/", views.view_novel,
-                    {"template_name": "sqwyre/about.html"},
-                    name="about"),
+                # url(r"^(?P<novel_surl>[-\w]+)/about/", views.view_novel,
+                #     {"template_name": "sqwyre/about.html"},
+                #     name="about"),
                 url(r"^(?P<novel_surl>[-\w]+)/legal/", views.view_legal,
                     {"template_name": "sqwyre/legal.html"},
                     name="legal"),
@@ -118,6 +118,6 @@ urlpatterns = [
                 url(r"^w/(?P<wiqi_surl>[-\w]+)/", views.view_chapter,
                     {"template_name": "sqwyre/view_text.html", "nav_type":"view"},
                     name="view_wiqi"),
-                url(r'^$', views.view_novel, {"template_name": "sqwyre/index.html"},
+                url(r'^$', views.view_index, {"template_name": "sqwyre/index.html"},
                     name='index'),
                 ]
