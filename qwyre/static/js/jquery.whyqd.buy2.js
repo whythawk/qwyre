@@ -66,7 +66,7 @@ $(document).ready(function() {
                                     }
                                 }
                                 else {
-                                    $('#buynowresponse' + novel_id).before(
+                                    $('#buynowresponse').before(
                                         '<div class="alert alert-danger alert-dismissable">'+
                                             '<button type="button" class="close" ' + 
                                                 'data-dismiss="alert" aria-hidden="true">' + '&times;' + 
@@ -77,7 +77,7 @@ $(document).ready(function() {
                                 }
                             },
                             error: function(data) {
-                                $('#buynowresponse' + novel_id).after(
+                                $('#buynowresponse').after(
                                     '<div class="alert alert-danger alert-dismissable">'+
                                         '<button type="button" class="close" ' + 
                                             'data-dismiss="alert" aria-hidden="true">' + '&times;' + 

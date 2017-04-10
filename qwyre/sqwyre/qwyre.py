@@ -89,8 +89,9 @@ def get_novel_for_user_details(request, novel_object):
         novel_dict['can_read'] = request.user.reader.can_read(novel_object)
         if novel_dict['can_read'] == "purchased":
             novel_dict['can_buy'] = False
-        elif novel_dict['can_read'] != "borrowed" and request.user.reader.current_price > novel_dict['page_price']:
-            novel_dict['page_price'] = request.user.reader.current_price
+        elif novel_dict['can_read'] != "borrowed" and \
+            request.user.reader.current_price(novel_object) > novel_dict['page_price']:
+            novel_dict['page_price'] = request.user.reader.current_price(novel_object)
     return novel_dict
         
 def closeness(a, b):
@@ -116,8 +117,8 @@ def check_fraud(user, price_object, data_object, data_length):
     try:
         check_price = price_object.price * 100
         if data_object.get("selfPurchase", False) == "true" and user.is_authenticated():
-            if user.reader.current_price > price_object.price:
-                check_price = user.reader.current_price * 100
+            if user.reader.current_price(price_object.novel) > price_object.price:
+                check_price = user.reader.current_price(price_object.novel) * 100
         received_price = int(data_object["stripePrice"])
         fx = get_forex(price_object.currency).get(data_object["stripeCurrency"].lower(), False)
         if not fx:

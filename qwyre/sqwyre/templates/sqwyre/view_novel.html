@@ -16,12 +16,12 @@
                             <div id="quote"></div>
                             <footer><small><div id="source"></div></small></footer>
                             {% else %}
-                            <p>{{ novel_object.summary }}</p>
+                            <p>{{ novel_object.summary|safe }}</p>
                             {% endif %}
                         </blockquote>
                         {% if novel_object.quote_file %}
                             <p></p>
-                            <p>{{ novel_object.summary }}</p>
+                            <p>{{ novel_object.summary|safe }}</p>
                         {% endif %}
                     </div>
                 </div>

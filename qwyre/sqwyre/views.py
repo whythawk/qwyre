@@ -42,8 +42,12 @@ def view_index(request, template_name="sqwyre/index.html"):
     page_subtitle = "Start Reading"
     page_class = "home"
     novel_list = []
+    any_can_buy = False
     for novel_object in novel_objects:
-        novel_list.append(sqwyd.get_novel_for_user_details(request, novel_object))
+        novel_object = sqwyd.get_novel_for_user_details(request, novel_object)
+        if not any_can_buy:
+            any_can_buy = novel_object['can_buy']
+        novel_list.append(novel_object)
     return render(request, template_name, locals())
 
 def view_novel(request, novel_surl=None, template_name="sqwyre/view_novel.html"):
@@ -72,8 +76,8 @@ def view_novel(request, novel_surl=None, template_name="sqwyre/view_novel.html")
         can_read = request.user.reader.can_read(novel_object)
         if can_read == "purchased":
             can_buy = False
-        elif can_read != "borrowed" and request.user.reader.current_price > page_price:
-            page_price = request.user.reader.current_price
+        elif can_read != "borrowed" and request.user.reader.current_price(novel_object) > page_price:
+            page_price = request.user.reader.current_price(novel_object)
     return render(request, template_name, locals())
 
 def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_chapter.html",
@@ -130,15 +134,15 @@ def view_chapter(request, wiqi_surl, wiqi_type=None, template_name="sqwyre/view_
             page_price = Decimal(page_price.quantize(Decimal('.01'), rounding=ROUND_HALF_UP))
         if request.user.is_authenticated():
             can_read = request.user.reader.can_read(novel_object)
-            if request.user.reader.current_price < page_price and can_read != "borrowed":
-                request.user.reader.current_price = page_price
-                request.user.reader.save()
+            if request.user.reader.current_price(novel_object) < page_price and can_read != "borrowed":
+                request.user.reader.current_price(novel_object, page_price)
+                # request.user.reader.save()
             if can_read == "purchased":
                 can_buy = False
             elif can_read == "borrowed":
                 page_price = price_object.price
-            elif request.user.reader.current_price > page_price:
-                page_price = request.user.reader.current_price
+            elif request.user.reader.current_price(novel_object) > page_price:
+                page_price = request.user.reader.current_price(novel_object)
         if can_buy and next_wiqi and page_price < (next_wiqi.price+1)*price_object.price:
             # Only appears if the next page price > than user current price
             next_price = (next_wiqi.price + 1) * price_object.price
@@ -167,13 +171,13 @@ def view_contents(request, novel_surl, template_name="sqwyre/view_contents.html"
         can_buy = price_object.can_buy
     if request.user.is_authenticated():
         can_read = request.user.reader.can_read(novel_object)
-        if request.user.reader.current_price < page_price and can_read != "borrowed":
-            request.user.reader.current_price = page_price
-            request.user.reader.save()
+        if request.user.reader.current_price(novel_object) < page_price and can_read != "borrowed":
+            request.user.reader.current_price(novel_object, page_price)
+            # request.user.reader.save()
         if can_read == "purchased":
             can_buy = False
-        elif can_read != "borrowed" and request.user.reader.current_price > page_price:
-            page_price = request.user.reader.current_price
+        elif can_read != "borrowed" and request.user.reader.current_price(novel_object) > page_price:
+            page_price = request.user.reader.current_price(novel_object)
     # if not novel_object.can_buy:
     #     can_buy = False
     #     can_read = True
@@ -978,8 +982,8 @@ def view_special(request, novel_surl, template_name="sqwyre/retailers.html"):
         can_read = request.user.reader.can_read(novel_object)
         if can_read == "purchased":
             can_buy = False
-        elif can_read != "borrowed" and request.user.reader.current_price > page_price:
-            page_price = request.user.reader.current_price
+        elif can_read != "borrowed" and request.user.reader.current_price(novel_object) > page_price:
+            page_price = request.user.reader.current_price(novel_object)
     return render(request, template_name, locals())
 
 def testing_novel(request, template_name="sqwyre/testing_novel.html"):

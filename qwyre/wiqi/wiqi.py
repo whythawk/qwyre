@@ -45,10 +45,10 @@ def user_has_permission(wiqi_object, usr, permission):
             return wiqi_object.wiqi.can_do(usr, permission)
     return True
 
-def save_user_view(usr, wiqi_object):
-    if usr.is_authenticated():
-        usr.reader.current_view = wiqi_object.surl
-        usr.reader.save()
+# def save_user_view(usr, wiqi_object):
+#     if usr.is_authenticated():
+#         usr.reader.current_view = wiqi_object.surl
+#         usr.reader.save()
 
 def get_user_view_rights(usr, wiqi_object):
     """
@@ -58,7 +58,7 @@ def get_user_view_rights(usr, wiqi_object):
     :param wiqi_object:
     :return:
     """
-    save_user_view(usr, wiqi_object)
+    #save_user_view(usr, wiqi_object)
     if wiqi_object.read_if == "open":
         return wiqi_object
     if usr.is_authenticated():
