@@ -15,7 +15,7 @@
 }
 .book-create a {
 	font-weight: 500;
-	font-size: 3.50rem;
+	font-size: 3.5rem;
     display:block;
     text-align: center;
     color: #eaa83d !important;
@@ -25,7 +25,7 @@
 }
 .book-content a {
 	font-weight: 500;
-	font-size: 2.60rem;
+	font-size: 2.6rem;
     display:block;
     text-align: center;
     color: #eaa83d !important;
@@ -36,7 +36,7 @@
 	margin: 0 0 12px;
 }
 .home .content p {
-	font-size: 2.4rem;
+	font-size: 2.2rem;
 }
 .small, small {
     font-size: 1.8rem;
@@ -70,16 +70,26 @@
 		font-size: 2.2rem;
 	}
 }
-@media (max-width: 1024px) {
-	.container-fluid.page-background {
-		background: url("/static/images/gavin-portrait-page.png") no-repeat 70% 25px;
-		background-size: 45% auto;
-	}
-}
 @media (max-width: 769px) {
 	.menu-image {
 		display: none;
 	}
+}
+@media (max-width: 1400px) {
+	.container-fluid.page-background {
+		background: url("/static/images/gavin-portrait-page.png") no-repeat 70% 25px;
+		background-size: 33% auto;
+	}
+	.home .content p {
+		font-size: 2.0rem;
+	}
+}
+@media (max-width: 1199px) {
+	.navbar-nav li a {
+		padding: 0 6px;
+	}
+}
+@media (max-width: 991px) {
 	.container-fluid.page-background {
 		background: url("/static/images/gavin-portrait-page.png") no-repeat 50% 25px;
 		background-size: 60% auto;
@@ -87,6 +97,25 @@
 	.home .content blockquote {
 		margin: 60vw 10vmin 0;
 		font-size: 2.2rem;
+	}
+}
+@media (max-width: 500px) {
+	.home .content p {
+		font-size: 1.6rem;
+	}
+	.home .content blockquote {
+		font-size: 1.6rem;
+	}
+	.book-content p {
+		font-size: 1.6rem;
+	}
+	.smallprint {
+		font-size: 1.0em;
+	}
+}
+@media (max-width: 370px) {
+	.book-content a {
+		font-size: 2.0rem;
 	}
 }
 .home .navbar-toggle, .home .navbar-toggle:hover {
@@ -180,7 +209,7 @@
     <div class="container home">
         <div class="col-xs-12">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <div class="content">
 						<blockquote class="blockquote-reverse">
 							<div id="quote"></div>
@@ -239,21 +268,21 @@
                 </div>
             </div>
             {% endfor %}
-        </div>
-		<div id="buynow">
-			<div class="row"></div>
-			<div class="row col-xs-12 col-xs-pull-1 text-center" id="buynowresponse">
-				{% if any_can_buy %}
-				<span class="smallprint">Buy to read complete novel online or download for Kindle & ePub readers.<br>
-				Payments securely processed by Stripe. Select BTC or USD from <span class="caret"></span>
-				for <em>Bitcoin</em>.<br>
-				This site never has access to your credit card number.</span>
-				{% endif %}
-				<span class="smallprint">Please review our Terms of Service<br>for 
-					{% for novel in novel_list %}
-					{% if not forloop.first and not forloop.last %}, {% endif %}{% if not forloop.first and forloop.last %}, and {% endif %}<a href="{% url 'legal' novel.novel_object.surl %}">{{ novel.novel_object.title }}</a>{% if forloop.last %}.{% endif %}
-					{% endfor %}
-				</span>
+			<div id="buynow">
+				<div class="row"></div>
+				<div class="col-xs-12 col-md-8 col-md-push-1 text-center" id="buynowresponse">
+					{% if any_can_buy %}
+					<span class="smallprint">Buy to read complete novel online or download for Kindle & ePub readers.
+					Payments securely processed by Stripe. Select BTC or USD from <span class="caret"></span>
+					for <em>Bitcoin</em>.<br>
+					This site never has access to your credit card number.</span>
+					{% endif %}
+					<span class="smallprint">Please review our Terms of Service<br>for 
+						{% for novel in novel_list %}
+						{% if not forloop.first and not forloop.last %}, {% endif %}{% if not forloop.first and forloop.last %}, and {% endif %}<a href="{% url 'legal' novel.novel_object.surl %}">{{ novel.novel_object.title }}</a>{% if forloop.last %}.{% endif %}
+						{% endfor %}
+					</span>
+				</div>
 			</div>
 		</div>
     </div>
