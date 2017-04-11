@@ -39,7 +39,7 @@ def view_index(request, template_name="sqwyre/index.html"):
     if not novel_objects:
         return redirect("create_novel")
     page_title = "Gavin Chait"
-    page_subtitle = "Start Reading"
+    page_subtitle = "Coffee-drinking economist, engineer, data scientist, sometime-traveler, and author."
     page_class = "home"
     novel_list = []
     any_can_buy = False
