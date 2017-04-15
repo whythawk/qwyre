@@ -10,7 +10,7 @@ This is a test mail for  {{ token_object.novel.title }}.
 
 Thanks and checking to see that this is received.
 
-{{ token_object.novel.creator.first_name }} {{ token_object.novel.creator.last_name }}
+Gavin Chait
 
 Author - {{ token_object.novel.title }}
-https://tartarusfalls.com/
+https://gavinchait.com{{ token_object.novel.get_absolute_url }}
