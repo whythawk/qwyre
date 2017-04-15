@@ -11,7 +11,7 @@ Hi,
 The link below will take you to the redemption page for you to download an ebook
 version (Kindle, ePub and PDF), and manage your access.
 
-https://qwyre.com{{ token_object.get_token_redemption_url }}
+https://gavinchait.com{{ token_object.get_token_redemption_url }}
 
 If you choose to login with Facebook, your online access allows you to:
 
@@ -24,7 +24,7 @@ If you choose to login with Facebook, your online access allows you to:
 
 Thank you and I hope you love the book,
 
-{{ token_object.novel.creator.first_name }} {{ token_object.novel.creator.last_name }}
+Gavin Chait
 
 Author - {{ token_object.novel.title }}
-https://qwyre.com{{ token_object.novel.get_absolute_url }}
+https://gavinchait.com{{ token_object.novel.get_absolute_url }}

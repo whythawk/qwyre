@@ -17,7 +17,7 @@ Note that you will not be able to download until {{ token_object.novel.is_live_f
 although this link will remain active. I'll send you a friendly reminder when
 downloads go live.
 
-https://qwyre.com{{ token_object.get_token_redemption_url }}
+https://gavinchait.com{{ token_object.get_token_redemption_url }}
 
 If you choose to login with Facebook, your online access allows you to:
 
@@ -33,7 +33,7 @@ reverse the transaction for a full refund.
 
 Thank you once again and I hope you love the book,
 
-{{ token_object.novel.creator.first_name }} {{ token_object.novel.creator.last_name }}
+Gavin Chait
 
 Author - {{ token_object.novel.title }}
-https://qwyre.com{{ token_object.novel.get_absolute_url }}
+https://gavinchait.com{{ token_object.novel.get_absolute_url }}
