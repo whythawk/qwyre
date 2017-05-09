@@ -35,8 +35,11 @@ EMAIL_SUBJECT = {'gift_lend': ' has lent you a copy of ',
                  }
 
 def view_index(request, template_name="sqwyre/index.html"):
-    novel_objects = Novel.objects.filter(is_active=True).order_by('-is_live_from')
-    if not novel_objects:
+    if not request.user.is_superuser:
+        novel_objects = Novel.objects.filter(is_active=True).order_by('-is_live_from')
+    else:
+        novel_objects = Novel.objects.all().order_by('-is_live_from')
+    if not novel_objects and request.user.is_superuser:
         return redirect("create_novel")
     page_title = "Gavin Chait"
     page_subtitle = "Coffee-drinking economist, engineer, data scientist, sometime-traveller, and author."

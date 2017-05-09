@@ -234,7 +234,7 @@
 						<img id="" src="/media/{{ novel.novel_object.image_mini }}" alt="{{ novel.novel_object.title }}">
 						<div class="book-content">
 							<h4>{% if request.user.is_authenticated and request.user.is_superuser %}
-							<a class="btn" role="button" href="{% url 'issue_tokens' novel.novel_object.surl %}">{% else %}
+							<a class="btn" role="button" href="{% url 'price_novel' novel.novel_object.surl %}">{% else %}
 							<a class="btn" role="button" href="{% url 'view_novel' novel.novel_object.surl %}">{% endif %}
 							{{ novel.novel_object.title|safe }}</a></h4>
 							<p>{{ novel.novel_object.pitch|safe }}</p>
