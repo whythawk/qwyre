@@ -38,6 +38,7 @@ class Novel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     is_live_from = models.DateTimeField(blank=True, null=True, default=datetime.now, verbose_name="Publish from", 
                                         help_text="Leave blank to publish immediately, otherwise select a future publication date.")
+    is_active = models.BooleanField(default=False)
     # Chapters and content
     jsonresponse = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict}, blank=True, null=True)
     chapterlist = models.ManyToManyField(Wiqi, related_name="%(class)s_chapterlist", blank=True)

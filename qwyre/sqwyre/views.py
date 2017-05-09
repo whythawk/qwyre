@@ -35,7 +35,7 @@ EMAIL_SUBJECT = {'gift_lend': ' has lent you a copy of ',
                  }
 
 def view_index(request, template_name="sqwyre/index.html"):
-    novel_objects = Novel.objects.all().order_by('-is_live_from')
+    novel_objects = Novel.objects.filter(is_active=True).order_by('-is_live_from')
     if not novel_objects:
         return redirect("create_novel")
     page_title = "Gavin Chait"
@@ -50,14 +50,10 @@ def view_index(request, template_name="sqwyre/index.html"):
         novel_list.append(novel_object)
     return render(request, template_name, locals())
 
-def view_novel(request, novel_surl=None, template_name="sqwyre/view_novel.html"):
-    if novel_surl:
-        novel_object = get_object_or_404(Novel, surl=novel_surl)
-    else:
-        novel_object = Novel.objects.all()
-        if not novel_object:
-            return redirect("create_novel")
-        novel_object = novel_object[0]
+def view_novel(request, novel_surl, template_name="sqwyre/view_novel.html"):
+    novel_object = get_object_or_404(Novel, surl=novel_surl)
+    if not novel_object.is_active:
+        return redirect("index")
     page_title = novel_object.title
     page_subtitle = "Start Reading"
     page_class = "home"
@@ -183,10 +179,11 @@ def view_contents(request, novel_surl, template_name="sqwyre/view_contents.html"
     #     can_read = True
     return render(request, template_name, locals())
 
-def view_legal(request, novel_surl, template_name="sqwyre/legal.html"):
-    novel_object = get_object_or_404(Novel, surl=novel_surl)
-    user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
-    page_title = novel_object.title
+def view_legal(request, novel_surl=None, template_name="sqwyre/legal.html"):
+    if novel_surl:
+        novel_object = get_object_or_404(Novel, surl=novel_surl)
+        user_has_purchased = sqwyd.user_has_purchased(request, novel_object)
+        page_title = novel_object.title
     return render(request, template_name, locals())
 
 def view_preorder(request, novel_surl, template_name="sqwyre/view_preorder.html"):

@@ -277,11 +277,7 @@
 					for <em>Bitcoin</em>.<br>
 					This site never has access to your credit card number.</span>
 					{% endif %}
-					<span class="smallprint">Please review our Terms of Service<br>for 
-						{% for novel in novel_list %}
-						{% if not forloop.first and not forloop.last %}, {% endif %}{% if not forloop.first and forloop.last %}, and {% endif %}<a href="{% url 'legal' novel.novel_object.surl %}">{{ novel.novel_object.title }}</a>{% if forloop.last %}.{% endif %}
-						{% endfor %}
-					</span>
+					<span class="smallprint">Please review our <a href="{% url 'plain_legal' %}">Terms of Service</a></span>
 				</div>
 			</div>
 		</div>
