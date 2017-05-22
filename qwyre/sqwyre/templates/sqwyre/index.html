@@ -250,7 +250,7 @@
                                 <a id="read" href="{% url 'view_wiqi' request.user.reader.current_view %}"
                                    class="btn btn-md btn-block btn-read" role="button">Read now</a>
                                 {% elif novel.price_object and novel.price_object.is_preorder %}
-                                <button class="btn btn-md btn-block btn-read" disabled>Available {{ novel.price_object.is_live_from|date:"d F Y" }}</button>
+                                <button class="btn btn-md btn-block btn-read" disabled>Read {{ novel.price_object.is_live_from|date:"d F Y" }}</button>
                                 {% else %}
                                 <a id="read" href="{{ novel.novel_object.sentinal.get_url }}"
                                    class="btn btn-md btn-block btn-read" role="button">Read now</a>
