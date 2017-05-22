@@ -78,13 +78,14 @@ def get_novel_for_user_details(request, novel_object):
         'page_price': False,
     }
     price_object = get_price_object(novel_object, request)
-    if price_object and price_object.can_buy:
-        # forex and pricing settings
-        novel_dict['fx'] = get_forex(price_object.currency)
-        novel_dict['fxd'] = price_object.currency
-        novel_dict['page_price'] = price_object.price
-        novel_dict['can_buy'] = price_object.can_buy
+    if price_object:
         novel_dict['price_object'] = price_object
+        if price_object.can_buy:
+            # forex and pricing settings
+            novel_dict['fx'] = get_forex(price_object.currency)
+            novel_dict['fxd'] = price_object.currency
+            novel_dict['page_price'] = price_object.price
+            novel_dict['can_buy'] = price_object.can_buy
     novel_dict['user_has_purchased'] = user_has_purchased(request, novel_object)
     if request.user.is_authenticated():
         novel_dict['can_read'] = request.user.reader.can_read(novel_object)
