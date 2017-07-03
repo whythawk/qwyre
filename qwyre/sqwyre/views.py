@@ -20,7 +20,7 @@ from ..wiqi.models import Wiqi
 from ..wiqi.forms import WiqiPriceForm
 from ..wiqi import wiqi as wiqid
 from ..sqwyre import qwyre as sqwyd
-from ..snippets.diff2merge import docxtract, xtractemail
+from ..snippets.diff2merge import docxtract, dictify_tree, xtractemail
 from ..snippets.mailem import send_email
 from ..snippets.forex import get_forex
 
@@ -592,16 +592,43 @@ def refund_token(request, token_surl, template_name="sqwyre/refund_token.html"):
         return HttpResponse(json.dumps(refund_response), content_type="application/json")
     return render(request, template_name, locals())
 
+# @login_required
+# def create_novel(request, template_name="sqwyre/create_novel.html"):
+#     """
+#     Create the novel but does not yet populate the chapters.
+#     """
+#     if not request.user.is_superuser:
+#         return render(request, '404.html', status=403)
+#     if request.method == "POST":
+#         novel_form = NovelForm(request.POST)
+#         if novel_form.is_valid():
+#             kwargs = request.POST.dict()
+#             kwargs["creator"] = request.user
+#             kwargs["creator_ip"] = sqwyd.get_user_ip(request)
+#             novel_object = Novel()
+#             novel_object.set(**kwargs)
+#             novel_object.assign_all_perm(request.user)
+#             if request.is_ajax():
+#                 return HttpResponse(json.dumps({'novel': novel_object.surl}), content_type="application/json")
+#     else:
+#         novel_form = NovelForm()
+#     page_title = "Qwyre - Create Novel"
+#     return render(request, template_name, locals())
+
 @login_required
 def create_novel(request, template_name="sqwyre/create_novel.html"):
     """
-    Create the novel but does not yet populate the chapters.
+    Create the novel and populate the chapters.
     """
     if not request.user.is_superuser:
         return render(request, '404.html', status=403)
     if request.method == "POST":
-        novel_form = NovelForm(request.POST)
+        novel_form = NovelForm(request.POST, request.FILES)
+        print novel_form.is_valid()
+        print request.FILES.get("upload", "----")
+        print request.POST
         if novel_form.is_valid():
+            upload = request.FILES.get("upload", "")
             kwargs = request.POST.dict()
             kwargs["creator"] = request.user
             kwargs["creator_ip"] = sqwyd.get_user_ip(request)
@@ -610,6 +637,14 @@ def create_novel(request, template_name="sqwyre/create_novel.html"):
             novel_object.assign_all_perm(request.user)
             if request.is_ajax():
                 return HttpResponse(json.dumps({'novel': novel_object.surl}), content_type="application/json")
+            kwargs["upload"] = dictify_tree(docxtract(upload))
+            kwargs["common"] = {"creator": request.user,
+                                "creator_ip": sqwyd.get_user_ip(request),
+                                "WiqiStack": wiqid.get_wiqi_or_404('text'),
+                                "is_live_from": novel_object.is_live_from,
+                                }
+            novel_object = novel_object.add_chapters(**kwargs)
+            return redirect('price_novel', novel_surl=novel_object.surl)
     else:
         novel_form = NovelForm()
     page_title = "Qwyre - Create Novel"
@@ -626,8 +661,12 @@ def upload_docx(request, template_name="sqwyre/create_novel.html"):
     if request.is_ajax():
         # http://stackoverflow.com/questions/1208067/wheres-my-json-data-in-my-incoming-django-request
         kwargs = request.POST.dict()
-        kwargs["file"] = request.FILES.get("file", "")
-        tree = docxtract(kwargs["file"])
+        kwargs["common"] = {"creator": request.user,
+                            "creator_ip": sqwyd.get_user_ip(request),
+                            "WiqiStack": wiqid.get_wiqi_or_404('text'),
+                            "is_live_from": novel_object.is_live_from,
+                            }
+        novel_object = novel_object.add_chapters(**kwargs)
         return HttpResponse(json.dumps(tree), content_type="application/json")
     return render(request, template_name, locals())
 

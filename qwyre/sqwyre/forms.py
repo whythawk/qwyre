@@ -13,9 +13,12 @@ class GlobalPriceForm(forms.ModelForm):
         exclude = ('slug', 'novel', 'created_on', 'objects', 'query')
 
 class NovelForm(forms.ModelForm):
+    upload = forms.FileField()
+    
     def __init__(self, *args, **kwargs):
         super(NovelForm, self).__init__(*args, **kwargs)
         self.fields['is_live_from'].widget.attrs['class'] = 'datepicker'
+        
     class Meta:
         model = Novel
         fields = ('title', 'pitch', 'is_live_from')

@@ -49,10 +49,15 @@
         <input type="hidden" value="{{ can_read }}" id="can_read"/>
         <input type="hidden" value="false" id="buytrigger"/>
         <p></p>
-        {% for key, chapter in chapter_objects.chapters.items|sort %}
+        {% with chapterlist=chapter_objects.chapters.items|sort %}
+        {% for key, chapter in chapterlist %}
             {% can_show_link request.user.is_authenticated chapter.read can_buy can_read as show_link %}
-            {% if not forloop.first %}
-                |
+            {% if not chapter.is_section and not chapter.is_callout %}
+                {% if not forloop.first and not forloop.last %}
+                    {% if chapterlist|showdivider:forloop.counter0  %}
+                    |
+                    {% endif %}
+                {% endif %}
             {% endif %}
             {% if chapter.is_section %}
                 <h3>
@@ -73,10 +78,8 @@
             {% elif chapter.is_callout %}
                 </blockquote>
             {% endif %}
-            {% if not chapter.is_section and not chapter.is_callout and forloop.last %}
-                |
-            {% endif %}
         {% endfor %}
+        {% endwith %}
     </div>
     {% if can_buy %}
     <div class="row col-md-10 col-md-push-1 text-center">
