@@ -17,6 +17,17 @@ def numdict(kwargs):
     return dictlist
 
 @register.filter
+def showdivider(chapters, counter):
+    """
+    If previous items is heading or callout, don't show the next divider.
+    """
+    try:
+        key, chapter = chapters[int(counter) - 1]
+        return not(chapter['is_section'] or chapter['is_callout'])
+    except:
+        return False
+
+@register.filter
 def orderchapters(formset):
     """
     Returns an ordered set of chapters based on the position of the sentinal.

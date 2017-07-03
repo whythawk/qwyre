@@ -37,8 +37,13 @@
     	{% block mapstyles %}{% endblock mapstyles %}
     	<title>{% block title %}{{ page_title }}{% if page_subtitle %}
 	- {{ page_subtitle  }}{% endif %}{% endblock title %}</title>
-    	<meta name="keywords" content="{{ meta_keywords }}">
-    	<meta name="description" content="{{ meta_description }}">
+		{% if not novel_list %}
+    	<meta name="keywords" content="science fiction, fantasy, Gavin Chait, author, novel, literature">
+    	<meta name="description" content="{{ novel_object.pitch }}">
+		{% else %}
+    	<meta name="keywords" content="data science, economic development, open data, entrepreneurship, science fiction, author">
+    	<meta name="description" content="Gavin Chait. Economist, engineer, data scientist, sometime-traveller, and author. I also drink a great deal of coffee.">
+		{% endif %}
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
