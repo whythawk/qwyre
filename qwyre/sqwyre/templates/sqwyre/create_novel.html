@@ -47,7 +47,7 @@ $(document).ready(function() {
         });
         //$("#pitch").keyup(function(e) {
         $('textarea[name="pitch"]', this).keyup(function(e) {
-              var count = 503 - $(this).val().length; //$this.text for original
+              var count = 701 - $(this).val().length; //$this.text for original
               var colour = count < 0 ? 'red' : 'black';
               $('#charactercount').text(count + ' characters remaining...').css("color", colour);           
         });
