@@ -46,9 +46,9 @@ class Novel(models.Model):
     sentinal = models.OneToOneField(Wiqi, related_name="%(class)s_sentinal", blank=True, null=True)
     word_count = models.IntegerField(blank=True, null=True)
     # Novel info
-    pitch = models.CharField(max_length=503, blank=True, null=True,
+    pitch = models.CharField(max_length=701, blank=True, null=True,
                                verbose_name="Elevator Pitch",
-                               help_text="You have 503 characters. Sell it to me.")
+                               help_text="You have 701 characters. Sell it to me.")
     summary = models.TextField(blank=True, null=True, verbose_name="Summary",
                                help_text="The back cover of your book.")
     playlist = models.TextField(blank=True, null=True, verbose_name="Playlist",
