@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
 from pydocx import PyDocX
 import re
+import os
+import io
+import uuid
 
 def fix_tags(html, **kwargs):
     valid_simplify = kwargs.get('valid_simplify', ['b', 'i', 'u', 'strong', 'em'])
@@ -8,6 +11,7 @@ def fix_tags(html, **kwargs):
         rem, rem_ = u'</{0}><{0}>'.format(v), u'</{0}> <{0}>'.format(v)
         html = html.replace(rem_, " ")
         html = html.replace(rem, "")
+    #html = html.replace('<p><span class="pydocx-center">===</span></p>', '<p style="text-align:center">&nbsp;</p>')
     #print html.encode(sys.stdout.encoding, errors='replace')
     return html
 
@@ -19,14 +23,13 @@ def clean_html(html, **kwargs):
     valid_del = kwargs.get('valid_del', ['del', 'hr'])
     valid_simplify = kwargs.get('valid_simplify', ['b', 'i', 'u', 'strong', 'em'])
     check_align = {u"pydocx-right": u"text-align:right", u"pydocx-center": u"text-align:center"}
-
     # https://medium.com/p/f2fa442daf99
     soup = BeautifulSoup(html, 'html.parser')
     if soup.body:
         soup = soup.body
     # http://tezro.livejournal.com/219164.html
-    empty_tags = soup.find_all(lambda tag: tag.name in valid_clean and not tag.contents and (tag.string is None or not tag.string.strip()))
-    [empty_tag.unwrap() for empty_tag in empty_tags]
+    #empty_tags = soup.find_all(lambda tag: tag.name in valid_clean and not tag.contents and (tag.string is None)) # or not tag.string.strip()))
+    #[empty_tag.unwrap() for empty_tag in empty_tags]
     # clear up the mess
     # http://stackoverflow.com/q/1765848
     for v in valid_clean:
@@ -59,9 +62,9 @@ def dictify_tree(tree):
     treedict = {}
     i = 0
     for title, content in ziptree:
-        treedict[str(i)] = {'title': title, 'content': content}
+        treedict[str(i)] = {'title': title, 'content': content.replace('===','&#160;')}
         i += 1
-    return treedict        
+    return treedict
 
 def mergediff(html, **kwargs):
     # Changes related to b, i, u, strong, em, blockquote are allowed...
@@ -91,11 +94,141 @@ def docxtract(docxfile, **kwargs):
                 if p:
                     p = ''.join([p, unicode(child)])
                 else:
+                    child['class'] = "first"
                     p = unicode(child)
                     ptext = "%s..." % child.get_text()[:80]
     if p:
         tree.append([ptext, p])
     return tree
+
+def make_epub(**kwargs):
+    """
+    Take a treedict of title/text and produce a structured set of files for epub use.
+    List of kwargs:
+        content [ a dictionary of form {i: {title: title, content: content}} ]
+        title
+        author
+        folder [ default = C:/Users/Turukawa/OneDrive/Novels/ebooks/ ]
+        html template [ default = template.html ]
+        isbn [ default generate unique uuid ]
+    Will create subfolder based on title
+    """
+    isbn = kwargs.get("isbn", str(uuid.uuid1()))
+    f = kwargs.get("folder", "C:/Users/Turukawa/OneDrive/Novels/ebooks/")
+    tf = f + kwargs.get("template", "template.html")
+    ncx = f + kwargs.get("nxc_template", "toc_template.ncx")
+    nav = f + kwargs.get("navpoint", "navpoint.html")
+    opf = f + kwargs.get("content_template", "content_template.opf")
+    t = "".join(word[0].upper() for word in kwargs["title"].split())
+    if not os.path.exists("{}{}".format(f, t)):
+        os.makedirs("{}{}".format(f, t))
+    with open(tf, "r") as template, open(ncx, "r") as nc, open(nav, "r") as navpoint, open(opf, "r") as op:
+        tp = template.read().encode('utf-8')
+        toc = nc.read().encode('utf-8')
+        opc = op.read().encode('utf-8')
+        np = navpoint.read().encode('utf-8')
+        navmap = ""
+        manifest = ""
+        spine = ""
+        manifest_x = '<item href="{}.html" id="html_{}" media-type="application/xhtml+xml"/>'
+        spine_x = '<itemref idref="html_{}"/>'
+        is_content = False
+        is_content_first = True
+        contents = ""
+        for i in range(len(kwargs["content"])):
+            ref = "html_{}".format(str(i).zfill(3))
+            title = BeautifulSoup(kwargs["content"][str(i)].get("title", "<h1> </h1>").encode('utf-8'), 'html.parser')
+            # Need to convert from form <h#>Title</h#> to <h#><a id="">Title</a></h#>
+            if title.text.upper() == 'CONTENTS' or is_content:
+                if title.h1:
+                    title.h1.string.wrap(title.new_tag("a"))
+                    spacer = False
+                if title.h2:
+                    title.h2.string.wrap(title.new_tag("a"))
+                    spacer = True
+                title.a['id'] = ref
+                title_text = unicode(title.text).encode('utf-8')
+                title = unicode(title).encode('utf-8')
+                if not is_content:
+                    c_title = title
+                    c_page = str(i).zfill(3)
+                    is_content = True
+            else:
+                title = ""
+            page = tp.format(kwargs["title"].encode('utf-8'),
+                             kwargs["author"].encode('utf-8'),
+                             title,
+                             kwargs["content"][str(i)]["content"].encode('utf-8'))
+            page_name = "{}_split_{}".format(t, str(i).zfill(3))
+            page_file = "{}{}/{}.html".format(f, t, page_name)
+            with open(page_file, "w") as pf:
+                pf.write(page)
+            if is_content:
+                if not is_content_first:
+                    if spacer:
+                        contents += '\t\t\t\t<p class="first spacer"><a href="{}.html">{}</a></p>\n'.format(page_name, title_text)
+                    else:
+                        contents += '\t\t\t<p class="first"><a href="{}.html">{}</a></p>\n'.format(page_name, title_text)
+                is_content_first = False
+            navmap += np.format(ref.encode('utf-8'),
+                                str(i+1),
+                                title_text,
+                                page_name.encode('utf-8'))
+            navmap += '\n'
+            manifest += manifest_x.format(page_name, str(i).zfill(3))
+            manifest += '\n'
+            spine += spine_x.format(str(i).zfill(3))
+            spine += '\n'
+        toc = toc.format(isbn,
+                         kwargs["title"],
+                         navmap)
+        opc = opc.format(kwargs["title"],
+                         kwargs["author"],
+                         isbn,
+                         manifest,
+                         spine,
+                         "{}_split_000".format(t),
+                         kwargs["title"],
+                         "{}_split_001".format(t))
+        c_file = "{}{}/{}_split_{}.html".format(f, t, t, c_page)
+        with open(c_file, "w") as cf:
+            page = tp.format(kwargs["title"].encode('utf-8'),
+                             kwargs["author"].encode('utf-8'),
+                             c_title,
+                             contents)
+            cf.write(page)
+        toc_file = "{}{}/{}".format(f, t, "toc.ncx")
+        opc_file = "{}{}/{}".format(f, t, "content.opf")
+        with open(toc_file, "w") as tocf, open(opc_file, "w") as opcf:
+            tocf.write(toc)
+            opcf.write(opc)
+
+def fix_things(last = 8):
+    basedress = "C:/Users/Turukawa/OneDrive/Novels/ebooks/OMLD/OMLD_split_"
+    to_find = [u'&nbsp',
+               u'<p style="text-align:center">&#160;</p>',
+               u'<p class="first" style="text-align:center">&#160;</p>',
+               u'<p style="text-align:center">\xe2\x80\x93</p><p>',
+               u'<p style="text-align:center">\u2013</p><p>',
+               u'<p style="text-align:center">-</p>',
+               u'</h2>\n\t\t\t<br/>\n\t\t\t<br/>\n\t\t\t<br/>']
+    to_replace = [u'&#160;',
+                  u'<br/>',
+                  u'<br/>',
+                  u'<p style="text-align:center">-</p><p class="first">',
+                  u'<p style="text-align:center">-</p><p class="first">',
+                  u'<p class="first" style="text-align:center">-</p>',
+                  u'</h2>\n\t\t\t<br/>\n\t\t\t<br/>']
+    for i in range(last):
+        b = '{}{}.html'.format(basedress, str(i).zfill(3))
+        print b
+        with io.open(b, "r", encoding='utf8') as page:
+            p = page.read()#.encode('utf-8')
+            for j in range(len(to_find)):
+                print i, j
+                p = p.replace(to_find[j], to_replace[j])
+        with io.open(b, "w", encoding='utf8') as page:
+            page.write(p)
 
 def xtractemail(emails):
     """

@@ -24,6 +24,10 @@ from ..snippets.diff2merge import docxtract, dictify_tree, xtractemail
 from ..snippets.mailem import send_email
 from ..snippets.forex import get_forex
 
+import logging
+logger = logging.getLogger(__name__) 
+
+
 EMAIL_SUBJECT = {'gift_lend': ' has lent you a copy of ',
                  'gift_purchase': ' has sent you a copy of ',
                  'issue_lend': 'You have lent out copies of ',
@@ -35,6 +39,9 @@ EMAIL_SUBJECT = {'gift_lend': ' has lent you a copy of ',
                  }
 
 def view_index(request, template_name="sqwyre/index.html"):
+    #logger.error('level error')
+    #logger.warning('level warn')
+    #logger.info('level info')
     if not request.user.is_superuser:
         novel_objects = Novel.objects.filter(is_active=True).order_by('-is_live_from')
     else:
