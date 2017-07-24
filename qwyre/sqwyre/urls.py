@@ -108,7 +108,7 @@ urlpatterns = [
                     {"template_name": "sqwyre/retailers.html"},
                     name="view_retailers"),
                 # Music playlist
-                url(r"^(?P<novel_surl>[-\w]+)/playlist/", views.view_special,
+                url(r"^(?P<novel_surl>[-\w]+)/notes/", views.view_special,
                     {"template_name": "sqwyre/playlist.html"},
                     name="view_playlist"),
                 # Still on preorder

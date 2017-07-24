@@ -14,7 +14,7 @@
                 <li><a href="{% url 'view_novel' novel_object.surl %}">Cover</a></li>
                 <li><a href="{% url 'view_contents' novel_object.surl %}">Contents</a></li>
                 {% if novel_object.playlist %}
-                <li><a href="{% url 'view_playlist' novel_object.surl %}">Playlist</a></li>
+                <li><a href="{% url 'view_playlist' novel_object.surl %}">Notes</a></li>
                 {% endif %}
                 {% if novel_object.retailers %}
                 <li><a href="{% url 'view_retailers' novel_object.surl %}">Retailers</a></li>
