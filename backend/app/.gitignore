@@ -1,0 +1,15 @@
+.mypy_cache
+.coverage
+htmlcov
+
+###############################
+# Qwyre
+###############################
+__pycache__/
+.ipynb_checkpoints/
+.vscode
+.venv
+working_data/
+temp_build/
+*.ipynb
+*.txt
