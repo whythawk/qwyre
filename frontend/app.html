@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html {{ HTML_ATTRS }}>
+  <head {{ HEAD_ATTRS }}>
+    {{ HEAD }}
+    <script>
+        if (document.monetization) {
+          document.monetizationExtensionInstalled = true
+        } else {
+          document.monetization = document.createElement('div')
+          document.monetization.state = 'stopped'
+        }
+      </script>
+      <script src="https://cdn.coil.com/coil-oauth-wm.v7.beta.js" defer></script>
+  </head>
+  <body {{ BODY_ATTRS }}>
+    {{ APP }}
+  </body>
+</html>
