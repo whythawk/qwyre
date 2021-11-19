@@ -11,22 +11,55 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY ./app/pyproject.toml ./app/poetry.lock* /app/
 
-# Install pyenv and set Python 3.9.1 as local default
+# /start Project-specific dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		# Sqwyre
+		make \
+		build-essential \
+		curl \
+		autoconf \
+		automake \
+		libtool \
+		pkg-config \
+		# Qwyre
+		pandoc \
+		default-jre \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*	
+
+# Install pyenv and set Python 3.9 as poetry env
 # set the variables as per $(pyenv init -)
 ENV LANG="C.UTF-8" \
     LC_ALL="C.UTF-8" \
-	PATH="/opt/pyenv/shims:/opt/pyenv/bin:$PATH" \
+    PATH="/opt/pyenv/shims:/opt/pyenv/bin:$PATH" \
     PYENV_ROOT="/opt/pyenv" \
     PYENV_SHELL="bash"
+	
+RUN git clone --depth 1 https://github.com/pyenv/pyenv.git $PYENV_ROOT \
+    && pyenv install 3.9.4 \
+	&& pyenv local 3.9.4
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		pandoc \
-		default-jre \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
- 
-RUN git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT \
-    && pyenv install 3.9.5 \
-	&& pyenv global 3.9.5
+WORKDIR /tmp/
+
+RUN git clone --depth 1 https://github.com/openvenues/libpostal && \
+	cd libpostal && \
+	#make distclean && \
+	./bootstrap.sh && \
+	./configure --datadir=/tmp && \
+	make -j4 && \
+	make install && \
+	ldconfig && \
+	apt-get purge --auto-remove -qy \
+	make \
+	build-essential \
+	curl \
+	autoconf \
+	automake \
+	libtool \
+	pkg-config
+
+WORKDIR /app/
+# /end Project-specific dependencies
+
 
 # Allow installing dev dependencies to run tests
 ARG INSTALL_DEV=false
@@ -34,7 +67,7 @@ RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; els
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
-# jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8890
+# jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
 ARG INSTALL_JUPYTER=false
 RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
 

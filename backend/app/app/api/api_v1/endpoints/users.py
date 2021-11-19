@@ -4,11 +4,12 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
-from app.utils import send_new_account_email
+from app.utilities import send_new_account_email
 
 router = APIRouter()
 
@@ -40,14 +41,11 @@ def create_user(
     user = crud.user.get_by_email(db, email=user_in.email)
     if user:
         raise HTTPException(
-            status_code=400,
-            detail="The user with this username already exists in the system.",
+            status_code=400, detail="The user with this username already exists in the system.",
         )
     user = crud.user.create(db, obj_in=user_in)
     if settings.EMAILS_ENABLED and user_in.email:
-        send_new_account_email(
-            email_to=user_in.email, username=user_in.email, password=user_in.password
-        )
+        send_new_account_email(email_to=user_in.email, username=user_in.email, password=user_in.password)
     return user
 
 
@@ -77,8 +75,7 @@ def update_user_me(
 
 @router.get("/me", response_model=schemas.User)
 def read_user_me(
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get current user.
@@ -105,8 +102,7 @@ def create_user_open(
     user = crud.user.get_by_email(db, email=email)
     if user:
         raise HTTPException(
-            status_code=400,
-            detail="The user with this username already exists in the system",
+            status_code=400, detail="The user with this username already exists in the system",
         )
     user_in = schemas.UserCreate(password=password, email=email, full_name=full_name)
     user = crud.user.create(db, obj_in=user_in)
@@ -115,9 +111,7 @@ def create_user_open(
 
 @router.get("/{user_id}", response_model=schemas.User)
 def read_user_by_id(
-    user_id: int,
-    current_user: models.User = Depends(deps.get_current_active_user),
-    db: Session = Depends(deps.get_db),
+    user_id: UUID, current_user: models.User = Depends(deps.get_current_active_user), db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Get a specific user by id.
@@ -126,9 +120,7 @@ def read_user_by_id(
     if user == current_user:
         return user
     if not crud.user.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
+        raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
     return user
 
 
@@ -136,7 +128,7 @@ def read_user_by_id(
 def update_user(
     *,
     db: Session = Depends(deps.get_db),
-    user_id: int,
+    user_id: UUID,
     user_in: schemas.UserUpdate,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
@@ -146,8 +138,7 @@ def update_user(
     user = crud.user.get(db, id=user_id)
     if not user:
         raise HTTPException(
-            status_code=404,
-            detail="The user with this username does not exist in the system",
+            status_code=404, detail="The user with this username does not exist in the system",
         )
     user = crud.user.update(db, db_obj=user, obj_in=user_in)
     return user

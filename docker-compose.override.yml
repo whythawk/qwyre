@@ -1,6 +1,5 @@
 version: "3.3"
 services:
-
   proxy:
     ports:
       - "80:80"
@@ -32,6 +31,10 @@ services:
     ports:
       - "5050:5050"
 
+  neo4j:
+    environment:
+      - NEO4J_AUTH=none
+
   flower:
     ports:
       - "5555:5555"
@@ -40,36 +43,32 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ./backend/app:/app
+      - ./backend/app/app:/app/app
     environment:
-      - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8890
+      - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
       - SERVER_HOST=http://${DOMAIN?Variable not set}
     build:
       context: ./backend
       dockerfile: backend.dockerfile
       args:
+        BACKEND_APP_MODULE: ${BACKEND_APP_MODULE-app.main:app}
+        BACKEND_PRE_START_PATH: ${BACKEND_PRE_START_PATH-/app/prestart.sh}
+        BACKEND_PROCESS_MANAGER: ${BACKEND_PROCESS_MANAGER-uvicorn}
+        BACKEND_WITH_RELOAD: ${BACKEND_WITH_RELOAD-true}
         INSTALL_DEV: ${INSTALL_DEV-true}
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
-    command: bash -c "while true; do sleep 1; done"  # Infinite loop to keep container live doing nothing
-    #command: /start.sh
-    #command: /start-reload.sh
-    command: /app/start-sockets-reload.sh
     labels:
       - traefik.enable=true
       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
       - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   celeryworker:
     volumes:
       - ./backend/app:/app
     environment:
       - RUN=celery worker -A app.worker -l info -Q main-queue -c 1
-      - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8890
+      - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
       - SERVER_HOST=http://${DOMAIN?Variable not set}
     build:
       context: ./backend
@@ -79,10 +78,11 @@ services:
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
 
   frontend:
+    volumes:
+      - ./frontend:/app
     build:
       context: ./frontend
-      args:
-        FRONTEND_ENV: dev
+      target: run-dev
     labels:
       - traefik.enable=true
       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}

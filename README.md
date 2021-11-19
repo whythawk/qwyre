@@ -1,4 +1,4 @@
-# Qwyre
+# FullStack
 
 ## Backend Requirements
 
@@ -8,7 +8,7 @@
 
 ## Frontend Requirements
 
-* Node.js (with `npm`).
+* Node.js (with `yarn`).
 
 ## Backend local development
 
@@ -29,6 +29,8 @@ Automatic interactive documentation with Swagger UI (from the OpenAPI backend): 
 Alternative automatic documentation with ReDoc (from the OpenAPI backend): http://localhost/redoc
 
 PGAdmin, PostgreSQL web administration: http://localhost:5050
+
+Neo4j web administration: http://localhost:7474
 
 Flower, administration of Celery tasks: http://localhost:5555
 
@@ -82,9 +84,7 @@ During development, you can change Docker Compose settings that will only affect
 
 The changes to that file only affect the local development environment, not the production environment. So, you can add "temporary" changes that help the development workflow.
 
-For example, the directory with the backend code is mounted as a Docker "host volume", mapping the code you change live to the directory inside the container. That allows you to test your changes right away, without having to build the Docker image again. It should only be done during development, for production, you should build the Docker image with a recent version of the backend code. But during development, it allows you to iterate very fast.
-
-There is also a command override that runs `/start-reload.sh` (included in the base image) instead of the default `/start.sh` (also included in the base image). It starts a single server process (instead of multiple, as would be for production) and reloads the process whenever the code changes. Have in mind that if you have a syntax error and save the Python file, it will break and exit, and the container will stop. After that, you can restart the container by fixing the error and running again:
+For example, the directory with the backend code is mounted as a Docker "host volume", mapping the code you change live to the directory inside the container. That allows you to test your changes right away, without having to build the Docker image again. It should only be done during development, for production, you should build the Docker image with a recent version of the backend code. But during development, it allows you to iterate very fast. Have in mind that if you have a syntax error and save the Python file, it will break and exit, and the container will stop. After that, you can restart the container by fixing the error and running again:
 
 ```console
 $ docker-compose up -d
@@ -111,24 +111,6 @@ root@7f2607af31c3:/app#
 ```
 
 that means that you are in a `bash` session inside your container, as a `root` user, under the `/app` directory.
-
-There you can use the script `/start-reload.sh` to run the debug live reloading server. You can run that script from inside the container with:
-
-```console
-$ bash /start-reload.sh
-```
-
-...it will look like:
-
-```console
-root@7f2607af31c3:/app# bash /start-reload.sh
-```
-
-and then hit enter. That runs the live reloading server that auto reloads when it detects code changes.
-
-Nevertheless, if it doesn't detect a change but a syntax error, it will just stop with an error. But as the container is still alive and you are in a Bash session, you can quickly restart it after fixing the error, running the same command ("up arrow" and "Enter").
-
-...this previous detail is what makes it useful to have the container alive doing nothing and then, in a Bash session, make it run the live reload server.
 
 ### Backend tests
 
@@ -307,36 +289,36 @@ Check all the corresponding available URLs in the section at the end.
 
 If you are running Docker in an IP address different than `127.0.0.1` (`localhost`) and `192.168.99.100` (the default of Docker Toolbox), you will need to perform some additional steps. That will be the case if you are running a custom Virtual Machine, a secondary Docker Toolbox or your Docker is located in a different machine in your network.
 
-In that case, you will need to use a fake local domain (`dev.qwyre.com`) and make your computer think that the domain is is served by the custom IP (e.g. `192.168.99.150`).
+In that case, you will need to use a fake local domain (`dev.fullstack.com`) and make your computer think that the domain is is served by the custom IP (e.g. `192.168.99.150`).
 
-If you used the default CORS enabled domains, `dev.qwyre.com` was configured to be allowed. If you want a custom one, you need to add it to the list in the variable `BACKEND_CORS_ORIGINS` in the `.env` file.
+If you used the default CORS enabled domains, `dev.fullstack.com` was configured to be allowed. If you want a custom one, you need to add it to the list in the variable `BACKEND_CORS_ORIGINS` in the `.env` file.
 
 * Open your `hosts` file with administrative privileges using a text editor:
   * **Note for Windows**: If you are in Windows, open the main Windows menu, search for "notepad", right click on it, and select the option "open as Administrator" or similar. Then click the "File" menu, "Open file", go to the directory `c:\Windows\System32\Drivers\etc\`, select the option to show "All files" instead of only "Text (.txt) files", and open the `hosts` file.
   * **Note for Mac and Linux**: Your `hosts` file is probably located at `/etc/hosts`, you can edit it in a terminal running `sudo nano /etc/hosts`.
 
-* Additional to the contents it might have, add a new line with the custom IP (e.g. `192.168.99.150`) a space character, and your fake local domain: `dev.qwyre.com`.
+* Additional to the contents it might have, add a new line with the custom IP (e.g. `192.168.99.150`) a space character, and your fake local domain: `dev.fullstack.com`.
 
 The new line might look like:
 
 ```
-192.168.99.100    dev.qwyre.com
+192.168.99.100    dev.fullstack.com
 ```
 
 * Save the file.
   * **Note for Windows**: Make sure you save the file as "All files", without an extension of `.txt`. By default, Windows tries to add the extension. Make sure the file is saved as is, without extension.
 
-...that will make your computer think that the fake local domain is served by that custom IP, and when you open that URL in your browser, it will talk directly to your locally running server when it is asked to go to `dev.qwyre.com` and think that it is a remote server while it is actually running in your computer.
+...that will make your computer think that the fake local domain is served by that custom IP, and when you open that URL in your browser, it will talk directly to your locally running server when it is asked to go to `dev.fullstack.com` and think that it is a remote server while it is actually running in your computer.
 
-To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `dev.qwyre.com`.
+To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `dev.fullstack.com`.
 
-After performing those steps you should be able to open: http://dev.qwyre.com and it will be server by your stack in `localhost`.
+After performing those steps you should be able to open: http://dev.fullstack.com and it will be server by your stack in `localhost`.
 
 Check all the corresponding available URLs in the section at the end.
 
 ### Change the development "domain"
 
-If you need to use your local stack with a different domain than `localhost`, you need to make sure the domain you use points to the IP where your stack is set up. See the different ways to achieve that in the sections above (i.e. using Docker Toolbox with `local.dockertoolbox.tiangolo.com`, using `localhost.tiangolo.com` or using `dev.qwyre.com`).
+If you need to use your local stack with a different domain than `localhost`, you need to make sure the domain you use points to the IP where your stack is set up. See the different ways to achieve that in the sections above (i.e. using Docker Toolbox with `local.dockertoolbox.tiangolo.com`, using `localhost.tiangolo.com` or using `dev.fullstack.com`).
 
 To simplify your Docker Compose setup, for example, so that the API docs (Swagger UI) knows where is your API, you should let it know you are using that domain for development. You will need to edit 1 line in 2 files.
 
@@ -378,37 +360,7 @@ and check all the corresponding available URLs in the section at the end.
 
 ## Frontend development
 
-* Enter the `frontend` directory, install the NPM packages and start the live server using the `npm` scripts:
-
-```bash
-cd frontend
-npm install
-npm run serve
-```
-
-Then open your browser at http://localhost:8080
-
-Notice that this live server is not running inside Docker, it is for local development, and that is the recommended workflow. Once you are happy with your frontend, you can build the frontend Docker image and start it, to test it in a production-like environment. But compiling the image at every change will not be as productive as running the local development server with live reload.
-
-Check the file `package.json` to see other available options.
-
-If you have Vue CLI installed, you can also run `vue ui` to control, configure, serve, and analyze your application using a nice local web user interface.
-
-If you are only developing the frontend (e.g. other team members are developing the backend) and there is a staging environment already deployed, you can make your local development code use that staging API instead of a full local Docker Compose stack.
-
-To do that, modify the file `./frontend/.env`, there's a section with:
-
-```
-VUE_APP_ENV=development
-# VUE_APP_ENV=staging
-```
-
-* Switch the comment, to:
-
-```
-# VUE_APP_ENV=development
-VUE_APP_ENV=staging
-```
+See the [frontend README](./frontend/README.md) for instructions.
 
 ### Removing the frontend
 
@@ -475,7 +427,7 @@ Then you need to have those constraints in your `docker-compose.yml` file for th
 To be able to use different environments, like `prod` and `stag`, you should pass the name of the stack as an environment variable. Like:
 
 ```bash
-STACK_NAME=stag-qwyre-com sh ./scripts/deploy.sh
+STACK_NAME=stag-fullstack-com sh ./scripts/deploy.sh
 ```
 
 To use and expand that environment variable inside the `docker-compose.yml` files you can add the constraints to the services like:
@@ -503,7 +455,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.qwyre-com.app-db-data == true
+          - node.labels.fullstack-com.app-db-data == true
 ```
 
 **Note**: The `${STACK_NAME?Variable not set}` means "use the environment variable `STACK_NAME`, but if it is not set, show an error `Variable not set`".
@@ -555,13 +507,13 @@ then chose a node from the list. For example, `dog.example.com`.
 * Add the label to that node. Use as label the name of the stack you are deploying followed by a dot (`.`) followed by the named volume, and as value, just `true`, e.g.:
 
 ```bash
-docker node update --label-add qwyre-com.app-db-data=true dog.example.com
+docker node update --label-add fullstack-com.app-db-data=true dog.example.com
 ```
 
 * Then you need to do the same for each stack version you have. For example, for staging you could do:
 
 ```bash
-docker node update --label-add stag-qwyre-com.app-db-data=true cat.example.com
+docker node update --label-add stag-fullstack-com.app-db-data=true cat.example.com
 ```
 
 ### Deploy to a Docker Swarm mode cluster
@@ -605,16 +557,16 @@ TAG=prod FRONTEND_ENV=production bash ./scripts/build-push.sh
 3. **Deploy your stack**
 
 * Set these environment variables:
-  * `DOMAIN=qwyre.com`
-  * `TRAEFIK_TAG=qwyre.com`
-  * `STACK_NAME=qwyre-com`
+  * `DOMAIN=fullstack.com`
+  * `TRAEFIK_TAG=fullstack.com`
+  * `STACK_NAME=fullstack-com`
   * `TAG=prod`
 * Use the provided `scripts/deploy.sh` file with those environment variables:
 
 ```bash
-DOMAIN=qwyre.com \
-TRAEFIK_TAG=qwyre.com \
-STACK_NAME=qwyre-com \
+DOMAIN=fullstack.com \
+TRAEFIK_TAG=fullstack.com \
+STACK_NAME=fullstack-com \
 TAG=prod \
 bash ./scripts/deploy.sh
 ```
@@ -703,33 +655,33 @@ These are the URLs that will be used and generated by the project.
 
 Production URLs, from the branch `production`.
 
-Frontend: https://qwyre.com
+Frontend: https://fullstack.com
 
-Backend: https://qwyre.com/api/
+Backend: https://fullstack.com/api/
 
-Automatic Interactive Docs (Swagger UI): https://qwyre.com/docs
+Automatic Interactive Docs (Swagger UI): https://fullstack.com/docs
 
-Automatic Alternative Docs (ReDoc): https://qwyre.com/redoc
+Automatic Alternative Docs (ReDoc): https://fullstack.com/redoc
 
-PGAdmin: https://pgadmin.qwyre.com
+PGAdmin: https://pgadmin.fullstack.com
 
-Flower: https://flower.qwyre.com
+Flower: https://flower.fullstack.com
 
 ### Staging URLs
 
 Staging URLs, from the branch `master`.
 
-Frontend: https://stag.qwyre.com
+Frontend: https://stag.fullstack.com
 
-Backend: https://stag.qwyre.com/api/
+Backend: https://stag.fullstack.com/api/
 
-Automatic Interactive Docs (Swagger UI): https://stag.qwyre.com/docs
+Automatic Interactive Docs (Swagger UI): https://stag.fullstack.com/docs
 
-Automatic Alternative Docs (ReDoc): https://stag.qwyre.com/redoc
+Automatic Alternative Docs (ReDoc): https://stag.fullstack.com/redoc
 
-PGAdmin: https://pgadmin.stag.qwyre.com
+PGAdmin: https://pgadmin.stag.fullstack.com
 
-Flower: https://flower.stag.qwyre.com
+Flower: https://flower.stag.fullstack.com
 
 ### Development URLs
 
@@ -771,19 +723,19 @@ Traefik UI: http://local.dockertoolbox.tiangolo.com:8090
 
 Development URLs, for local development.
 
-Frontend: http://dev.qwyre.com
+Frontend: http://dev.fullstack.com
 
-Backend: http://dev.qwyre.com/api/
+Backend: http://dev.fullstack.com/api/
 
-Automatic Interactive Docs (Swagger UI): https://dev.qwyre.com/docs
+Automatic Interactive Docs (Swagger UI): https://dev.fullstack.com/docs
 
-Automatic Alternative Docs (ReDoc): https://dev.qwyre.com/redoc
+Automatic Alternative Docs (ReDoc): https://dev.fullstack.com/redoc
 
-PGAdmin: http://dev.qwyre.com:5050
+PGAdmin: http://dev.fullstack.com:5050
 
-Flower: http://dev.qwyre.com:5555
+Flower: http://dev.fullstack.com:5555
 
-Traefik UI: http://dev.qwyre.com:8090
+Traefik UI: http://dev.fullstack.com:8090
 
 ### Development in localhost with a custom domain URLs
 

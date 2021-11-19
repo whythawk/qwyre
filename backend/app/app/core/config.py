@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 90
     SERVER_NAME: str
     SERVER_HOST: AnyHttpUrl
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
@@ -58,6 +59,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: Optional[str] = None
     EMAILS_FROM_EMAIL: Optional[EmailStr] = None
     EMAILS_FROM_NAME: Optional[str] = None
+    EMAILS_TO_EMAIL: Optional[EmailStr] = None
 
     @validator("EMAILS_FROM_NAME")
     def get_project_name(cls, v: Optional[str], values: Dict[str, Any]) -> str:
@@ -71,20 +73,95 @@ class Settings(BaseSettings):
 
     @validator("EMAILS_ENABLED", pre=True)
     def get_emails_enabled(cls, v: bool, values: Dict[str, Any]) -> bool:
-        return bool(
-			values.get("SMTP_HOST") 
-			and values.get("SMTP_PORT") 
-			and values.get("EMAILS_FROM_EMAIL")
-		)
+        return bool(values.get("SMTP_HOST") and values.get("SMTP_PORT") and values.get("EMAILS_FROM_EMAIL"))
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
-    USERS_OPEN_REGISTRATION: bool = False
+    USERS_OPEN_REGISTRATION: bool = True
+	
+    # NEO4J
+    NEO4J_FORCE_TIMEZONE: Optional[bool] = True
+    NEO4J_AUTO_INSTALL_LABELS: Optional[bool] = True
+    NEO4J_MAX_CONNECTION_POOL_SIZE: Optional[int] = 50
+    NEO4J_SERVER: Optional[str] = "localhost"
+    NEO4J_USERNAME: str
+    NEO4J_PASSWORD: str
+    NEO4J_AUTH: str
+    NEO4J_BOLT_URL: Optional[str] = None
 
+    @validator("NEO4J_BOLT_URL", pre=True)
+    def get_neo4j_bolt_url(cls, v: str, values: Dict[str, Any]) -> str:
+        return f"bolt://{values.get('NEO4J_USERNAME')}:{values.get('NEO4J_PASSWORD')}@{values.get('NEO4J_SERVER')}:7687"
+
+    # WORKING WITH DATA
+    WORKING_PATH: str = "/app/working_data"
+	
     # https://github.com/bebraw/pypandoc/pull/99/commits/5be3973b2a2c7eeb1abd6521c13374d82aa5ba99
     PYPANDOC_PANDOC: str = "/usr/bin/pandoc"
 
+    # PAYMENT KEYS
+    STRIPE_API_KEY: str
+    STRIPE_PUBLIC_KEY: str
+    STRIPE_MINIMUM_CHARGE_AMOUNT: int = 50
+    COIL_URI: HttpUrl = "https://coil.com"
+    COIL_API_URI: HttpUrl = "https://api.coil.com"
+    COIL_CLIENT_ID: str
+    COIL_CLIENT_SECRET: str
+
+    # DIGITALOCEAN SPACES KEYS
+    SPACES_ACCESS_KEY: str
+    SPACES_SECRET_KEY: str
+    SPACES_REGION_NAME: str = "fra1"
+    SPACES_ENDPOINT_URL: HttpUrl = "https://fra1.digitaloceanspaces.com"
+    SPACES_BUCKET: str = "whyqd"
+
+    # IP2LOCATION IP COUNTRY LOCATION
+    IP2_LINK: HttpUrl = "https://www.ip2location.com/download/"
+    IP2_FOLDER: str
+    IP2_BIN_FILE: str = "IP2LOCATION-LITE-DB1.BIN"
+    IP2_TOKEN: str
+    IP2_FILE: str
+    IP2_FILE_IPV6: str
+    IP2_ENDPOINT_URL: Optional[HttpUrl] = None
+    EURO_CURRENCY: List[str] = [
+        "AT",
+        "BE",
+        "BG",
+        "CH",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "FR",
+        "GR",
+        "HR",
+        "HU",
+        "IE",
+        "IS",
+        "IT",
+        "LI",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "NO",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK",
+    ]
+
+    @validator("IP2_ENDPOINT_URL", pre=True)
+    def get_ip2_endpoint_url(cls, v: str, values: Dict[str, Any]) -> str:
+        return f"{values.get('IP2_LINK')}?token={values.get('IP2_TOKEN')}&file={values.get('IP2_FILE')}"
+		
     class Config:
         case_sensitive = True
 

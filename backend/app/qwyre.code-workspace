@@ -1,12 +1,12 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../../../qwyre-frontend"
-		}
-	],
-	"remoteAuthority": "wsl+ubuntu-20.04",
-	"settings": {}
+  "folders": [
+	{
+		"path": "."
+	},
+	{
+		"path": "../../frontend"
+	}
+],
+  "remoteAuthority": "wsl+Ubuntu-20.04",
+  "settings": {}
 }

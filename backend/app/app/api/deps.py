@@ -37,11 +37,44 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
+    if token_data.refresh:
+        # Refresh token is not a valid access token
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Could not validate credentials",
+        )
     user = crud.user.get(db, id=token_data.sub)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
+def get_refresh_user(db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)) -> models.User:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[security.ALGORITHM])
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Could not validate credentials",
+        )
+    if not token_data.refresh:
+        # Refresh token is not a valid refresh token
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Could not validate credentials",
+        )
+    user = crud.user.get(db, id=token_data.sub)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not crud.user.is_active(user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+    # Check and revoke this refresh token
+    token_obj = crud.token.get(db, token=token, user=user)
+    if not token_obj:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Could not validate credentials",
+        )
+    token_in = schemas.RefreshTokenUpdate(**{"token": token, "is_valid": False})
+    crud.token.update(db, db_obj=token_obj, obj_in=token_in)
+    return user
 
 def get_current_active_user(
     current_user: models.User = Depends(get_current_user),
@@ -59,3 +92,20 @@ def get_current_active_superuser(
             status_code=400, detail="The user doesn't have enough privileges"
         )
     return current_user
+
+
+def get_active_websocket_user(*, db: Session, token: str) -> models.User:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[security.ALGORITHM])
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError):
+        raise ValidationError("Could not validate credentials")
+    if token_data.refresh:
+        # Refresh token is not a valid access token
+        raise ValidationError("Could not validate credentials")
+    user = crud.user.get(db, id=token_data.sub)
+    if not user:
+        raise ValidationError("User not found")
+    if not crud.user.is_active(user):
+        raise ValidationError("Inactive user")
+    return user
