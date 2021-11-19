@@ -41,14 +41,14 @@ deploy-stag:
   stage: deploy
   script: 
     - >
-      DOMAIN=stag.qwyre.com
-      TRAEFIK_TAG=stag.qwyre.com
-      STACK_NAME=stag-qwyre-com
+      DOMAIN=stag.fullstack.com
+      TRAEFIK_TAG=stag.fullstack.com
+      STACK_NAME=stag-fullstack-com
       TAG=stag
       sh ./scripts/deploy.sh
   environment:
     name: staging
-    url: https://stag.qwyre.com
+    url: https://stag.fullstack.com
   only:
     - master
   tags:
@@ -59,14 +59,14 @@ deploy-prod:
   stage: deploy
   script:
     - >
-      DOMAIN=qwyre.com
-      TRAEFIK_TAG=qwyre.com
-      STACK_NAME=qwyre-com
+      DOMAIN=fullstack.com
+      TRAEFIK_TAG=fullstack.com
+      STACK_NAME=fullstack-com
       TAG=prod
       sh ./scripts/deploy.sh
   environment:
     name: production
-    url: https://qwyre.com
+    url: https://fullstack.com
   only:
     - production
   tags:

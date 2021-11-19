@@ -1,6 +1,5 @@
 version: "3.3"
 services:
-
   proxy:
     image: traefik:v2.2
     networks:
@@ -62,7 +61,7 @@ services:
         # Redirect a domain without www to www
         # To enable it remove the previous line and uncomment the next
         # - traefik.http.middlewares.${STACK_NAME}-www-redirect.redirectregex.replacement=https://www.${DOMAIN}/$${3}
-        # Middleware to redirect www, to disable it remove the next line 
+        # Middleware to redirect www, to disable it remove the next line
         - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.middlewares=${STACK_NAME?Variable not set}-www-redirect
         # Middleware to redirect www, and redirect HTTP to HTTPS
         # to disable www redirection remove the section: ${STACK_NAME?Variable not set}-www-redirect,
@@ -104,15 +103,56 @@ services:
         - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.tls.certresolver=le
         - traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050
 
+  neo4j:
+    image: neo4j
+    networks:
+      - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+      - default
+    ports:
+      - "6477:6477"
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - app-neo4j-data:/data
+      - app-neo4j-plugins:/plugins
+    env_file:
+      - .env
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_AUTH=neo4j/neo4j
+      - NEO4J_dbms_default__advertised__address=0.0.0.0
+      - NEO4J_dbms_mode=SINGLE
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+        - traefik.constraint-label=${TRAEFIK_PUBLIC_TAG?Variable not set}
+        - traefik.http.routers.${STACK_NAME?Variable not set}-neo4j-http.rule=Host(`neo4j.${DOMAIN?Variable not set}`)
+        - traefik.http.routers.${STACK_NAME?Variable not set}-neo4j-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME?Variable not set}-neo4j-http.middlewares=${STACK_NAME?Variable not set}-https-redirect
+        - traefik.http.routers.${STACK_NAME?Variable not set}-neo4j-https.rule=Host(`neo4j.${DOMAIN?Variable not set}`)
+        - traefik.http.routers.${STACK_NAME?Variable not set}-neo4j-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME?Variable not set}-neo4j-https.tls=true
+        - traefik.http.routers.${STACK_NAME?Variable not set}-neo4j-https.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME?Variable not set}-neo4j.loadbalancer.server.port=7474
+      replicas: 1
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 500M
+      restart_policy:
+        condition: on-failure
+
   queue:
     image: rabbitmq:3
     # Using the below image instead is required to enable the "Broker" tab in the flower UI:
     # image: rabbitmq:3-management
     #
     # You also have to change the flower command
-  
+
   flower:
-    image: mher/flower
+    image: mher/flower:0.9.7
     networks:
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - default
@@ -136,9 +176,9 @@ services:
         - traefik.http.routers.${STACK_NAME?Variable not set}-flower-https.tls=true
         - traefik.http.routers.${STACK_NAME?Variable not set}-flower-https.tls.certresolver=le
         - traefik.http.services.${STACK_NAME?Variable not set}-flower.loadbalancer.server.port=5555
-  
+
   backend:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    image: "${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}"
     depends_on:
       - db
     env_file:
@@ -152,6 +192,10 @@ services:
       context: ./backend
       dockerfile: backend.dockerfile
       args:
+        BACKEND_APP_MODULE: ${BACKEND_APP_MODULE-app.main:app}
+        BACKEND_PRE_START_PATH: ${BACKEND_PRE_START_PATH-/app/prestart.sh}
+        BACKEND_PROCESS_MANAGER: ${BACKEND_PROCESS_MANAGER-gunicorn}
+        BACKEND_WITH_RELOAD: ${BACKEND_WITH_RELOAD-false}
         INSTALL_DEV: ${INSTALL_DEV-false}
     deploy:
       labels:
@@ -159,9 +203,9 @@ services:
         - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
         - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
         - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
-  
+
   celeryworker:
-    image: '${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}'
+    image: "${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}"
     depends_on:
       - db
       - queue
@@ -177,13 +221,19 @@ services:
       dockerfile: celeryworker.dockerfile
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
-  
+
   frontend:
-    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
+    image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
+    env_file:
+      - .env
+      - ./frontend/.env
+    environment:
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=80
     build:
       context: ./frontend
       args:
-        FRONTEND_ENV: ${FRONTEND_ENV-production}
+        NUXT_VERSION: ${NUXT_VERSION:-^2.15}
     deploy:
       labels:
         - traefik.enable=true
@@ -193,6 +243,8 @@ services:
 
 volumes:
   app-db-data:
+  app-neo4j-data:
+  app-neo4j-plugins:
 
 networks:
   traefik-public:
