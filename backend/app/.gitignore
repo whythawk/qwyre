@@ -5,6 +5,8 @@ htmlcov
 *.py[co]
 *.egg
 *.egg-info
+*.ipynb
+*.code-workspace
 dist
 build
 eggs

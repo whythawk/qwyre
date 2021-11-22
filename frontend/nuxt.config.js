@@ -31,8 +31,8 @@ export default {
   env: {
     baseUrl: process.env.BASE_URL || "http://localhost:3000",
     appName: process.env.VUE_APP_NAME,
-    apiWS: `ws://${process.env.VUE_APP_DOMAIN}`,
-    apiUrl: `http://${process.env.VUE_APP_DOMAIN}`,
+    apiWS: process.env.VUE_APP_DOMAIN_WS,
+    apiUrl: process.env.VUE_APP_DOMAIN_API,
     idbName: process.env.VUE_IDB_NAME,
     idbVersion: process.env.VUE_IDB_VERSION,
     stripeKey: process.env.STRIPE_PUBLIC_KEY,

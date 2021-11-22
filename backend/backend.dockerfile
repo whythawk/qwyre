@@ -11,37 +11,11 @@ RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; els
 
 # /start Project-specific dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-		# Sqwyre
-		make \
-		build-essential \
-		curl \
-		autoconf \
-		automake \
-		libtool \
-		pkg-config \
 		# Qwyre
 		pandoc \
 		default-jre \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*	
 
-WORKDIR /tmp/
-
-RUN git clone --depth 1 https://github.com/openvenues/libpostal && \
-	cd libpostal && \
-	#make distclean && \
-	./bootstrap.sh && \
-	./configure --datadir=/tmp && \
-	make -j4 && \
-	make install && \
-	ldconfig && \
-	apt-get purge --auto-remove -qy \
-	make \
-	build-essential \
-	curl \
-	autoconf \
-	automake \
-	libtool \
-	pkg-config
 
 WORKDIR /app/
 # /end Project-specific dependencies
