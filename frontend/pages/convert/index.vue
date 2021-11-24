@@ -324,11 +324,15 @@ export default class ConvertWork extends mixins(importWorkData) {
   }
 
   public download(content, fileName, contentType) {
+    // https://stackoverflow.com/a/18197341/295606
     const a = document.createElement("a")
-    const file = new Blob([content], { type: contentType })
-    a.href = URL.createObjectURL(file)
+    a.href = content
     a.download = fileName
+    a.type = contentType
+    a.style.display = "none"
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
   }
 
   public get workName() {
