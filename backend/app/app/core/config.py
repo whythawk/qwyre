@@ -79,7 +79,7 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = True
-	
+
     # NEO4J
     NEO4J_FORCE_TIMEZONE: Optional[bool] = True
     NEO4J_AUTO_INSTALL_LABELS: Optional[bool] = True
@@ -96,7 +96,7 @@ class Settings(BaseSettings):
 
     # WORKING WITH DATA
     WORKING_PATH: str = "/app/working_data"
-	
+
     # https://github.com/bebraw/pypandoc/pull/99/commits/5be3973b2a2c7eeb1abd6521c13374d82aa5ba99
     PYPANDOC_PANDOC: str = "/usr/bin/pandoc"
 
@@ -108,6 +108,7 @@ class Settings(BaseSettings):
     COIL_API_URI: HttpUrl = "https://api.coil.com"
     COIL_CLIENT_ID: str
     COIL_CLIENT_SECRET: str
+    COIL_PAYMENT_POINTER: str
 
     # DIGITALOCEAN SPACES KEYS
     SPACES_ACCESS_KEY: str
@@ -161,7 +162,7 @@ class Settings(BaseSettings):
     @validator("IP2_ENDPOINT_URL", pre=True)
     def get_ip2_endpoint_url(cls, v: str, values: Dict[str, Any]) -> str:
         return f"{values.get('IP2_LINK')}?token={values.get('IP2_TOKEN')}&file={values.get('IP2_FILE')}"
-		
+
     class Config:
         case_sensitive = True
 

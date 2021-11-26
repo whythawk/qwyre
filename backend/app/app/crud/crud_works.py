@@ -6,7 +6,7 @@ import base64
 
 from app.core.config import settings
 from app.schemas.base_schema import BaseSchema
-from app.schema_types import DCMimeType
+from app.schema_types import MimeType
 
 
 class CRUDWorks:
@@ -20,7 +20,7 @@ class CRUDWorks:
         self,
         *,
         source: str,
-        filetype: DCMimeType,
+        filetype: MimeType,
         filename: Optional[str] = None,
         subdirectory: Optional[str] = None,
         decoded: bool = False,
