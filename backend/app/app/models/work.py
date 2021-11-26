@@ -19,10 +19,11 @@ from app.gdb import NodeBase, MetadataBase
 from app.schema_types import WorkStateType
 
 if TYPE_CHECKING:
-    from app.models import Creator, Contributor, Contract, StateHistory, SeriesWorks  # noqa: F401
+    from app.models import Subject, Creator, Contributor, Contract, StateHistory, SeriesWorks  # noqa: F401
 
 
 class WorkMetadata(MetadataBase):
+    subject = RelationshipTo("app.models.subject.Subject", "DESCRIBES_WORK")
     isodate = DateProperty(help_text="The publication date of the creative work. Provide in ISO format, YYYY-MM-DD.")
     language = StringProperty(
         help_text="Specify the language of the creative work. Controlled vocabulary defined by ISO 639-1, ISO 639-2 or ISO 639-3.",

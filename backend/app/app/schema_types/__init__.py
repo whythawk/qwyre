@@ -1,6 +1,5 @@
 from .base_type import BaseEnum
 from .currency_types import CurrencyType
-from .resource_types import ResourceType
 from .mime_types import MimeType
 from .contributor_role_types import ContributorRoleType
 from .work_state_types import WorkStateType

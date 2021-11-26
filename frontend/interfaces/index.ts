@@ -1,3 +1,4 @@
+import { IWorkStateType, IMimeType, IContributorRoleType } from "./schema_types"
 import {
   IUserProfile,
   IUserProfileUpdate,
@@ -26,6 +27,9 @@ import { ICurrencyTypes, IStripeIntent } from "./paystripe"
 import { ISendEmail } from "./utilities"
 
 export {
+  IWorkStateType,
+  IMimeType,
+  IContributorRoleType,
   IUserProfile,
   IUserProfileUpdate,
   IUserProfileCreate,

@@ -1,17 +1,13 @@
 from neomodel import (
     StructuredNode,
     StringProperty,
-    ArrayProperty,
     BooleanProperty,
     UniqueIdProperty,
     DateTimeProperty,
-    DateProperty,
 )
 from neomodel.util import classproperty
 from datetime import datetime
 import pytz
-
-from app.schema_types import MimeType
 
 
 class NodeBase(StructuredNode):
@@ -96,7 +92,6 @@ class MetadataBase(NodeBase):
     title = StringProperty(help_text="A human-readable name given to the resource.")
     description = StringProperty(help_text="A short, single-sentence summary of the creative work.",)
     long_description = StringProperty(help_text="The pitch, or jacket-cover, description of the creative work.",)
-    subject = ArrayProperty(StringProperty(), help_text="A list of topics of the resource.")
     rights = StringProperty(help_text="Information about rights held in and over the resource.",)
     # Node-specific labels
     created = DateTimeProperty(default=lambda: datetime.now(pytz.utc))

@@ -2,6 +2,7 @@ from .user import User
 from .token import Token
 
 # Nodes
+from .subject import Subject
 from .creator import Creator
 from .contributor import Contributor
 from .history import StateHistory

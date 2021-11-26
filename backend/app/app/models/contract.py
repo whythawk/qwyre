@@ -1,14 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from neomodel import (
-    StringProperty,
     BooleanProperty,
+    StringProperty,
     UniqueIdProperty,
     IntegerProperty,
     DateTimeProperty,
     RelationshipTo,
     RelationshipFrom,
-    Relationship,
     One,
 )
 from datetime import datetime
@@ -32,9 +31,9 @@ class Party(NodeBase):
 class Contract(NodeBase):
     identifier = UniqueIdProperty()
     created = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
-    supersedes = Relationship("Contract", "SUPERSEDES")
     parties = RelationshipTo("Party", "PARTIES")
     isApproved = BooleanProperty(default=False, help_text="Contract only approved once all parties have approved it.",)
+    description = StringProperty(help_text="Optional notes to the contract.",)
     work = RelationshipFrom("app.models.work.Work", "WORK_CONTRACT", cardinality=One)
     series = RelationshipFrom("app.models.anthology.Series", "SERIES_CONTRACT", cardinality=One)
     anthology = RelationshipFrom("app.models.anthology.Anthology", "ANTHOLOGY_CONTRACT", cardinality=One)
