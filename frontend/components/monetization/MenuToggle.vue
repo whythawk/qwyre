@@ -3,7 +3,7 @@
     <NuxtLink
       v-if="!coilSub"
       :class="`text-xs sm:text-sm px-3 sm:px-8 pb-1 flex flex-col flex-shrink-0 border border-transparent rounded-md text-ochre-10 ${themeText}`"
-      to="/create"
+      to="/support-us"
       >Support us<SvgIcon
         terms="h-6 w-6 mt-2 mx-auto"
         icon="svgMonetizationStatic"
