@@ -23,6 +23,6 @@ RUN yarn add @nuxtjs/axios @nuxt/content @nuxtjs/pwa nuxt-i18n nuxt-start@${NUXT
 COPY --from=build /app/.nuxt ./.nuxt
 COPY --from=build /app/content ./content
 COPY --from=build /app/static ./static
-COPY --from=build /app/nuxt.config* /app/api.ts /app/utils.ts ./
+COPY --from=build /app/nuxt.config* ./
 ENTRYPOINT ["yarn"]
 CMD ["nuxt-start"]
