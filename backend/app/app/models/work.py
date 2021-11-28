@@ -19,7 +19,7 @@ from app.gdb import NodeBase, MetadataBase
 from app.schema_types import WorkStateType
 
 if TYPE_CHECKING:
-    from app.models import Subject, Creator, Contributor, Contract, StateHistory, SeriesWorks  # noqa: F401
+    from app.models import Subject, Creator, Contributor, Contract, StateHistory, SeriesWorks, Bookmark  # noqa: F401
 
 
 class WorkMetadata(MetadataBase):
@@ -60,4 +60,4 @@ class Work(NodeBase):
     history = RelationshipTo("app.models.history.StateHistory", "WORKFLOW")
     contract = RelationshipTo("app.models.contract.Contract", "WORK_CONTRACT")
     member = RelationshipFrom("app.models.anthology.SeriesWorks", "WORK_MEMBER")
-    reader = RelationshipFrom("app.models.creator.Creator", "READING")
+    reader = RelationshipFrom("app.models.bookmark.Bookmark", "READING")

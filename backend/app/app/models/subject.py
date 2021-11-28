@@ -14,7 +14,7 @@ from app.gdb import NodeBase
 from app.schema_types import WorkStateType
 
 if TYPE_CHECKING:
-    from app.models import Creator, Work, Series, Anthology, Subscription  # noqa: F401
+    from app.models import Creator, WorkMetadata, Series, Anthology, Subscription  # noqa: F401
 
 
 class Subject(NodeBase):
@@ -23,6 +23,6 @@ class Subject(NodeBase):
     term = StringProperty(help_text="Optional notes to the state change.",)
     subscribers = RelationshipFrom("app.models.subscriptions.Subscription", "SUBJECT_SUBSCRIBER")
     creator = RelationshipFrom("app.models.creator.Creator", "DESCRIBES_CREATOR", cardinality=One)
-    work = RelationshipFrom("app.models.work.Work", "DESCRIBES_WORK", cardinality=One)
+    work = RelationshipFrom("app.models.work.WorkMetadata", "DESCRIBES_WORK", cardinality=One)
     series = RelationshipFrom("app.models.anthology.Series", "DESCRIBES_SERIES", cardinality=One)
     anthology = RelationshipFrom("app.models.anthology.Anthology", "DESCRIBES_ANTHOLOGY", cardinality=One)

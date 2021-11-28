@@ -39,7 +39,7 @@ class Series(MetadataBase):
     state = StringProperty(choices=WorkStateType.as_dict(), help_text="The current work state.")
     history = RelationshipTo("app.models.history.StateHistory", "SERIES_WORKFLOW")
     contract = RelationshipTo("app.models.contract.Contract", "SERIES_CONTRACT")
-    anthology = RelationshipFrom("Series", "SERIES_RELEASE", cardinality=One)
+    anthology = RelationshipFrom("Anthology", "SERIES_RELEASE", cardinality=One)
     curator = RelationshipFrom("app.models.creator.Creator", "CURATED_SERIES")
     subscribers = RelationshipFrom("app.models.subscriptions.Subscription", "SERIES_SUBSCRIBER")
 

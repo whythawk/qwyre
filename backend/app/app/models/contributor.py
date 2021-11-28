@@ -6,7 +6,7 @@ from app.gdb import NodeBase
 from app.schema_types import ContributorRoleType
 
 if TYPE_CHECKING:
-    from app.models import Creator, Work  # noqa: F401
+    from app.models import Creator, WorkMetadata  # noqa: F401
 
 
 class Contributor(NodeBase):
@@ -18,6 +18,6 @@ class Contributor(NodeBase):
     terms = StringProperty(
         help_text="Information about copyright held by the rights-holder and their terms-of-use for their contribution to the creative work.",
     )
-    work = RelationshipFrom("app.models.work.Work", "WORK_CONTRIBUTOR", cardinality=One)
+    work = RelationshipFrom("app.models.work.WorkMetadata", "WORK_CONTRIBUTOR", cardinality=One)
     creator = RelationshipFrom("app.models.creator.Creator", "CONTRIBUTED", cardinality=One)
 
