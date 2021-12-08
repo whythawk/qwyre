@@ -17,6 +17,8 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     creator = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    email_validated = Column(Boolean(), default=False)
     is_active = Column(Boolean(), default=True)
+    is_moderator = Column(Boolean(), default=False)
     is_superuser = Column(Boolean(), default=False)
     refresh_tokens = relationship("Token", back_populates="authenticates", lazy="dynamic")

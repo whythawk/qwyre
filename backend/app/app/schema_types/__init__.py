@@ -4,3 +4,4 @@ from .mime_types import MimeType
 from .contributor_role_types import ContributorRoleType
 from .work_state_types import WorkStateType
 from .invitation_response_types import InvitationResponseType
+from .resource_types import ResourceType

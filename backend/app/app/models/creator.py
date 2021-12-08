@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from neomodel import StringProperty, RelationshipTo
+from neomodel import StringProperty, BooleanProperty, RelationshipTo, RelationshipFrom
 
 from app.gdb import MetadataBase
 
@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from app.models import (
         WorkMetadata,
         Contributor,
+        Contract,
         StateHistory,
         Series,
         Anthology,
@@ -28,4 +29,8 @@ class Creator(MetadataBase):
     anthologies = RelationshipTo("app.models.anthology.Anthology", "CURATED_ANTHOLOGY")
     curations = RelationshipTo("app.models.history.StateHistory", "CURATION_HISTORY")
     subscriptions = RelationshipTo("app.models.subscriptions.Subscription", "SUBSCRIBES")
+    subscribers = RelationshipFrom("app.models.subscriptions.Subscription", "CREATOR_SUBSCRIBER")
     reading = RelationshipTo("app.models.bookmarks.Bookmark", "BOOKMARK")
+    isBanned = BooleanProperty(default=False, help_text="This creator crossed the line.",)
+    history = RelationshipTo("app.models.history.StateHistory", "MODERATION_WORKFLOW")
+    contracts = RelationshipTo("app.models.contract.Party", "CONTRACTS")

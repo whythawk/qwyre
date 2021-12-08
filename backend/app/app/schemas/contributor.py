@@ -7,7 +7,7 @@ from app.schema_types import ContributorRoleType
 from .base_schema import BaseSchema
 
 if TYPE_CHECKING:
-    from app.schemas import CreatorSummary  # noqa: F401
+    from app.schemas import CreatorSummary, WorkSummary  # noqa: F401
 
 
 class ContributorCreate(BaseSchema):
@@ -20,23 +20,25 @@ class ContributorCreate(BaseSchema):
         None,
         description="Information about copyright held by the rights-holder and their terms-of-use for their contribution to the creative work.",
     )
-    work: UUID = Field(..., description="Reference UUID to creative work.")
-    creator: Optional[UUID] = Field(None, description="Reference UUID for a creator profile.")
 
-    @validator("creator")
-    def evaluate_creator(cls, v, values: Dict[str, Any]):
-        if not values.get("name") and not v:
-            raise ValueError("Contributor must have either of a named creator, or a linked profile.")
-        return v
+    # @validator("creator")
+    # def evaluate_creator(cls, v, values: Dict[str, Any]):
+    #     if not values.get("name") and not v:
+    #         raise ValueError("Contributor must have either of a named creator, or a linked profile.")
+    #     return v
 
 
 class ContributorUpdate(ContributorCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
 
+    class Config:
+        orm_mode = True
+
 
 class ContributorInDB(ContributorCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
     creator: Optional[CreatorSummary] = Field(None, description="Summary creator profiles.")
+    work: WorkSummary = Field(..., description="Reference UUID to creative work.")
 
     class Config:
         # https://github.com/samuelcolvin/pydantic/issues/1334#issuecomment-745434257
@@ -47,3 +49,9 @@ class ContributorInDB(ContributorCreate):
 class Contributor(ContributorInDB):
     pass
 
+
+from app.schemas.creator import CreatorSummary
+from app.schemas.work import WorkSummary
+
+ContributorInDB.update_forward_refs()
+Contributor.update_forward_refs()

@@ -26,10 +26,12 @@ class CreatorInDB(CreatorCreate):
     subject: List[Subject] = Field([], description="A list of topics of the resource.")
     isActive: bool = Field(..., description="Whether the work is publically accessible.")
     isPrivate: bool = Field(..., description="Whether the work is private to creators with appropriate authorisation.")
+    isBanned: bool = Field(..., description="Whether the creator has been banned by the moderators.")
 
     class Config:
         # https://github.com/samuelcolvin/pydantic/issues/1334#issuecomment-745434257
         # Call PydanticModel.from_orm(dbQuery)
+        use_enum_values = True
         orm_mode = True
 
 
@@ -45,6 +47,15 @@ class CreatorSummary(BaseSchema):
     )
     wallet: Optional[AnyUrl] = Field(None, description="Payment pointer for web monetization.")
     website: Optional[AnyHttpUrl] = Field(None, description="Payment pointer for web monetization.")
+    isActive: bool = Field(..., description="Whether the work is publically accessible.")
+    isPrivate: bool = Field(..., description="Whether the work is private to creators with appropriate authorisation.")
+    isBanned: bool = Field(..., description="Whether the creator has been banned by the moderators.")
 
     class Config:
         orm_mode = True
+
+
+from app.schemas import Subject
+
+CreatorInDB.update_forward_refs()
+Creator.update_forward_refs()

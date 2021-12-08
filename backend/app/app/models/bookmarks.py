@@ -4,6 +4,7 @@ from neomodel import (
     UniqueIdProperty,
     StringProperty,
     IntegerProperty,
+    BooleanProperty,
     DateTimeProperty,
     RelationshipTo,
     RelationshipFrom,
@@ -26,4 +27,5 @@ class Bookmark(NodeBase):
     page = IntegerProperty(help_text="Page or chapter number.")
     position = IntegerProperty(help_text="Current text position.")
     paid = IntegerProperty(help_text="Price pad for reading. In US$ cents.")
+    isOwned = BooleanProperty(default=False, help_text="Whether the work is owned or not.",)
     payment_reference = StringProperty(help_text="Payment reference, if any.")

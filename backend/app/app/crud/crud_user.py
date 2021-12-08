@@ -6,6 +6,7 @@ from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
+from app.models.creator import Creator
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -17,6 +18,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             email=obj_in.email,
             hashed_password=get_password_hash(obj_in.password),
             full_name=obj_in.full_name,
+            creator=obj_in.creator,
             is_superuser=obj_in.is_superuser,
         )
         db.add(db_obj)
@@ -24,9 +26,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def update(
-        self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
-    ) -> User:
+    def update(self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]) -> User:
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
@@ -50,6 +50,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_superuser(self, user: User) -> bool:
         return user.is_superuser
+
+    def is_email_validated(self, user: User) -> bool:
+        return user.email_validated
 
 
 user = CRUDUser(User)

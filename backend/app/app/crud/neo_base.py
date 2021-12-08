@@ -5,9 +5,9 @@ from uuid import UUID
 import inspect
 from neomodel.relationship_manager import RelationshipDefinition, ZeroOrMore
 
-from app.gdb import NeomodelConfig, DCNodeElementsBase
+from app.gdb import NeomodelConfig, NodeBase
 
-ModelType = TypeVar("ModelType", bound=DCNodeElementsBase)
+ModelType = TypeVar("ModelType", bound=NodeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
@@ -56,13 +56,21 @@ class NeoCRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 return db_obj
         return db_objs
 
+    def _response(
+        self, *, db_objs: Union[ModelType, List[ModelType]], get_raw: bool = False, get_first: bool = True
+    ) -> Union[ModelType, List[ModelType]]:
+        # create_or_update is used to create multiples, so returns a list (of 1)
+        if get_first and isinstance(db_objs, list):
+            db_objs = db_objs[0]
+        if get_raw:
+            return db_objs
+        return self.get_relationships(db_objs)
+
     @db.read_transaction
     def get(self, *, id: UUID, get_raw: bool = False) -> Optional[ModelType]:
         id = self._hexify(id)
         db_obj = self.model.nodes.get_or_none(identifier=id)
-        if get_raw:
-            return db_obj
-        return self.get_relationships(db_obj)
+        return self._response(db_objs=db_obj, get_raw=get_raw)
 
     @db.read_transaction
     def get_multi(self, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
@@ -76,18 +84,16 @@ class NeoCRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return self.get_relationships(db_objs)
 
     @db.write_transaction
-    def create(self, *, obj_in: CreateSchemaType) -> ModelType:
+    def create(self, *, obj_in: CreateSchemaType, get_raw: bool = False, get_first: bool = True) -> ModelType:
         obj_in_data = obj_in.as_neo_dict
         db_obj = self.model.create_or_update(obj_in_data)  # type: ignore
-        # create_or_update is used to create multiples, so returns a list (of 1)
-        return self.get_relationships(db_obj)[0]
+        return self._response(db_objs=db_obj, get_raw=get_raw, get_first=get_first)
 
     @db.write_transaction
-    def update(self, *, obj_in: UpdateSchemaType) -> ModelType:
+    def update(self, *, obj_in: UpdateSchemaType, get_raw: bool = False, get_first: bool = True) -> ModelType:
         obj_in_data = obj_in.as_neo_dict
         db_obj = self.model.create_or_update(obj_in_data)  # type: ignore
-        # create_or_update is used to create multiples, so returns a list (of 1)
-        return self.get_relationships(db_obj)[0]
+        return self._response(db_objs=db_obj, get_raw=get_raw, get_first=get_first)
 
     @db.write_transaction
     def remove(self, *, id: UUID) -> bool:

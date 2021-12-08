@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 
 class WorkMetadata(MetadataBase):
+    uid = StringProperty(help_text="UUID, DOI or ISBN of the creative work. A UUID will be generated if not included.")
     subject = RelationshipTo("app.models.subject.Subject", "DESCRIBES_WORK")
     isodate = DateProperty(help_text="The publication date of the creative work. Provide in ISO format, YYYY-MM-DD.")
     language = StringProperty(
@@ -58,6 +59,6 @@ class Work(NodeBase):
     spine = ArrayProperty(StringProperty(help_text="Spine list of contents for the creative work.",))
     state = StringProperty(choices=WorkStateType.as_dict(), help_text="The current work state.")
     history = RelationshipTo("app.models.history.StateHistory", "WORKFLOW")
-    contract = RelationshipTo("app.models.contract.Contract", "WORK_CONTRACT")
+    contract = RelationshipTo("app.models.contract.Contract", "WORK_CONTRACT", cardinality=One)
     member = RelationshipFrom("app.models.anthology.SeriesWorks", "WORK_MEMBER")
-    reader = RelationshipFrom("app.models.bookmark.Bookmark", "READING")
+    reader = RelationshipFrom("app.models.bookmarks.Bookmark", "READING")

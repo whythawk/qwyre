@@ -24,25 +24,25 @@ class CRUDSpaces:
         )
         self.bucket = self.space.Bucket(settings.SPACES_BUCKET)
 
-    def get(self, *, team_id: UUID, filename: str, resource_type: ResourceType) -> BinaryIO:
+    def get(self, *, filename: str, resource_type: ResourceType) -> BinaryIO:
         # https://stackoverflow.com/a/35376156/295606
-        key = f"{team_id}/{resource_type}/{filename}"
+        key = f"{resource_type}/{filename}"
         obj = self.bucket.Object(key)
         source = obj.get()["Body"].read().decode("utf-8")
         # Convert base64 to binary
         return base64.b64decode(source)
 
-    def create(self, *, team_id: UUID, filename: str, resource_type: ResourceType, source: str) -> int:
-        key = f"{team_id}/{resource_type}/{filename}"
+    def create(self, *, filename: str, resource_type: ResourceType, source: str) -> int:
+        key = f"{resource_type}/{filename}"
         obj = self.bucket.Object(key)
         response = obj.put(Body=source)
         return response.get("ResponseMetadata", {}).get("HTTPStatusCode", 400)
 
-    def update(self, *, team_id: UUID, filename: str, resource_type: ResourceType, source: str) -> int:
-        return self.create(team_id=team_id, filename=filename, resource_type=resource_type, source=source)
+    def update(self, *, filename: str, resource_type: ResourceType, source: str) -> int:
+        return self.create(filename=filename, resource_type=resource_type, source=source)
 
-    def remove(self, *, team_id: UUID, filename: str, resource_type: ResourceType) -> int:
-        key = f"{team_id}/{resource_type}/{filename}"
+    def remove(self, *, filename: str, resource_type: ResourceType) -> int:
+        key = f"{resource_type}/{filename}"
         obj = self.bucket.Object(key)
         response = obj.delete()
         return response.get("ResponseMetadata", {}).get("HTTPStatusCode", 400)

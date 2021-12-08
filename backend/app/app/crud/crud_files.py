@@ -9,7 +9,7 @@ from app.schemas.base_schema import BaseSchema
 from app.schema_types import MimeType
 
 
-class CRUDWorks:
+class CRUDFiles:
     def __init__(self):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD) working data on the local drive.
@@ -35,7 +35,7 @@ class CRUDWorks:
         if subdirectory:
             # subdirectory must be of form: '{term}/{term}'
             directory = directory / subdirectory
-            Path(directory).mkdir(parents=True, exist_ok=True)
+        Path(directory).mkdir(parents=True, exist_ok=True)
         with open(directory / filename, "wb") as f:
             f.write(data)
         return filename
@@ -47,8 +47,16 @@ class CRUDWorks:
         # https://stackoverflow.com/a/42641792/295606
         (directory / filename).unlink(missing_ok=True)
 
+    def set_as_epub(self, *, source: str) -> str:
+        return "data:application/epub+zip;base64," + source.decode("utf-8")
+
+    def strip_as_epub(self, *, source: str) -> str:
+        if source.startswith("data:application/epub+zip;base64,"):
+            return source.split("data:application/epub+zip;base64,")[1]
+        return source
+
     def remove_directory(self, *, directory: str):
         shutil.rmtree(self.directory / directory, ignore_errors=True)
 
 
-works = CRUDWorks()
+files = CRUDFiles()

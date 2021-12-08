@@ -8,7 +8,17 @@ from .subject import SubjectCreate, SubjectUpdate, SubjectInDB, Subject
 from .creator import CreatorCreate, CreatorUpdate, CreatorInDB, Creator, CreatorSummary
 from .contributor import ContributorCreate, ContributorUpdate, ContributorInDB, Contributor
 from .history import HistoryCreate, HistoryUpdate, HistoryInDB, History
-from .contract import PartyCreate, PartyUpdate, PartyInDB, Party, ContractCreate, ContractUpdate, ContractInDB, Contract
+from .contract import (
+    PartyCreatorCreate,
+    PartyCreate,
+    PartyUpdate,
+    PartyInDB,
+    Party,
+    ContractCreate,
+    ContractUpdate,
+    ContractInDB,
+    Contract,
+)
 from .bookmark import BookmarkCreate, BookmarkUpdate, BookmarkInDB, Bookmark
 from .subscription import SubscriptionCreate, SubscriptionUpdate, SubscriptionInDB, Subscription
 from .work import (
@@ -38,3 +48,4 @@ from .anthology import (
     AnthologyInDB,
     Anthology,
 )
+from .workstream import WorkStreamCreate

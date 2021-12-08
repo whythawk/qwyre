@@ -14,6 +14,9 @@ class SubjectCreate(BaseSchema):
 class SubjectUpdate(SubjectCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
 
+    class Config:
+        orm_mode = True
+
 
 class SubjectInDB(SubjectCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")

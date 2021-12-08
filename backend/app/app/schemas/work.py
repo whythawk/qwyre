@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, AnyHttpUrl, validator
 from uuid import UUID
 from datetime import date
 
-from chapisha import WorkMetadata
+from chapisha import WorkMetadata as ChapishaWorkMetadata
 
 from app.schema_types import MimeType
 from app.schema_types import WorkStateType
@@ -23,10 +23,11 @@ if TYPE_CHECKING:
 
 
 class BuildData(BaseModel):
-    metadata: WorkMetadata = Field(...)
+    metadata: ChapishaWorkMetadata = Field(...)
     cover: str = Field(...)
     text: str = Field(...)
     dedication: Optional[list[str]] = Field(None)
+    work: Optional[str] = Field(None)
 
 
 class DataSource(BaseModel):
@@ -36,6 +37,9 @@ class DataSource(BaseModel):
 
 
 class WorkMetadataCreate(MetadataBaseCreate):
+    uid: Optional[str] = Field(
+        ..., description="UUID, DOI or ISBN of the creative work. A UUID will be generated if not included."
+    )
     isodate: Optional[date] = Field(
         None, description="The publication date of the creative work. Provide in ISO format, YYYY-MM-DD."
     )
@@ -59,12 +63,13 @@ class WorkMetadataCreate(MetadataBaseCreate):
     word_count: Optional[int] = Field(
         None, description="Total word count of the creative work.",
     )
-    creator: Optional[List[UUID]] = Field([], description="Reference UUID for a creator profile.")
-    contributor: Optional[List[ContributorCreate]] = Field([], description="Contributors to the creative work.")
 
 
 class WorkMetadataUpdate(WorkMetadataCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
+
+    class Config:
+        orm_mode = True
 
 
 class WorkMetadataInDBBase(WorkMetadataCreate):
@@ -113,9 +118,6 @@ class WorkSummary(BaseSchema):
 
 
 class WorkCreate(BaseSchema):
-    metadata: Optional[WorkMetadataCreate] = Field(
-        None, description="Subset of metadata from work.",
-    )
     dedication: Optional[list[str]] = Field(None)
     price: Optional[int] = Field(
         None, description="Maximum price to be charged for reading. In US$ cents.",
@@ -136,18 +138,15 @@ class WorkCreate(BaseSchema):
 
 class WorkUpdate(WorkCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
-    metadata: Optional[WorkMetadataUpdate] = Field(
-        ..., description="Subset of metadata from work.",
-    )
-    history: HistoryCreate = Field(..., description="New state history definition.")
+
+    class Config:
+        orm_mode = True
 
 
 class WorkInDB(WorkCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
     created: date = Field(..., description="Automatically generated date resource was created.")
-    metadata: Optional[WorkMetadata] = Field(
-        ..., description="Subset of metadata from work.",
-    )
+    metadata: WorkMetadataInDBBase = Field(..., description="Subset of metadata from work.")
 
     class Config:
         # https://github.com/samuelcolvin/pydantic/issues/1334#issuecomment-745434257
@@ -159,3 +158,16 @@ class Work(WorkInDB):
     history: List[History] = Field(..., description="State history definitions.")
     contract: List[Contract] = Field(..., description="Contract between contributors to this creative work.")
 
+
+from app.schemas.contributor import Contributor
+from app.schemas.subject import Subject
+from app.schemas.creator import CreatorSummary
+from app.schemas.history import History
+from app.schemas.contract import Contract
+
+WorkMetadataCreate.update_forward_refs()
+WorkMetadataInDBBase.update_forward_refs()
+WorkMetadata.update_forward_refs()
+WorkSummary.update_forward_refs()
+WorkInDB.update_forward_refs()
+Work.update_forward_refs()

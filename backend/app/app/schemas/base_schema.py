@@ -2,7 +2,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field, validator, constr
 from typing import Optional, List
 from uuid import UUID
-from datetime import date
+from datetime import date, datetime
 import json
 
 from app.schema_types import BaseEnum
@@ -25,6 +25,10 @@ class BaseSchema(BaseModel):
             if isinstance(self.dict()[key], BaseEnum):
                 # Uppercase the Enum values
                 to_db[key] = to_db[key].upper()
+            if isinstance(self.dict()[key], datetime):
+                to_db[key] = datetime.fromisoformat(to_db[key])
+            if isinstance(self.dict()[key], date):
+                to_db[key] = date.fromisoformat(to_db[key])
             if key in ["id", "identifier"]:
                 to_db[key] = self.dict()[key].hex
         return to_db
@@ -39,9 +43,6 @@ class MetadataBaseSchema(BaseSchema):
     )
     long_description: Optional[str] = Field(
         None, description="The pitch, or jacket-cover, description of the creative work.",
-    )
-    subject: Optional[List[str]] = Field(
-        None, description="A list of topics of the resource.",
     )
     rights: Optional[str] = Field(
         None, description="Information about rights held in and over the resource.",

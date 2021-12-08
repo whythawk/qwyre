@@ -11,11 +11,10 @@ if TYPE_CHECKING:
 
 
 class BookmarkCreate(BaseSchema):
-    reader: UUID = Field(..., description="Reference UUID for a creator profile.")
-    reading: UUID = Field(..., description="Reference UUID for a creative work.")
     page: int = Field(..., description="Page or chapter number.")
     position: int = Field(..., description="Current text position.")
-    paid: Optional[int] = Field(None, description="Price pad for reading. In US$ cents.")
+    paid: Optional[int] = Field(None, description="Price paid for reading. In US$ cents.")
+    isOwned: bool = Field(default=False, description="Whether the work is owned or not.")
     payment_reference: Optional[str] = Field(None, description="Payment reference, if any.")
 
 

@@ -21,10 +21,11 @@ if TYPE_CHECKING:
 class StateHistory(NodeBase):
     identifier = UniqueIdProperty()
     created = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+    expires = DateTimeProperty(help_text="Expiry datetime for this state. Only valid for certain states, e.g. OFFERED.")
     state = StringProperty(choices=WorkStateType.as_dict(), help_text="The work state.")
-    isApproved = BooleanProperty(default=False, help_text="Some states require explicit approval.",)
     description = StringProperty(help_text="Optional notes to the state change.",)
     curator = RelationshipFrom("app.models.creator.Creator", "CURATION_HISTORY", cardinality=One)
     work = RelationshipFrom("app.models.work.Work", "WORKFLOW", cardinality=One)
     series = RelationshipFrom("app.models.anthology.Series", "SERIES_WORKFLOW", cardinality=One)
     anthology = RelationshipFrom("app.models.anthology.Anthology", "ANTHOLOGY_WORKFLOW", cardinality=One)
+    creator = RelationshipFrom("app.models.creator.Creator", "MODERATION_WORKFLOW")

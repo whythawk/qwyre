@@ -9,7 +9,6 @@ from .base_schema import BaseSchema, MetadataBaseCreate
 
 if TYPE_CHECKING:
     from app.schemas import (
-        HistoryCreate,
         History,
         Subject,
         Contract,
@@ -23,7 +22,6 @@ class SeriesWorksCreate(BaseSchema):
     description: Optional[str] = Field(
         None, description="Optional notes as to why included in the series.",
     )
-    work: UUID = Field(..., description="Reference UUID for a creative work.")
 
 
 class SeriesWorksUpdate(SeriesWorksCreate):
@@ -33,6 +31,7 @@ class SeriesWorksUpdate(SeriesWorksCreate):
 class SeriesWorksInDB(SeriesWorksCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
     creator: Optional[str] = Field(None, description="The public name a creator wishes to be called.")
+    work: UUID = Field(..., description="Reference UUID for a creative work.")
 
     class Config:
         # https://github.com/samuelcolvin/pydantic/issues/1334#issuecomment-745434257
@@ -48,14 +47,11 @@ class SeriesCreate(MetadataBaseCreate):
     isodate: Optional[date] = Field(
         None, description="The publication date of the creative work. Provide in ISO format, YYYY-MM-DD."
     )
-    works: Optional[List[SeriesWorksCreate]] = Field([], description="A list of included works.")
     state: WorkStateType = Field(..., description="The current work state.")
-    curator: Optional[List[UUID]] = Field([], description="Reference UUID for a creator profile.")
 
 
 class SeriesUpdate(SeriesCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
-    history: HistoryCreate = Field(..., description="New state history definition.")
 
 
 class SeriesInDB(SeriesCreate):
@@ -80,15 +76,11 @@ class AnthologyCreate(MetadataBaseCreate):
     isodate: Optional[date] = Field(
         None, description="The publication date of the creative work. Provide in ISO format, YYYY-MM-DD."
     )
-    works: Optional[List[SeriesWorksCreate]] = Field([], description="A list of included works.")
-    series: Optional[List[SeriesCreate]] = Field([], description="A list of included series.")
     state: WorkStateType = Field(..., description="The current work state.")
-    curator: Optional[List[UUID]] = Field([], description="Reference UUID for a creator profile.")
 
 
 class AnthologyUpdate(AnthologyCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
-    history: HistoryCreate = Field(..., description="New state history definition.")
 
 
 class AnthologyInDB(AnthologyCreate):
