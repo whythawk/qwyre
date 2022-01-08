@@ -11,26 +11,43 @@ from app.schema_types import BaseEnum
 class BaseSchema(BaseModel):
     @property
     def as_db_dict(self):
-        to_db = self.dict(by_alias=True, exclude_defaults=True, exclude_none=True, exclude={"identifier, id"})
+        to_db = self.dict(exclude_defaults=True, exclude_none=True, exclude={"identifier, id"})
         for key in ["id", "identifier"]:
             if key in self.dict().keys():
                 to_db[key] = self.dict()[key].hex
         return to_db
 
+    # @property
+    # def as_neo_dict(self):
+    #     to_db = self.json(by_alias=True, exclude_defaults=True, exclude_none=True, exclude={"identifier, id"})
+    #     to_db = json.loads(to_db)
+    #     for key in self.dict(by_alias=True).keys():
+    #         if isinstance(self.dict(by_alias=True)[key], BaseEnum):
+    #             # Uppercase the Enum values
+    #             to_db[key] = to_db[key].upper()
+    #         if isinstance(self.dict(by_alias=True)[key], datetime):
+    #             to_db[key] = datetime.fromisoformat(to_db[key])
+    #         if isinstance(self.dict(by_alias=True)[key], date):
+    #             to_db[key] = date.fromisoformat(to_db[key])
+    #         if key in ["id", "identifier"]:
+    #             to_db[key] = self.dict(by_alias=True)[key].hex
+    #     return to_db
+
     @property
     def as_neo_dict(self):
-        to_db = self.json(by_alias=True, exclude_defaults=True, exclude_none=True, exclude={"identifier, id"})
+        to_db = self.json(exclude_defaults=True, exclude_none=True, exclude={"identifier, id"})
         to_db = json.loads(to_db)
-        for key in self.dict().keys():
-            if isinstance(self.dict()[key], BaseEnum):
+        self_dict = self.dict()
+        for key in self_dict.keys():
+            if isinstance(self_dict[key], BaseEnum):
                 # Uppercase the Enum values
                 to_db[key] = to_db[key].upper()
-            if isinstance(self.dict()[key], datetime):
+            if isinstance(self_dict[key], datetime):
                 to_db[key] = datetime.fromisoformat(to_db[key])
-            if isinstance(self.dict()[key], date):
+            if isinstance(self_dict[key], date):
                 to_db[key] = date.fromisoformat(to_db[key])
             if key in ["id", "identifier"]:
-                to_db[key] = self.dict()[key].hex
+                to_db[key] = self_dict[key].hex
         return to_db
 
 
@@ -42,7 +59,7 @@ class MetadataBaseSchema(BaseSchema):
         None, description="A short, single-sentence summary of the creative work.",
     )
     long_description: Optional[str] = Field(
-        None, description="The pitch, or jacket-cover, description of the creative work.",
+        None, alias="long-description", description="The pitch, or jacket-cover, description of the creative work.",
     )
     rights: Optional[str] = Field(
         None, description="Information about rights held in and over the resource.",

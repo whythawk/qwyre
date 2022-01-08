@@ -34,3 +34,4 @@ class Creator(MetadataBase):
     isBanned = BooleanProperty(default=False, help_text="This creator crossed the line.",)
     history = RelationshipTo("app.models.history.StateHistory", "MODERATION_WORKFLOW")
     contracts = RelationshipTo("app.models.contract.Party", "CONTRACTS")
+    offers = RelationshipTo("app.models.contract.Contract", "INTERESTED")

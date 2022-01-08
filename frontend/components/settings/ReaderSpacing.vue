@@ -1,6 +1,14 @@
 <template>
   <div
-    class="relative flex flex-row justify-center max-w-xs sm:max-w-screen-sm mx-auto my-4"
+    class="
+      relative
+      flex flex-row
+      justify-center
+      max-w-xs
+      sm:max-w-screen-sm
+      mx-auto
+      my-4
+    "
   >
     <button
       v-for="(ro, i) in readerOptions"
@@ -21,13 +29,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Getter, Mutation } from "nuxt-property-decorator"
-import { PageSpacing } from "@/store/main/state"
+import {
+  Component,
+  Vue,
+  Getter,
+  Mutation,
+  Action,
+} from "nuxt-property-decorator"
+import { IPageSpacing } from "@/interfaces"
 
 @Component
 export default class SettingsReaderSpacing extends Vue {
   @Getter("main/pageSpacing") pageSpacing
   @Mutation("main/setSpacing") setSpacing
+  @Action("main/storeThemeState") storeThemeState
 
   public readerOptions: { [key: string]: string | boolean }[] = [
     {
@@ -66,8 +81,9 @@ export default class SettingsReaderSpacing extends Vue {
     newSetting.active = true
   }
 
-  public async setReaderOption(option: PageSpacing) {
+  public async setReaderOption(option: IPageSpacing) {
     await this.setSpacing(option)
+    await this.storeThemeState()
     await this.refreshReaderOptions()
   }
 

@@ -2,8 +2,7 @@
 title: Guide to publishing a standards-compliant ebook
 description: Guide to preparing your creative work, and converting a well-formatted Microsoft Word .docx file into a standards-compliant EPUB3 ebook.
 ---
-
-> [**Your creative work and rights:**](/privacy-rights) Nothing is uploaded to the **Qwyre** server until you click the build button, and nothing will be saved on our servers. You maintain complete control of the build process. You are not giving up any of your rights over your work, and **Qwyre** is not acting as an agent, publisher, or distributor on your behalf. This is a free service for writers, and respects your property.
+> **Your creative work and rights:** Your work is not uploaded to the **Qwyre** server until you authorise it, and nothing will be saved on our servers unless you expressly decide to monetize your work via the app. You maintain complete control of the build process. You are not giving up any of your rights over your work, and **Qwyre** is not acting as an agent, publisher, or distributor on your behalf. This is a free service for writers, and respects your property.
 
 Everyone's creative process is different, but there is no doubt that getting to this point - where you are ready to release your work for others to read - has cost you, whether that be forgone income, or quality time with those dearest to you. 
 
@@ -80,4 +79,4 @@ The description and content you set are presented in the way you're probably fam
 
 Depending on how big the files you uploaded are, this may take a little time. Once complete, you can download your work.
 
-> [**Your creative work and rights:**](/privacy-rights) Nothing is uploaded to the **Qwyre** server until you click the build button, and nothing will be saved on our servers. You maintain complete control of the build process. You are not giving up any of your rights over your work, and **Qwyre** is not acting as an agent, publisher, or distributor on your behalf. This is a free service for writers, and respects your property.
+> [**Your creative work and rights:**](/privacy-rights) Your work is not uploaded to the **Qwyre** server until you authorise it, and nothing will be saved on our servers unless you expressly decide to monetize your work via the app. You maintain complete control of the build process. You are not giving up any of your rights over your work, and **Qwyre** is not acting as an agent, publisher, or distributor on your behalf. This is a free service for writers, and respects your property.

@@ -100,7 +100,7 @@ import { ISendEmail } from "@/interfaces"
 import { api } from "@/api"
 
 @Component({
-  middleware: "anonymous",
+  middleware: "refresh-authentication",
   layout: "working",
 })
 export default class Login extends Vue {

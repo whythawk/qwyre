@@ -7,6 +7,11 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.utilities import (
+    generate_password_reset_token,
+    send_email_validation_email,
+    verify_password_reset_token,
+)
 
 router = APIRouter()
 
@@ -29,9 +34,11 @@ def create_user_profile(
         )
     # Create user profile
     creator_in = schemas.CreatorCreate()
+    if full_name:
+        creator_in.creator = full_name
     creator = crud.creator.create(obj_in=creator_in)
     # Create user auth
-    user_in = schemas.UserCreate(password=password, email=email, full_name=full_name, creator=creator.identifier)
+    user_in = schemas.UserCreate(password=password, email=email, creator=creator.identifier)
     user = crud.user.create(db, obj_in=user_in)
     return user
 
@@ -55,6 +62,11 @@ def update_user(
     if full_name is not None:
         user_in.full_name = full_name
     if email is not None:
+        check_user = crud.user.get_by_email(db, email=email)
+        if check_user and check_user.email != current_user.email:
+            raise HTTPException(
+                status_code=400, detail="This username already exists in the system",
+            )
         user_in.email = email
     user = crud.user.update(db, db_obj=current_user, obj_in=user_in)
     return user
@@ -68,6 +80,40 @@ def read_user(
     Get current user.
     """
     return current_user
+
+
+@router.post("/send-validation-email", response_model=schemas.Msg, status_code=201)
+def send_validation_email(*, current_user: models.User = Depends(deps.get_current_active_user),) -> Any:
+    """
+    Send validation email.
+    """
+    password_validation_token = generate_password_reset_token(email=current_user.email)
+    data = schemas.EmailValidation(
+        **{"email": current_user.email, "subject": "Validate your email address", "token": password_validation_token,}
+    )
+    # EmailValidation
+    send_email_validation_email(data=data)
+    return {"msg": "Password recovery email sent"}
+
+
+@router.post("/validate-email", response_model=schemas.Msg)
+def validate_email(
+    *,
+    db: Session = Depends(deps.get_db),
+    payload: dict = Body(...),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Reset password
+    """
+    # https://stackoverflow.com/a/65114346/295606
+    email = verify_password_reset_token(payload["validation"])
+    if not email or current_user.email != email:
+        raise HTTPException(
+            status_code=400, detail="Invalid token",
+        )
+    crud.user.validate_email(db=db, db_obj=current_user)
+    return {"msg": "Email address validated successfully."}
 
 
 # @router.post("/", response_model=schemas.User)

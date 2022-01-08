@@ -5,7 +5,15 @@
         v-for="(nav, i) in navigation"
         :key="`nav-${i}`"
         :to="nav.to"
-        class="text-xs sm:text-sm text-ochre-100 hover:text-ochre-300 px-3 sm:px-8 flex flex-col flex-shrink-0"
+        class="
+          text-xs
+          sm:text-sm
+          text-ochre-100
+          hover:text-ochre-300
+          px-3
+          sm:px-8
+          flex flex-col flex-shrink-0
+        "
         >{{ nav.name }}
         <div v-if="nav.centre">
           <SvgIcon
@@ -17,6 +25,7 @@
           <SvgIcon terms="h-6 w-6 fill-current mt-2 mx-auto" :icon="nav.icon" />
         </div>
       </NuxtLink>
+      <NavigationCoverLoginMenu />
       <MonetizationMenuToggle :dark-mode="monetizationDark" />
     </nav>
   </div>
@@ -27,22 +36,18 @@ import { Component, Vue, Getter, Action } from "nuxt-property-decorator"
 
 @Component
 export default class NavigationReaderMenu extends Vue {
-  @Getter("collections/firstCollection") firstCollection
-  @Action("collections/restoreCollection") restoreCollection
-  @Getter("main/isLoggedIn") isLoggedIn
-  @Action("main/logOut") userLogOut
   public monetizationDark: boolean = false
   public cover: string | null = null
 
   public navigation = [
     {
-      name: "About",
-      to: "/about",
-      icon: "svgUserGroup",
+      name: "Search",
+      to: "/search",
+      icon: "svgSearch",
     },
     {
       name: "Library",
-      to: "/",
+      to: "/library",
       icon: "svgBookOpen",
     },
     {
@@ -51,15 +56,6 @@ export default class NavigationReaderMenu extends Vue {
       icon: "qwyreLogo",
       centre: true,
     },
-    {
-      name: "Conversions",
-      to: "/library/conversions",
-      icon: "svgBookmark",
-    },
   ]
-
-  public async logout() {
-    await this.userLogOut()
-  }
 }
 </script>

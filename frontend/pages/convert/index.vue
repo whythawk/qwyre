@@ -19,11 +19,10 @@
       <p v-show="work.description" class="text-sm py-2 font-bold">
         {{ work.description }}
       </p>
-      <div v-show="work.long_description" class="py-1">
+      <div v-show="work.long_description" class="py-1 space-y-1 text-sm">
         <p
           v-for="(descript, i) in drawWorkLines(work.long_description)"
           :key="`long-description-${i}`"
-          class="text-sm py-1"
         >
           {{ descript }}
         </p>
@@ -72,7 +71,7 @@
       </p>
       <div v-show="work.long_rights" class="py-1">
         <p
-          v-for="(right, i) in drawWorkLines(work.long_rights)"
+          v-for="(right, i) in work.long_rights"
           :key="`long-rights-${i}`"
           class="text-xs py-1"
         >
@@ -123,16 +122,45 @@
     <div class="my-1 px-1 w-1/3 flex flex-col">
       <!-- Cover -->
       <div
-        class="relative mx-auto my-5 w-60 h-96 filter drop-shadow-lg shadow transition ease-in duration-200"
+        class="
+          relative
+          mx-auto
+          my-5
+          w-60
+          h-96
+          filter
+          drop-shadow-lg
+          shadow
+          transition
+          ease-in
+          duration-200
+        "
       >
         <img
           :src="workCover"
-          class="object-cover object-center min-h-full min-w-full animate-fade-in rounded-lg"
+          class="
+            object-cover object-center
+            min-h-full min-w-full
+            animate-fade-in
+            rounded-lg
+          "
         />
       </div>
       <!-- WorkDOCX -->
       <div
-        class="mx-auto mb-5 text-xs p-2 bg-ochre-100 filter drop-shadow-lg shadow transition ease-in duration-200"
+        class="
+          mx-auto
+          mb-5
+          text-xs
+          p-2
+          bg-ochre-100
+          filter
+          drop-shadow-lg
+          shadow
+          transition
+          ease-in
+          duration-200
+        "
       >
         <a
           :href="workText"
@@ -146,7 +174,19 @@
       <!-- WorkEPUB -->
       <div
         v-if="convertState === 'complete'"
-        class="mx-auto mb-5 text-xs p-2 bg-ochre-100 filter drop-shadow-lg shadow transition ease-in duration-200"
+        class="
+          mx-auto
+          mb-5
+          text-xs
+          p-2
+          bg-ochre-100
+          filter
+          drop-shadow-lg
+          shadow
+          transition
+          ease-in
+          duration-200
+        "
       >
         <a :href="convertEPUB" :download="workEPUB" type="application/epub+zip">
           <SvgIcon
@@ -157,7 +197,45 @@
         </a>
       </div>
       <!-- Call to action -->
-      <div class="mt-8 max-w-2xl flex mx-auto justify-center">
+      <div class="mt-8 flex mx-auto justify-center">
+        <div v-if="isLoggedIn" class="relative flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="saveWork"
+              v-model="saveWork"
+              aria-describedby="store-description"
+              name="saveWork"
+              type="checkbox"
+              class="
+                focus:ring-woad-500
+                h-4
+                w-4
+                text-woad-600
+                border-gray-300
+                rounded
+              "
+            />
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="saveWork" class="font-medium text-gray-700"
+              >Save online</label
+            >
+            <span id="store-description" class="text-gray-500"
+              ><span class="sr-only">Save online </span>to publish on
+              Qwyre.</span
+            >
+          </div>
+        </div>
+        <div v-else class="relative flex items-start">
+          <NuxtLink class="ml-3 text-sm" to="/login">
+            <span class="text-gray-500 hover:text-ochre-500"
+              ><span class="font-semibold">Login </span>to publish on
+              Qwyre.</span
+            >
+          </NuxtLink>
+        </div>
+      </div>
+      <div class="mt-2 max-w-2xl flex mx-auto justify-center">
         <button
           v-if="convertState === 'waiting'"
           type="submit"
@@ -198,13 +276,17 @@ import {
   Mutation,
 } from "nuxt-property-decorator"
 import WebSocketAsPromised from "websocket-as-promised"
-import { IConversion, IWorkMetadata } from "@/interfaces"
-import { SocketResponse } from "@/interfaces/utilities"
+import { IConversion, IKeyable, IWorkMetadata } from "@/interfaces"
+import { ISocketResponse } from "@/interfaces/utilities"
 import { idb } from "@/api"
 import importWorkData from "@/mixins/importWorkData"
 
-@Component
+@Component({
+  middleware: "refresh-authentication",
+})
 export default class ConvertWork extends mixins(importWorkData) {
+  @Getter("main/isLoggedIn") isLoggedIn
+  @Getter("main/token") token
   @Getter("conversions/conversionKey") conversionKey
   @Action("collections/storePayload") storePayload
   @Action("collections/storeCollectionPayload") storeConversionPayload
@@ -222,9 +304,10 @@ export default class ConvertWork extends mixins(importWorkData) {
   public workCover: string = ""
   public workText: string = ""
   public workDedication: string = ""
+  public saveWork: boolean = false
 
   public wsp = new WebSocketAsPromised(
-    `${process.env.apiWS}/api/v1/chapisha/build`,
+    `${process.env.apiWS}/api/v1/works/create`,
     {
       packMessage: (data) => JSON.stringify(data),
       unpackMessage: (data) => JSON.parse(data as string),
@@ -234,10 +317,10 @@ export default class ConvertWork extends mixins(importWorkData) {
   async created(): Promise<void> {
     // Get the conversion
     // https://stackoverflow.com/a/53813384/295606
-    this.conversion = ((await idb.getPayload(
+    this.conversion = (await idb.getPayload(
       "conversion",
       this.conversionKey
-    )) as unknown) as IConversion
+    )) as unknown as IConversion
     this.work = this.conversion.metadata
     this.workDedication = this.conversion.dedication
     // Cover and Text
@@ -256,11 +339,30 @@ export default class ConvertWork extends mixins(importWorkData) {
 
   public submit(): void {
     // await this.buildWorkMetadata()
-    const jsonData = {
-      metadata: this.work,
-      cover: this.workCover,
-      text: this.workText,
-      dedication: this.workDedication === "" ? null : this.workDedication,
+    const jsonData: IKeyable = {
+      metadata: {} as IKeyable,
+      cover: "" as string,
+      text: "" as string,
+      dedication: null as string[] | null,
+      token: null as string | null,
+      save: false,
+    }
+    jsonData.metadata = JSON.parse(JSON.stringify(this.work)) as IKeyable
+    // console.log(jsonData.metadata.long_description)
+    // console.log(this.drawWorkMarkup(jsonData.metadata.long_description))
+    // if (this.work.long_description)
+    //   jsonData.metadata.long_description = this.drawWorkMarkup(
+    //     this.work.long_description
+    //   )
+    jsonData.cover = this.workCover
+    jsonData.text = this.workText
+    jsonData.dedication =
+      this.workDedication === ""
+        ? null
+        : this.drawWorkLines(this.workDedication)
+    if (this.isLoggedIn && this.saveWork) {
+      jsonData.token = this.token
+      jsonData.save = this.saveWork
     }
     this.wsp
       .open()
@@ -277,10 +379,17 @@ export default class ConvertWork extends mixins(importWorkData) {
   }
 
   public async convertSocketResponse(
-    convertResponse: SocketResponse
+    convertResponse: ISocketResponse
   ): Promise<void> {
-    if (!this.work.identifier && convertResponse.data.identifier) {
-      this.work.identifier = convertResponse.data.identifier as string
+    if (
+      !this.work.identifier &&
+      Object.prototype.hasOwnProperty.call(
+        convertResponse.data,
+        "identifier"
+      ) &&
+      (convertResponse.data as any).identifier
+    ) {
+      this.work.identifier = (convertResponse.data as any).identifier as string
       // await this.storeWorkMetadata(this.work)
     }
     if (convertResponse.state === "converting") {
@@ -297,7 +406,7 @@ export default class ConvertWork extends mixins(importWorkData) {
       })
       this.convertState = "complete"
       // Save epub and update conversion
-      this.convertEPUB = convertResponse.data.work as string
+      this.convertEPUB = (convertResponse.data as any).work as string
       const epubFile = await this.getFileFromBase64(
         this.convertEPUB,
         this.workEPUB,
@@ -361,9 +470,16 @@ export default class ConvertWork extends mixins(importWorkData) {
     else return ""
   }
 
+  public drawWorkMarkup(text: string) {
+    return `<p>${this.drawWorkLines(text).join("</p><p>")}</p>`
+  }
+
   public drawWorkLines(text: string) {
     if (text) {
-      return text.replace(/\r/g, "").split(/\n/)
+      return text
+        .replace(/\r/g, "")
+        .split(/\n/)
+        .filter((n) => n)
     } else {
       return [text]
     }

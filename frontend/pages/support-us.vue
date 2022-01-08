@@ -28,9 +28,9 @@
           text-center
         "
       >
-        <p class="mb-4 text-xl text-ochre-10">
+        <span class="mb-4 text-xl text-ochre-10">
           <SvgIcon terms="h-20 w-20" icon="qwyreLogo" />
-        </p>
+        </span>
         <h1
           class="inline-flex text-4xl font-extrabold text-ochre-10 lg:text-6xl"
         >
@@ -55,7 +55,7 @@
           <MonetizationAuthenticating v-if="showAuthenticating" />
           <MonetizationAuthComplete v-if="!showAuthenticating && coilSub" />
           <!--- STRIPE --->
-          <div class="flex justify-center px-4 sm:px-6 lg:px-8 my-10">
+          <div class="flex justify-center px-4 sm:px-6 lg:px-8 mb-10">
             <div class="max-w-md w-full space-y-8">
               <p class="text-xl text-ochre-800">
                 <span class="font-semibold">If</span> you prefer a one-time
@@ -148,7 +148,7 @@ import { ICoilUserResourceResponse, IStripeIntent } from "@/interfaces"
 import { coil } from "@/api"
 
 @Component({
-  middleware: "anonymous",
+  middleware: "refresh-authentication",
   layout: "support",
 })
 export default class AuthoriseUserWebMonetization extends Vue {
@@ -299,6 +299,7 @@ export default class AuthoriseUserWebMonetization extends Vue {
         scope: this.$route.query.scope as string,
       }
       await this.initialiseUserBTP(payload)
+      if (this.coilSub) this.showAuthenticating = false
     }
     if (!this.coilSub) {
       const lastPage: string = this.$nuxt.context.from

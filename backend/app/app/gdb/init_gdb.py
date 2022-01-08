@@ -1,5 +1,5 @@
 import inspect
-from neomodel import StructuredNode, ClientError, install_labels
+from neomodel import StructuredNode, ClientError, install_labels, db
 
 # from neomodel import config
 # from app.core.config import settings
@@ -13,6 +13,37 @@ import app.models
 # config.DATABASE_URL = "bolt://neo4j:neo4j@172.18.0.5:7687"
 # config.FORCE_TIMEZONE = settings.NEO4J_FORCE_TIMEZONE
 # config.MAX_CONNECTION_POOL_SIZE = settings.NEO4J_MAX_CONNECTION_POOL_SIZE
+
+
+def createNodeIndices():
+    """Create indexes for:
+            WorkMetadata: title, description
+            Creator: creator
+            Subject: term
+    With analyzer: StandardAnalyzer ('standard')
+    """
+    indices = [
+        ("titles", "WorkMetadata", "title", "simple"),
+        ("descriptions", "WorkMetadata", "description", "standard"),
+        ("creators", "Creator", "creator", "simple"),
+        ("subjects", "Subject", "term", "standard"),
+    ]
+    for (index, node, key, analyzer) in indices:
+        try:
+            q = f"CALL db.index.fulltext.createNodeIndex('{index}',['{node}'],['{key}'], {{analyzer: '{analyzer}'}})"
+            db.cypher_query(q)
+        except ClientError:
+            pass
+
+
+def dropNodeIndices():
+    indices = ["titles", "descriptions", "creators", "subjects"]
+    for index in indices:
+        try:
+            q = f"CALL db.index.fulltext.drop('{index}')"
+            db.cypher_query(q)
+        except ClientError:
+            pass
 
 
 def init_gdb() -> None:
@@ -29,4 +60,5 @@ def init_gdb() -> None:
         except ClientError as e:
             if not str(e.message).lower().startswith("an equivalent constraint already exists"):
                 raise e
+    createNodeIndices()
 

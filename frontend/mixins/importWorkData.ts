@@ -1,11 +1,55 @@
-import { Action, Component, Vue } from "nuxt-property-decorator"
-import { IWorkMetadata, IWorkContents, IWork } from "@/interfaces"
+import { fileOpen } from "browser-fs-access"
 import { Book } from "epubjs"
+import { Action, Component, Mutation, Vue } from "nuxt-property-decorator"
+import { prxy } from "@/api"
+import { isValidHttpUrl } from "@/utilities"
+import { IWorkMetadata, IWorkContents, IWork } from "@/interfaces"
 
 @Component
 export default class ImportWorkData extends Vue {
   @Action("collections/storePayload") storePayload
   @Action("collections/storeCollectionPayload") storeCollectionPayload
+  @Mutation("main/addNotification") addNotification
+  public workURL: string = ""
+  public blob: File = {} as File
+
+  public async importWorkFromURL() {
+    const checkURL = isValidHttpUrl(this.workURL)
+    if (!checkURL) {
+      this.addNotification({
+        content: "URL to epub is not a valid link.",
+        color: "error",
+      })
+    } else {
+      try {
+        const workBlob = await prxy.proxyGetBlob(this.workURL)
+        this.blob = await this.getFileFromBase64(
+          workBlob.data,
+          this.workURL.split("/").slice(-1)[0],
+          "application/epub+zip"
+        )
+      } catch (e) {
+        this.addNotification({
+          content: "Please import a valid epub.",
+          color: "error",
+        })
+      }
+    }
+  }
+
+  public async importWorkFromClick() {
+    try {
+      this.blob = await fileOpen({
+        mimeTypes: ["application/epub+zip"],
+        extensions: [".epub"],
+      })
+    } catch (e) {
+      this.addNotification({
+        content: "Please import a valid epub.",
+        color: "error",
+      })
+    }
+  }
 
   public async getFileFromBase64(
     payload: string,
@@ -17,6 +61,16 @@ export default class ImportWorkData extends Vue {
     const response = await fetch(payload)
     const responseBuffer = await response.arrayBuffer()
     return new File([responseBuffer], filename, { type: mimeType })
+  }
+
+  public getBase64FromFile(file: File) {
+    // https://stackoverflow.com/a/57272491/295606
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = (error) => reject(error)
+    })
   }
 
   public getBase64FromCoverUrl(src: string) {
@@ -54,7 +108,7 @@ export default class ImportWorkData extends Vue {
     })
   }
 
-  public storeWork(blob: File | string) {
+  public storeWork(blob: File | string, reset: boolean = true) {
     // Open the epub
     // https://stackoverflow.com/a/61040339/295606
     // epubjs is confuse ...
@@ -64,7 +118,7 @@ export default class ImportWorkData extends Vue {
     book.ready.then(async () => {
       // Get the metadata and populate the work
       work.metadata = {
-        ...((book.packaging.metadata as unknown) as IWorkMetadata),
+        ...(book.packaging.metadata as unknown as IWorkMetadata),
       }
       work.key = book.packaging.metadata.identifier
       work.date_created = new Date(book.packaging.metadata.pubdate)
@@ -107,5 +161,9 @@ export default class ImportWorkData extends Vue {
         })
       })
     })
+    if (reset) {
+      this.blob = {} as File
+      this.workURL = ""
+    }
   }
 }

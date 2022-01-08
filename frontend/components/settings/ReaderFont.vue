@@ -18,13 +18,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Getter, Mutation } from "nuxt-property-decorator"
-import { PageFont } from "@/store/main/state"
+import {
+  Component,
+  Vue,
+  Getter,
+  Mutation,
+  Action,
+  Watch,
+} from "nuxt-property-decorator"
+import { IPageFont } from "@/interfaces"
 
 @Component
 export default class SettingsReaderFont extends Vue {
   @Getter("main/pageFont") pageFont
   @Mutation("main/setFont") setFont
+  @Action("main/storeThemeState") storeThemeState
 
   public readerOptions: { [key: string]: string | boolean }[] = [
     {
@@ -41,8 +49,9 @@ export default class SettingsReaderFont extends Vue {
     },
   ]
 
-  public async refreshReaderOptions() {
-    const currentOption = await this.pageFont
+  @Watch("pageFont")
+  public refreshReaderOptions() {
+    const currentOption = this.pageFont
     const oldSetting = this.readerOptions.filter((ro) => ro.active)
     if (oldSetting.length === 1) oldSetting[0].active = false
     const newSetting = this.readerOptions.filter(
@@ -51,9 +60,10 @@ export default class SettingsReaderFont extends Vue {
     newSetting.active = true
   }
 
-  public async setReaderOption(option: PageFont) {
+  public async setReaderOption(option: IPageFont) {
     await this.setFont(option)
-    await this.refreshReaderOptions()
+    await this.storeThemeState()
+    // await this.refreshReaderOptions()
   }
 
   async created() {

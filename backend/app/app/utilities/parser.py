@@ -1,3 +1,4 @@
+import base64
 from typing import List, Dict
 from bs4 import BeautifulSoup
 from html.parser import HTMLParser
@@ -110,8 +111,18 @@ class StreamFromWork:
         idrefs = [e["idref"] for e in spine.find_all("itemref")]
         return [self._get_page_path(ref, path_list) for ref in idrefs]
 
-    def _get_start_page(self, guide: BeautifulSoup) -> str:
-        return [e["href"] for e in guide.find_all("reference") if e.get("type") == "bodymatter"][0]
+    def _get_start_page(self, contents: BeautifulSoup) -> str:
+        pages = [e.get("href") for e in contents.guide.find_all("reference") if e.get("type") == "bodymatter"]
+        if pages:
+            return pages[0]
+        pages = [
+            e.get("href")
+            for e in contents.manifest.find_all("item")
+            if "1." in e.get("href") and e.get("media-type") == "application/xhtml+xml"
+        ]
+        if pages:
+            return pages[0]
+        return None
 
     def _get_publisher_uri(self, contents: BeautifulSoup) -> str:
         tag_id = f"#{contents.find('dc:publisher').get('id')}"
@@ -143,6 +154,13 @@ class StreamFromWork:
             return contents.find("dc:title", id="title").string
         return ""
 
+    def _get_cover_source(self, contents: BeautifulSoup, source_list: List[str]) -> str:
+        cover_source = contents.find("item", {"properties": "cover-image"}).get("href")
+        cover_source = list(filter(lambda x: cover_source in x, source_list))
+        if cover_source:
+            return cover_source[0]
+        return None
+
     def _clean_metadata(self, metadata: dict) -> Dict:
         allowed_tags = bleach.sanitizer.ALLOWED_TAGS + ["p"]
         for key in metadata.keys():
@@ -170,7 +188,10 @@ class StreamFromWork:
                 page.section.svg.decompose()
         except AttributeError:
             pass
-        page_xml = "".join([str(e) for e in page.section.contents if e not in ["\n", "\t", "\r"]])
+        try:
+            page_xml = "".join([str(e) for e in page.section.contents if e not in ["\n", "\t", "\r"]])
+        except AttributeError:
+            return []
         parser = ChapterParser()
         parser.feed(page_xml)
         if len(parser.bits) >= 3:
@@ -222,19 +243,23 @@ class StreamFromWork:
                 raise ValueError("Invalid EPUB: missing 'content.opf'")
             contents = w.read(opf_file[0])
             contents = BeautifulSoup(contents.decode("utf-8"), "lxml")
+            # Process cover
+            cover_source = self._get_cover_source(contents=contents, source_list=w.namelist())
+            if cover_source:
+                work_stream["cover"] = base64.b64encode(w.read(cover_source))
             # Process metadata
             metadata = self._get_work_metadata(contents)
             if metadata:
                 work_stream["metadata"] = metadata
             # Process stream
-            start_page = self._get_start_page(contents.guide)
+            start_page = self._get_start_page(contents)
             stream_page = 0
             for page in self._get_spine_pages(contents.spine, w.namelist()):
                 page_xml = w.read(page)
                 source = BeautifulSoup(page_xml.decode("utf-8"), "lxml")
                 stream = self._get_work_stream(source)
                 if stream:
-                    if start_page in page:
+                    if start_page and start_page in page:
                         work_stream["start_page"] = stream_page
                     stream_page += 1
                     work_stream["spine"].append(source.title.string)

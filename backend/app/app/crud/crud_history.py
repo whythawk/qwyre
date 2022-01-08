@@ -10,4 +10,4 @@ class CRUDHistory(NeoCRUDBase[StateHistory, HistoryCreate, HistoryUpdate]):
     pass
 
 
-party = CRUDHistory(StateHistory)
+history = CRUDHistory(StateHistory)

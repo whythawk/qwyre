@@ -19,7 +19,12 @@
         <div v-show="showOptions" class="absolute inset-0">
           <!-- Background overlay, show/hide based on showOptions state. -->
           <div
-            class="absolute inset-0 bg-ochre-700 bg-opacity-30 transition-opacity"
+            class="
+              absolute
+              inset-0
+              bg-ochre-700 bg-opacity-30
+              transition-opacity
+            "
             aria-hidden="true"
           ></div>
           <!-- top options panel: user experience -->
@@ -33,14 +38,43 @@
           >
             <div
               v-show="showOptions"
-              class="z-40 fixed inset-x-0 top-0 w-screen flex"
+              class="z-30 fixed inset-x-0 top-0 w-screen flex"
             >
               <div class="w-screen">
                 <div
-                  class="relative flex flex-col py-4 bg-ochre-900 opacity-90 shadow-xl"
+                  class="
+                    relative
+                    flex flex-col
+                    py-4
+                    bg-ochre-900
+                    opacity-90
+                    shadow-xl
+                  "
                 >
                   <div class="relative flex-1 px-4 sm:px-6">
                     <NavigationReaderMenu />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
+          <!-- center options panel: call to monetize -->
+          <transition
+            enter-active-class="transform transition ease-in-out duration-400 sm:duration-500 opacity-100"
+            enter-from-class="-translate-y-full"
+            enter-to-class="translate-y-0"
+            leave-active-class="transform transition ease-in-out duration-400 sm:duration-500 opacity-100"
+            leave-from-class="translate-y-0"
+            leave-to-class="-translate-y-full"
+          >
+            <div
+              v-show="showOptions && showOptionsCall"
+              class="z-40 fixed inset-x-0 top-32 w-screen flex"
+            >
+              <div class="w-screen">
+                <div class="relative flex flex-col">
+                  <div class="relative flex-1 px-4 sm:px-6">
+                    <MonetizationStreamWork />
                   </div>
                 </div>
               </div>
@@ -57,11 +91,18 @@
           >
             <div
               v-show="showOptions"
-              class="z-40 fixed inset-x-0 bottom-0 w-screen flex"
+              class="z-30 fixed inset-x-0 bottom-0 w-screen flex"
             >
               <div class="w-screen">
                 <div
-                  class="relative flex flex-col py-4 bg-ochre-900 opacity-90 shadow-xl"
+                  class="
+                    relative
+                    flex flex-col
+                    py-4
+                    bg-ochre-900
+                    opacity-90
+                    shadow-xl
+                  "
                 >
                   <div class="relative flex-1 px-4 sm:px-6">
                     <NavigationReaderOptions :completion="completion" />
@@ -92,6 +133,7 @@ export default class OverlaysReaderOptions extends Vue {
   @Prop(String) readonly completion!: string
   @Ref("options-panel-view") readonly optionsView!: HTMLElement
   @Getter("main/showOptions") showOptions
+  @Getter("main/showOptionsCall") showOptionsCall
   @Mutation("main/setShowOptions") setShowOptions
 
   public listenerResponse(event: string) {

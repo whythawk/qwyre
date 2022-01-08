@@ -1,3 +1,4 @@
+from pydantic.error_wrappers import ValidationError
 from raven import Client
 from typing import Optional
 from pathlib import Path
@@ -52,9 +53,16 @@ def create_or_update_work(data: BuildData, creator_id: UUID, work_id: Optional[U
     creator = crud.creator.get(id=creator_id, get_raw=True)
     # Create the work & get identifier
     if work_id:
-        work = crud.work.get(id=work_id)
+        work = crud.work.get(id=work_id, get_raw=True)
+        if not crud.work.validate_editing_permitted(db_obj=work):
+            raise ValidationError
         work_in = WorkUpdate.from_orm(work)
         work_in.state = WorkStateType.UPDATED
+        try:
+            if work.contract.single().isApproved:
+                work_in.state = WorkStateType.EDITED
+        except CardinalityViolation:
+            pass
         if data.get("dedication"):
             work_in.dedication = data.get("dedication")
         work = crud.work.update(obj_in=work_in, get_raw=True)
@@ -66,21 +74,17 @@ def create_or_update_work(data: BuildData, creator_id: UUID, work_id: Optional[U
     else:
         work_in = WorkCreate(**{"dedication": data.get("dedication"), "state": WorkStateType.SUBMITTED,})
         work = crud.work.create(obj_in=work_in, get_raw=True)
-    # Save the epub to Spaces ... create/update are equivalent
-    work_name = f"{work.identifier}.epub"
-    crud.spaces.create(
-        filename=work_name, resource_type=ResourceType.WORK, source=data["work"],
-    )
-    # Save the cover to Spaces
-    cover_name = f"{work.identifier}.img"
-    crud.spaces.create(
-        filename=cover_name, resource_type=ResourceType.COVER, source=data["cover"],
-    )
+    # Save the epub
+    crud.epub.save(source=data["work"], source_id=work.identifier)
     # Load work and process to generate stream and summaries
-    data["work"] = crud.files.strip_as_epub(source=data["work"])
+    data["work"] = crud.epub.strip_mimetype(source=data["work"])
+    work_name = f"{work.identifier}.epub"
     crud.files.create(source=data["work"], filetype=MimeType.EPUB, filename=work_name)
     workstream = StreamFromWork()
     workstream_in = workstream.get_work_stream(Path(settings.WORKING_PATH) / work_name)
+    # Save the cover
+    crud.cover.save(source=workstream_in.cover, source_id=work.identifier)
+    # Process Workstream
     work_in = WorkUpdate.from_orm(work)
     work_in = WorkUpdate(**work_in.copy(update=workstream_in.dict(exclude_unset=True)).dict())
     work = crud.work.update(obj_in=work_in, get_raw=True)

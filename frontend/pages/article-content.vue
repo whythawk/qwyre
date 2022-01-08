@@ -10,6 +10,7 @@ import { Component, Vue } from "nuxt-property-decorator"
 
 @Component({
   layout: "content",
+  middleware: "refresh-authentication",
 })
 export default class ArticleContent extends Vue {
   async asyncData({ $content }) {

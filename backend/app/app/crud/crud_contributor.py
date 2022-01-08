@@ -20,17 +20,18 @@ class CRUDContributor(NeoCRUDBase[Contributor, ContributorCreate, ContributorUpd
             roles = [roles]
         if user_obj.is_superuser:
             return True
-        if ContributorRoleType.MODERATOR in [roles] and user_obj.is_moderator:
+        if ContributorRoleType.MODERATOR in roles and user_obj.is_moderator:
             return True
-        if ContributorRoleType.AUTHOR in [roles] and creator_obj.works.get_or_none(
+        if ContributorRoleType.AUTHOR in roles and creator_obj.works.get_or_none(
             identifier=work_obj.metadata.single().identifier
         ):
             return True
+        # Not all contributors have creator profiles, so need this 'filter().all()' fudge
         contributor_roles = set(
             [
                 ContributorRoleType(contributor.role)
                 for contributor in work_obj.metadata.single().contributor.all()
-                if contributor.creator.single().identifier == creator_obj.identifier
+                if creator_obj.identifier in [c.identifier for c in contributor.creator.filter().all()]
             ]
         )
         if contributor_roles and not set(roles).isdisjoint(contributor_roles):

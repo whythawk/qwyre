@@ -31,7 +31,16 @@
               <button
                 id="menu-button"
                 type="button"
-                class="group inline-flex justify-center text-sm font-medium focus:outline-none text-ochre-600 hover:text-ochre-800"
+                class="
+                  group
+                  inline-flex
+                  justify-center
+                  text-sm
+                  font-medium
+                  focus:outline-none
+                  text-ochre-600
+                  hover:text-ochre-800
+                "
                 aria-expanded="false"
                 aria-haspopup="true"
                 @click="isFilterOpen = !isFilterOpen"
@@ -53,7 +62,18 @@
             >
               <div
                 v-show="isFilterOpen"
-                class="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                class="
+                  origin-top-right
+                  absolute
+                  right-0
+                  mt-2
+                  w-40
+                  rounded-md
+                  shadow-2xl
+                  bg-white
+                  ring-1 ring-black ring-opacity-5
+                  focus:outline-none
+                "
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="menu-button"
@@ -98,14 +118,14 @@
           <div class="transition ease-in duration-200">
             <div v-if="i === 0">
               <CollectionsWorkPlateSummary
-                :collection="collection"
+                collection="work"
                 :collection-key="c.key"
                 :show-new="true"
               />
             </div>
             <div v-else>
               <CollectionsWorkPlateSummary
-                :collection="collection"
+                :collection="c.collection"
                 :collection-key="c.key"
                 :show-delete="showDelete"
               />
@@ -119,12 +139,31 @@
     <nav
       v-show="totalPages > 1"
       aria-label="Pagination"
-      class="max-w-7xl mx-auto px-4 mt-6 flex justify-between text-sm font-medium text-gray-700 sm:px-6 lg:px-8"
+      class="
+        max-w-7xl
+        mx-auto
+        px-4
+        mt-6
+        flex
+        justify-between
+        text-sm
+        font-medium
+        text-gray-700
+        sm:px-6
+        lg:px-8
+      "
     >
       <div class="min-w-0 flex-1">
         <a
           disabled="currentPage < 1"
-          class="inline-flex items-center px-4 h-10 cursor-pointer btn-ochre-extended-sm"
+          class="
+            inline-flex
+            items-center
+            px-4
+            h-10
+            cursor-pointer
+            btn-ochre-extended-sm
+          "
           @click="currentPage > 1 ? (currentPage -= 1) : (currentPage = 1)"
         >
           Previous
@@ -151,7 +190,14 @@
       <div class="min-w-0 flex-1 flex justify-end">
         <a
           disabled="currentPage === totalPages"
-          class="inline-flex items-center px-4 h-10 cursor-pointer btn-ochre-extended-sm"
+          class="
+            inline-flex
+            items-center
+            px-4
+            h-10
+            cursor-pointer
+            btn-ochre-extended-sm
+          "
           @click="
             currentPage < totalPages
               ? (currentPage += 1)
@@ -166,14 +212,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Watch, Getter, Vue } from "nuxt-property-decorator"
+import { Component, Watch, Getter, Vue } from "nuxt-property-decorator"
 import { idb } from "@/api"
-import { IAnthology, IConversion, ISeries, IWork } from "@/interfaces"
+import {
+  IWork,
+  IStream,
+  ILibrary,
+  IKeyable,
+  ICreatorSummary,
+} from "@/interfaces"
 
 @Component
 export default class CollectionsLibrary extends Vue {
-  @Prop(String) readonly collection!: string
   @Getter("collections/collectionWatcher") collectionWatcher
+  public collection: string = "library"
   public isFilterOpen: boolean = false
   public showDelete: boolean = false
   public forceRefresh: boolean = false
@@ -181,22 +233,27 @@ export default class CollectionsLibrary extends Vue {
   public totalPages: number = 1
   public currentPage: number = 1
   public currentSort: string = "latest"
-  public completeCollection:
-    | IWork[]
-    | IAnthology[]
-    | ISeries[]
-    | IConversion[] = []
+  public libraryCollection: ILibrary[] = []
+  public completeCollection: IKeyable[] = []
 
-  public pagedCollection:
-    | IWork[]
-    | IAnthology[]
-    | ISeries[]
-    | IConversion[] = []
+  public pagedCollection: IKeyable[] = []
 
   public sortOptions = [
     {
       key: "latest",
       value: "Latest",
+    },
+    {
+      key: "title",
+      value: "Title",
+    },
+    {
+      key: "author",
+      value: "Author",
+    },
+    {
+      key: "published",
+      value: "Published",
     },
   ]
 
@@ -211,28 +268,23 @@ export default class CollectionsLibrary extends Vue {
     switch (sortBy) {
       case "latest":
         this.completeCollection = this.completeCollection.sort(
-          (a, b) => b.date_created - a.date_created
+          (a, b) => b.created - a.created
         )
         break
       case "published":
         // https://stackoverflow.com/a/45544166/295606
         this.completeCollection = this.completeCollection.sort((a, b) =>
-          a.metadata.pubdate.localeCompare(b.metadata.pubdate)
+          a.published.localeCompare(b.published)
         )
         break
       case "title":
         this.completeCollection = this.completeCollection.sort((a, b) =>
-          a.metadata.title.localeCompare(b.metadata.title)
+          a.title.localeCompare(b.title)
         )
         break
       case "author":
         this.completeCollection = this.completeCollection.sort((a, b) =>
-          a.metadata.creator.localeCompare(b.metadata.creator)
-        )
-        break
-      case "name":
-        this.completeCollection = this.completeCollection.sort((a, b) =>
-          a.name.localeCompare(b.name)
+          a.author.localeCompare(b.author)
         )
         break
     }
@@ -287,6 +339,53 @@ export default class CollectionsLibrary extends Vue {
     this.pagedCollection.unshift(this.disardable)
   }
 
+  public checkBy(name: string | null): string {
+    if (!name) return "Anonymous"
+    return name
+  }
+
+  public makeAuthorString(authors: ICreatorSummary[]): string {
+    if (authors.length === 1) {
+      return this.checkBy(authors[0].creator)
+    }
+    if (authors.length >= 2) {
+      const authorList: string[] = []
+      for (const author of authors.slice(0, -1))
+        authorList.push(this.checkBy(author.creator))
+      return `${authorList.join(", ")} &amp; ${this.checkBy(
+        authors.slice(-1)[0].creator
+      )}`
+    }
+    return "Anonymous"
+  }
+
+  public async refreshCompleteCollection() {
+    const completeCollection: IKeyable[] = []
+    for (const book of this.libraryCollection) {
+      const member = (await idb.getPayload(book.collection, book.key)) as
+        | IWork
+        | IStream
+      member.date_created = book.date_created
+      const newMember: IKeyable = {
+        key: book.key,
+        created: book.date_created,
+        collection: book.collection,
+        title: member.metadata.title,
+        author:
+          book.collection === "work"
+            ? member.metadata.creator
+            : this.makeAuthorString(
+                member.metadata.creator as ICreatorSummary[]
+              ),
+        published: member.metadata.isodate
+          ? member.metadata.isodate
+          : (member.metadata as any).pubdate,
+      }
+      completeCollection.push(newMember)
+    }
+    this.completeCollection = completeCollection
+  }
+
   @Watch("collectionWatcher")
   public async refreshCollection() {
     if (
@@ -295,7 +394,10 @@ export default class CollectionsLibrary extends Vue {
         this.collectionWatcher.split("-")[0] === this.collection)
     ) {
       this.forceRefresh = false
-      this.completeCollection = await idb.getAllPayloads(this.collection)
+      this.libraryCollection = (await idb.getAllPayloads(
+        this.collection
+      )) as ILibrary[]
+      await this.refreshCompleteCollection()
       this.sortCompleteCollection(this.currentSort)
       this.totalPages = Math.ceil(
         (this.completeCollection.length + 1) / this.paginationLimit
@@ -306,26 +408,6 @@ export default class CollectionsLibrary extends Vue {
   async mounted() {
     this.forceRefresh = true
     await this.refreshCollection()
-    if (["work", "conversion"].includes(this.collection)) {
-      this.sortOptions.push({
-        key: "title",
-        value: "Title",
-      })
-      this.sortOptions.push({
-        key: "author",
-        value: "Author",
-      })
-      this.sortOptions.push({
-        key: "published",
-        value: "Published",
-      })
-    }
-    if (["anthology", "series"].includes(this.collection)) {
-      this.sortOptions.push({
-        key: "name",
-        value: "Name",
-      })
-    }
   }
 }
 </script>

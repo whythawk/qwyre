@@ -1,3 +1,5 @@
+import { AxiosError } from "axios"
+import { AppNotification } from "./state"
 import { api } from "@/api"
 import {
   saveLocalToken,
@@ -5,10 +7,10 @@ import {
   saveRefreshToken,
   removeRefreshToken,
   tokenExpired,
+  getLocalSettings,
+  saveLocalSettings,
 } from "@/utilities"
-import { AxiosError } from "axios"
-import { IUserOpenProfileCreate } from "@/interfaces"
-import { AppNotification } from "./state"
+import { IUserOpenProfileCreate, IThemeState } from "@/interfaces"
 
 export default {
   async logIn(
@@ -83,9 +85,19 @@ export default {
   },
   async getUserProfile({ commit, dispatch, state }) {
     try {
-      const response = await api.getMe(state.token)
+      const response = await api.getOfficialMe(state.token)
       if (response.data) {
         await commit("setUserProfile", response.data)
+      }
+    } catch (error) {
+      await dispatch("checkApiError", error)
+    }
+  },
+  async getCreatorProfile({ commit, dispatch, state }) {
+    try {
+      const response = await api.getMe(state.token)
+      if (response.data) {
+        await commit("setCreatorProfile", response.data)
       }
     } catch (error) {
       await dispatch("checkApiError", error)
@@ -95,8 +107,38 @@ export default {
     try {
       const loadingNotification = { content: "Saving...", showProgress: true }
       await commit("addNotification", loadingNotification)
-      const response = await api.updateMe(state.token, payload)
+      const response = await api.updateOfficialMe(state.token, payload)
       await commit("setUserProfile", response.data)
+      await commit("removeNotification", loadingNotification)
+      await commit("addNotification", {
+        content: "Profile successfully updated",
+        color: "success",
+      })
+    } catch (error) {
+      await dispatch("checkApiError", error)
+    }
+  },
+  async updateCreatorProfile({ commit, dispatch, state }, payload) {
+    try {
+      const loadingNotification = { content: "Saving...", showProgress: true }
+      await commit("addNotification", loadingNotification)
+      const response = await api.updateMe(state.token, payload)
+      await commit("setCreatorProfile", response.data)
+      await commit("removeNotification", loadingNotification)
+      await commit("addNotification", {
+        content: "Profile successfully updated",
+        color: "success",
+      })
+    } catch (error) {
+      await dispatch("checkApiError", error)
+    }
+  },
+  async toggleCreatorPrivacy({ commit, dispatch, state }) {
+    try {
+      const loadingNotification = { content: "Saving...", showProgress: true }
+      await commit("addNotification", loadingNotification)
+      const response = await api.toggleCreatorPrivacy(state.token)
+      await commit("setCreatorProfile", response.data)
       await commit("removeNotification", loadingNotification)
       await commit("addNotification", {
         content: "Profile successfully updated",
@@ -136,6 +178,7 @@ export default {
       } else {
         await commit("setToken", token)
         try {
+          await dispatch("getCreatorProfile")
           await dispatch("getUserProfile")
           await commit("setLoggedIn", true)
         } catch (error) {
@@ -143,7 +186,9 @@ export default {
         }
       }
     } else {
-      await dispatch("logOut")
+      try {
+        await dispatch("logOut")
+      } catch {}
     }
   },
   async logOut({ commit }) {
@@ -152,6 +197,7 @@ export default {
     await commit("setToken", "")
     await commit("setLoggedIn", false)
     await commit("setUserProfile", null)
+    await commit("setCreatorProfile", null)
     ;(this as any).$cookies.remove("token")
     ;(this as any).$cookies.remove("refresh")
   },
@@ -162,16 +208,18 @@ export default {
     }
   },
   async addErrorNotification({ commit }, payload: AxiosError) {
-    let content
-    try {
-      content = `${payload.response!.data.detail}`
-    } catch {
-      content = payload
+    if (payload.response!.data.detail !== "Could not validate credentials") {
+      let content
+      try {
+        content = `${payload.response!.data.detail}`
+      } catch {
+        content = payload
+      }
+      await commit("addNotification", {
+        content,
+        color: "error",
+      })
     }
-    await commit("addNotification", {
-      content,
-      color: "error",
-    })
   },
   async removeNotification(
     { commit },
@@ -222,6 +270,23 @@ export default {
         color: "error",
         content: "Error resetting password",
       })
+    }
+  },
+  storeThemeState({ state }) {
+    const theme: IThemeState = {
+      theme: state.theme.theme,
+      spacing: state.theme.spacing,
+      font: state.theme.font,
+      size: state.theme.size,
+    }
+    saveLocalSettings(JSON.stringify(theme))
+  },
+  async recoverThemeState({ commit, dispatch }) {
+    const localSettings = getLocalSettings()
+    if (localSettings) {
+      await commit("setThemeState", JSON.parse(localSettings))
+    } else {
+      await dispatch("storeThemeState")
     }
   },
 }

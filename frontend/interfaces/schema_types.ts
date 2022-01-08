@@ -1,9 +1,13 @@
 export type IWorkStateType =
   | "submitted"
+  | "updated"
   | "offered"
   | "contracted"
+  | "departed"
   | "edited"
+  | "priced"
   | "published"
+  | "pending"
   | "withdrawn"
   | "reviewed"
   | "suspended"

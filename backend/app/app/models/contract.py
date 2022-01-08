@@ -32,6 +32,7 @@ class Party(NodeBase):
 class Contract(NodeBase):
     identifier = UniqueIdProperty()
     created = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+    offers = RelationshipFrom("app.models.creator.Creator", "INTERESTED")
     parties = RelationshipTo("Party", "PARTIES")
     isApproved = BooleanProperty(default=False, help_text="Contract only approved once all parties have approved it.",)
     publicationApproved = BooleanProperty(

@@ -27,6 +27,8 @@ IP2Location = "^8.6.4"
 neo4j = "^4.4.0"
 boto3 = "^1.20.9"
 neomodel = "^4.0.7"
+bleach = "^4.1.0"
+Pillow = "^8.4.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.770"

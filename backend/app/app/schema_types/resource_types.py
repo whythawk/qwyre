@@ -7,3 +7,4 @@ class ResourceType(BaseEnum):
     WORK = auto()
     SOURCE = auto()
     COVER = auto()
+    THUMBNAIL = auto()

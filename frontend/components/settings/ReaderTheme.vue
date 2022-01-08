@@ -1,6 +1,14 @@
 <template>
   <div
-    class="relative flex flex-row justify-center max-w-xs sm:max-w-screen-sm mx-auto my-4"
+    class="
+      relative
+      flex flex-row
+      justify-center
+      max-w-xs
+      sm:max-w-screen-sm
+      mx-auto
+      my-4
+    "
   >
     <div class="text-xs sm:text-sm text-ochre-100 mx-2 my-auto">Light</div>
     <button
@@ -26,12 +34,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Getter, Mutation } from "nuxt-property-decorator"
+import {
+  Component,
+  Vue,
+  Getter,
+  Mutation,
+  Watch,
+  Action,
+} from "nuxt-property-decorator"
 
 @Component
 export default class SettingsReaderTheme extends Vue {
   @Getter("main/pageTheme") pageTheme
   @Mutation("main/setTheme") setTheme
+  @Action("main/storeThemeState") storeThemeState
 
   public theme: boolean = false
 
@@ -39,10 +55,16 @@ export default class SettingsReaderTheme extends Vue {
     this.theme = !this.theme
     if (this.theme) await this.setTheme("dark")
     else await this.setTheme("light")
+    await this.storeThemeState()
   }
 
-  async created() {
-    this.theme = (await this.pageTheme) === "dark"
+  @Watch("pageTheme")
+  public setPageTheme() {
+    this.theme = this.pageTheme === "dark"
+  }
+
+  created() {
+    this.setPageTheme()
   }
 }
 </script>

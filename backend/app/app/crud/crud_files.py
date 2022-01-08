@@ -1,11 +1,10 @@
-from typing import List, Optional
+from typing import Optional
 from pathlib import Path
 import shutil
 from uuid import uuid4
 import base64
 
 from app.core.config import settings
-from app.schemas.base_schema import BaseSchema
 from app.schema_types import MimeType
 
 
@@ -46,14 +45,6 @@ class CRUDFiles:
             directory = directory / subdirectory
         # https://stackoverflow.com/a/42641792/295606
         (directory / filename).unlink(missing_ok=True)
-
-    def set_as_epub(self, *, source: str) -> str:
-        return "data:application/epub+zip;base64," + source.decode("utf-8")
-
-    def strip_as_epub(self, *, source: str) -> str:
-        if source.startswith("data:application/epub+zip;base64,"):
-            return source.split("data:application/epub+zip;base64,")[1]
-        return source
 
     def remove_directory(self, *, directory: str):
         shutil.rmtree(self.directory / directory, ignore_errors=True)

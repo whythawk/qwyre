@@ -1,6 +1,14 @@
 <template>
   <div
-    class="relative flex flex-row justify-center max-w-xs sm:max-w-screen-sm mx-auto my-4"
+    class="
+      relative
+      flex flex-row
+      justify-center
+      max-w-xs
+      sm:max-w-screen-sm
+      mx-auto
+      my-4
+    "
   >
     <button
       v-for="ro in readerOptions"
@@ -18,13 +26,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Getter, Mutation } from "nuxt-property-decorator"
-import { PageFont } from "@/store/main/state"
+import {
+  Component,
+  Vue,
+  Getter,
+  Mutation,
+  Action,
+} from "nuxt-property-decorator"
+import { IPageFont } from "@/interfaces"
 
 @Component
 export default class SettingsReaderFont extends Vue {
   @Getter("main/pageFont") pageFont
   @Mutation("main/setFont") setFont
+  @Action("main/storeThemeState") storeThemeState
 
   public readerOptions: { [key: string]: string | boolean }[] = [
     {
@@ -50,8 +65,8 @@ export default class SettingsReaderFont extends Vue {
     },
   ]
 
-  public async refreshReaderOptions() {
-    const currentOption = await this.pageFont
+  public refreshReaderOptions() {
+    const currentOption = this.pageFont
     const oldSetting = this.readerOptions.filter((ro) => ro.active)
     if (oldSetting.length === 1) oldSetting[0].active = false
     const newSetting = this.readerOptions.filter(
@@ -60,8 +75,9 @@ export default class SettingsReaderFont extends Vue {
     newSetting.active = true
   }
 
-  public async setReaderOption(name: PageFont) {
+  public async setReaderOption(name: IPageFont) {
     await this.setFont(name)
+    await this.storeThemeState()
     await this.refreshReaderOptions()
   }
 

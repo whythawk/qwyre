@@ -18,7 +18,6 @@ export default function clickYListener(
 ) {
   function listenerAction(event: MouseEvent) {
     const cY = event.clientY
-    console.log(cY)
     fn("menu")
   }
   if (listen) el.addEventListener("click", listenerAction, false)

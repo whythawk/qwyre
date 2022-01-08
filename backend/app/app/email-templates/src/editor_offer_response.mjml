@@ -1,0 +1,81 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-image
+          width="60px"
+          src="https://qwyre.com/qwyre-icon.png"
+          href="https://qwyre.com"
+        ></mj-image>
+        <mj-divider border-color="#3A5C84"></mj-divider>
+        <mj-text font-size="16px" font-weight="bold" color="#635246"
+          >We have shared your interest in editing</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >Hi,</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >We have shared your email address with the creator of "{{ work_title
+          }}". We leave the specifics to you but you can find guidance
+          <a href="https://qwyre.com/guides/editing">here</a>, if you
+          need.</mj-text
+        >
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#EDE7E3">
+      <mj-column>
+        <mj-text
+          font-size="16px"
+          color="#635246"
+          font-family="helvetica"
+          font-style="italic"
+          >Your next steps:</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >1. The creator will respond to you direct, although they are under no
+          obligation to do so.</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >2. You will collaborate with the creator to ensure you each
+          understand what to expect from the other.</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >3. Once you're comfortable with your agreement, document that in your
+          <a href="{{ contract_link }}">contract</a> and each of you must accept
+          it.</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >4. Only once your contract is in place should you each begin work on
+          the edits.</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >5. The creator will import your edited version to their
+          <a href="{{ workspace_link }}">workspace</a> where you can validate it
+          appears as you each expect.</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >6. When you, and the creator, are each satisfied, you can approve the
+          contract and publish their work.</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >During your negotiations, you can also agree a proportional payment
+          for the work, and a maximum price to the reader.</mj-text
+        >
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >For any concerns or queries, just email me.</mj-text
+        >
+        <mj-text
+          font-size="16px"
+          font-weight="bold"
+          color="#635246"
+          font-family="helvetica"
+          >Symon @ Qwyre</mj-text
+        >
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

@@ -16,6 +16,7 @@ export default {
       { src: "https://js.stripe.com/v3", async: true },
       // { src: "https://cdn.coil.com/coil-oauth-wm.v7.beta.js", defer: true },
     ],
+    noscript: [{ innerHTML: "This website requires JavaScript." }],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
   },
 
@@ -43,6 +44,8 @@ export default {
     coilID: process.env.COIL_CLIENT_ID,
     coilSecret: process.env.COIL_CLIENT_SECRET,
     coilPointer: process.env.COIL_PAYMENT_POINTER,
+    coilVerifier: process.env.COIL_RECEIPT_VERIFIER,
+    coilRedirect: process.env.COIL_REDIRECT_URI,
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -89,8 +92,22 @@ export default {
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
+    meta: {
+      name: "Qwyre",
+      author: "Gavin Chait",
+      description:
+        "Qwyre.com is a streaming payments platform for collaborative publishing, a simple ebook converter, and an ereader.",
+      theme_color: "#4974a5",
+      ogHost: "https://qwyre.com/",
+      twitterCard: "app",
+      twitterSite: "@GavinChait",
+      twitterCreator: "@GavinChait",
+    },
     manifest: {
-      lang: "en",
+      name: "Qwyre",
+      short_name: "Qwyre",
+      description:
+        "Qwyre.com is a streaming payments platform for collaborative publishing, a simple ebook converter, and an ereader.",
     },
   },
 

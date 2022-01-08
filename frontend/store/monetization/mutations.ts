@@ -11,6 +11,9 @@ export default {
   setCoilPointer(state, payload: string) {
     state.coilPointer = payload
   },
+  setCoilReceipt(state, payload: string) {
+    state.coilReceipt = payload
+  },
   setIsStreaming(state, payload: boolean) {
     state.isStreaming = payload
   },
@@ -22,5 +25,8 @@ export default {
   },
   setBtpToken(state, payload: string) {
     state.btpToken = payload
+  },
+  setMonetizationWatcher(state, payload: string) {
+    state.monetizationWatcher = payload
   },
 }

@@ -18,6 +18,11 @@ import {
   removeCoilRefresh,
 } from "./coil"
 import {
+  getLocalSettings,
+  saveLocalSettings,
+  removeLocalSettings,
+} from "./settings"
+import {
   generateUUID,
   isValidHttpUrl,
   getTimeInSeconds,
@@ -55,6 +60,9 @@ export {
   getCoilRefresh,
   saveCoilRefresh,
   removeCoilRefresh,
+  getLocalSettings,
+  saveLocalSettings,
+  removeLocalSettings,
   convertCSVtoJSON,
   convertBlobToBase64,
   readableDate,

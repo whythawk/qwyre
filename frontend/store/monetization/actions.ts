@@ -1,3 +1,4 @@
+import { AxiosError, AxiosResponse } from "axios"
 import { coil } from "@/api"
 import {
   generateUUID,
@@ -9,7 +10,6 @@ import {
   saveCoilRefresh,
   removeCoilRefresh,
 } from "@/utilities"
-import { AxiosError, AxiosResponse } from "axios"
 import {
   ICoilUserResourceResponse,
   ICoilUserTokenResponse,

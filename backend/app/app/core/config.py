@@ -89,6 +89,8 @@ class Settings(BaseSettings):
     NEO4J_PASSWORD: str
     NEO4J_AUTH: str
     NEO4J_BOLT_URL: Optional[str] = None
+    NEO4J_SUGGESTION_LIMIT: int = 8
+    NEO4J_RESULTS_LIMIT: int = 100
 
     @validator("NEO4J_BOLT_URL", pre=True)
     def get_neo4j_bolt_url(cls, v: str, values: Dict[str, Any]) -> str:
@@ -109,6 +111,7 @@ class Settings(BaseSettings):
     COIL_CLIENT_ID: str
     COIL_CLIENT_SECRET: str
     COIL_PAYMENT_POINTER: str
+    COIL_RECEIPT_VERIFIER: str = "https://receipt-verifier.example/verify"
 
     # DIGITALOCEAN SPACES KEYS
     SPACES_ACCESS_KEY: str
@@ -116,6 +119,12 @@ class Settings(BaseSettings):
     SPACES_REGION_NAME: str = "fra1"
     SPACES_ENDPOINT_URL: HttpUrl = "https://fra1.digitaloceanspaces.com"
     SPACES_BUCKET: str = "whyqd"
+
+    # STREAMING DEFAULTS
+    STREAM_PER_SECOND: int = 5
+    STREAM_FIRST: int = 500
+    STREAM_SHARE: int = 15
+    STREAM_WALLET: str = "$ilp.uphold.com/4hAWm9XEZzYY"
 
     # IP2LOCATION IP COUNTRY LOCATION
     IP2_LINK: HttpUrl = "https://www.ip2location.com/download/"

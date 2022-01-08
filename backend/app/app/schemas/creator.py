@@ -1,8 +1,9 @@
 from __future__ import annotations
 from typing import Optional, List, TYPE_CHECKING
-from pydantic import Field, AnyHttpUrl, AnyUrl
+from pydantic import Field, AnyHttpUrl, AnyUrl, validator
 from uuid import UUID
 from datetime import date
+from neomodel.relationship_manager import ZeroOrMore
 
 from .base_schema import BaseSchema, MetadataBaseCreate
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 
 class CreatorCreate(MetadataBaseCreate):
     creator: Optional[str] = Field(None, description="The public name a creator wishes to be called.")
-    wallet: Optional[AnyUrl] = Field(None, description="Payment pointer for web monetization.")
+    wallet: Optional[str] = Field(None, description="Payment pointer for web monetization.")
     website: Optional[AnyHttpUrl] = Field(None, description="Payment pointer for web monetization.")
 
 
@@ -34,6 +35,12 @@ class CreatorInDB(CreatorCreate):
         use_enum_values = True
         orm_mode = True
 
+    @validator("subject", pre=True)
+    def evaluate_subjects(cls, v):
+        if isinstance(v, ZeroOrMore):
+            return [Subject.from_orm(c) for c in v.all()]
+        return v
+
 
 class Creator(CreatorInDB):
     pass
@@ -45,7 +52,7 @@ class CreatorSummary(BaseSchema):
     description: Optional[str] = Field(
         None, description="A short, single-sentence summary of the creator.",
     )
-    wallet: Optional[AnyUrl] = Field(None, description="Payment pointer for web monetization.")
+    wallet: Optional[str] = Field(None, description="Payment pointer for web monetization.")
     website: Optional[AnyHttpUrl] = Field(None, description="Payment pointer for web monetization.")
     isActive: bool = Field(..., description="Whether the work is publically accessible.")
     isPrivate: bool = Field(..., description="Whether the work is private to creators with appropriate authorisation.")
@@ -55,7 +62,36 @@ class CreatorSummary(BaseSchema):
         orm_mode = True
 
 
+class CreatorProfile(BaseSchema):
+    identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
+    creator: Optional[str] = Field(None, description="The public name a creator wishes to be called.")
+    description: Optional[str] = Field(
+        None, description="A short, single-sentence summary of the creator.",
+    )
+    wallet: Optional[str] = Field(None, description="Payment pointer for web monetization.")
+    website: Optional[AnyHttpUrl] = Field(None, description="Payment pointer for web monetization.")
+    subject: List[Subject] = Field([], description="A list of topics of the resource.")
+
+    class Config:
+        orm_mode = True
+
+    @validator("subject", pre=True)
+    def evaluate_subjects(cls, v):
+        if isinstance(v, ZeroOrMore):
+            return [Subject.from_orm(c) for c in v.all()]
+        return v
+
+
+class CreatorMini(BaseSchema):
+    identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
+    creator: Optional[str] = Field(None, description="The public name a creator wishes to be called.")
+
+    class Config:
+        orm_mode = True
+
+
 from app.schemas import Subject
 
 CreatorInDB.update_forward_refs()
 Creator.update_forward_refs()
+CreatorProfile.update_forward_refs()

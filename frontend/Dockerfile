@@ -19,7 +19,7 @@ FROM node:lts-alpine AS run-minimal
 ARG NUXT_VERSION=^2.15
 ENV NODE_ENV=production NUXT_HOST=${NUXT_HOST:-0.0.0.0} NUXT_PORT=${NUXT_PORT:-3000} NUXT_TELEMETRY_DISABLED=1
 WORKDIR /app
-RUN yarn add @nuxtjs/axios @nuxt/content @nuxtjs/pwa nuxt-i18n nuxt-start@${NUXT_VERSION} @stripe/stripe-js @tailwindcss/aspect-ratio @tailwindcss/forms @tailwindcss/typography browser-fs-access core-js epubjs nuxt-property-decorator swiper vee-validate websocket websocket-as-promised cookie-universal-nuxt
+RUN yarn add @nuxtjs/axios @nuxt/content @nuxtjs/pwa nuxt-i18n nuxt-start@${NUXT_VERSION} @stripe/stripe-js @tailwindcss/aspect-ratio @tailwindcss/forms @tailwindcss/typography @tailwindcss/line-clamp browser-fs-access core-js epubjs nuxt-property-decorator swiper vee-validate websocket websocket-as-promised cookie-universal-nuxt
 COPY --from=build /app/.nuxt ./.nuxt
 COPY --from=build /app/api ./api
 COPY --from=build /app/app ./app

@@ -13,13 +13,16 @@ if TYPE_CHECKING:
 class BookmarkCreate(BaseSchema):
     page: int = Field(..., description="Page or chapter number.")
     position: int = Field(..., description="Current text position.")
-    paid: Optional[int] = Field(None, description="Price paid for reading. In US$ cents.")
+    paid: Optional[int] = Field(default=0, description="Price paid for reading. In US$ cents.")
     isOwned: bool = Field(default=False, description="Whether the work is owned or not.")
     payment_reference: Optional[str] = Field(None, description="Payment reference, if any.")
 
 
 class BookmarkUpdate(BookmarkCreate):
     identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
+
+    class Config:
+        orm_mode = True
 
 
 class BookmarkInDB(BookmarkCreate):

@@ -1,21 +1,28 @@
 <template>
-  <div class="container">
-    <OverlaysReaderOptions :completion="completion" />
-    <!-- Invisible overlay for reader input -->
-    <div
-      ref="reader-input"
-      class="z-30 fixed inset-0 overflow-hidden outline-none"
-      aria-hidden="true"
-      tabindex="0"
-    >
-      <div class="absolute inset-0 bg-opacity-0" aria-hidden="true"></div>
+  <div
+    :class="`mx-auto ${pageTheme === 'light' ? 'bg-ochre-10' : 'bg-ochre-900'}
+    `"
+  >
+    <div class="h-screen flex justify-center">
+      <article>
+        <OverlaysReaderOptions :completion="completion" />
+        <!-- Invisible overlay for reader input -->
+        <div
+          ref="reader-input"
+          class="z-30 fixed inset-0 overflow-hidden outline-none"
+          aria-hidden="true"
+          tabindex="0"
+        >
+          <div class="absolute inset-0 bg-opacity-0" aria-hidden="true"></div>
+        </div>
+        <client-only placeholder="Loading...">
+          <div
+            ref="reader-view"
+            class="z-1 relative h-screen w-screen sm:max-w-xl sm:mx-auto"
+          ></div>
+        </client-only>
+      </article>
     </div>
-    <client-only placeholder="Loading...">
-      <div
-        ref="reader-view"
-        class="z-1 relative h-screen w-screen sm:max-w-xl sm:mx-auto"
-      ></div>
-    </client-only>
   </div>
 </template>
 
@@ -39,19 +46,25 @@ import {
 import { IWork } from "@/interfaces"
 import { idb } from "@/api"
 import { dark, light, serif, sanserif } from "@/assets/css/themes"
+import { generateUUID } from "@/utilities"
 // import Section from "epubjs/types/section"
 // import { readerIframeView } from "@/interfaces/reader"
 
 @Component({
+  middleware: "refresh-authentication",
   layout: "reader",
 })
 export default class Reader extends Vue {
   @Ref("reader-view") readonly readerView!: HTMLElement
   @Ref("reader-input") readonly readerInput!: HTMLElement
+  @Mutation("main/setChangeWatcher") setChangeWatcher
+  @Action("collections/restoreCollection") restoreCollection
+  @Getter("collections/latestCollections") latestCollections
   @Getter("collections/firstCollection") firstCollection
   @Getter("main/showOptions") showOptions
   @Mutation("main/setShowOptions") setShowOptions
   @Action("collections/storeCollectionPayload") storeCollectionPayload
+  @Action("main/recoverThemeState") recoverThemeState
   @Getter("main/pageTheme") pageTheme
   @Getter("main/pageSize") pageSize
   @Getter("main/pageFont") pageFont
@@ -140,10 +153,8 @@ export default class Reader extends Vue {
     }
   }
 
-  async mounted() {
-    // Already checked that it exists
-    const workKey = await this.firstCollection("work")
-    this.work = (await idb.getPayload("work", workKey)) as IWork
+  public async initiliase() {
+    const workKey = this.work.key
     if (Object.keys(this.work).length !== 0) {
       // Get the epub and cover
       this.epub = (await idb.getPayload("epub", workKey)) as File
@@ -184,6 +195,9 @@ export default class Reader extends Vue {
           this.rendition.themes.registerRules("serif", serif)
           this.rendition.themes.registerRules("sans-serif", sanserif)
           this.rendition.themes.select(this.pageTheme)
+          this.rendition.themes.font(this.pageFont.split("_").join("-"))
+          const newSize = `${this.pageSize}%`
+          this.rendition.themes.fontSize(newSize)
           this.rendition.start()
           if (this.locations.length > 0)
             // @ts-expect-error
@@ -197,18 +211,23 @@ export default class Reader extends Vue {
             this.updateReadingWork()
           }
         })
+      await this.book.ready
+      await this.recoverThemeState()
+      await this.setChangeWatcher(`newstream-${generateUUID()}`)
     }
   }
 
-  async asyncData({ store, redirect }): Promise<void> {
-    let workKey = await store.getters["collections/firstCollection"]("work")
-    if (!workKey) {
-      await store.dispatch("collections/restoreCollection", {
-        collection: "work",
-      })
-      workKey = await store.getters["collections/firstCollection"]("work")
+  async created() {
+    let key = this.firstCollection("library")
+    if (!key) {
+      await this.restoreCollection({ collection: "work" })
+      key = this.firstCollection("library")
     }
-    if (!workKey) redirect("/")
+    if (key) {
+      this.work = (await idb.getPayload("work", key)) as IWork
+    }
+    if (key && Object.keys(this.work).length !== 0) await this.initiliase()
+    else this.$router.push("/")
   }
 }
 </script>

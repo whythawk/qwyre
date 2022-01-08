@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional, Dict, Any, TYPE_CHECKING
 from pydantic import Field, validator
 from uuid import UUID
+from neomodel import CardinalityViolation, One
 
 from app.schema_types import ContributorRoleType
 from .base_schema import BaseSchema
@@ -50,8 +51,26 @@ class Contributor(ContributorInDB):
     pass
 
 
+class ContributorSummary(ContributorCreate):
+    identifier: UUID = Field(..., description="Automatically generated unique identity for the resource.")
+    creator: Optional[CreatorSummary] = Field(None, description="Summary creator profiles.")
+
+    class Config:
+        orm_mode = True
+
+    @validator("creator", pre=True)
+    def evaluate_creator(cls, v):
+        if isinstance(v, One):
+            try:
+                return CreatorSummary.from_orm(v.single())
+            except CardinalityViolation:
+                return None
+        return v
+
+
 from app.schemas.creator import CreatorSummary
 from app.schemas.work import WorkSummary
 
 ContributorInDB.update_forward_refs()
 Contributor.update_forward_refs()
+ContributorSummary.update_forward_refs()

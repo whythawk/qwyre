@@ -25,14 +25,33 @@
       </div>
       <div
         v-show="currentOption === 'Contents'"
-        class="relative flex flex-col max-w-xs sm:max-w-screen-sm my-4 mx-auto h-56 sm:h-72"
+        class="
+          relative
+          flex flex-col
+          max-w-xs
+          sm:max-w-screen-sm
+          my-4
+          mx-auto
+          h-56
+          sm:h-72
+        "
       >
         <NavigationReaderContents />
         <NavigationReaderSlider :completion="completion" />
       </div>
       <div
         v-show="currentOption === 'Theme'"
-        class="relative flex flex-col max-w-xs sm:max-w-screen-sm my-4 mx-auto overflow-y-auto h-56 sm:h-72"
+        class="
+          relative
+          flex flex-col
+          max-w-xs
+          sm:max-w-screen-sm
+          my-4
+          mx-auto
+          overflow-y-auto
+          h-56
+          sm:h-72
+        "
       >
         <div class="text-xs sm:text-sm text-ochre-100">Theme</div>
         <SettingsReaderTheme />
@@ -46,14 +65,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Getter, Action, Prop } from "nuxt-property-decorator"
+import { Component, Vue, Prop } from "nuxt-property-decorator"
 
 @Component
 export default class NavigationReaderOptions extends Vue {
   @Prop(String) readonly completion!: string
-  @Getter("collections/firstCollection") firstCollection
-  @Getter("main/isLoggedIn") isLoggedIn
-  @Action("main/logOut") userLogOut
 
   public navigation = [
     {
@@ -78,10 +94,6 @@ export default class NavigationReaderOptions extends Vue {
     )[0]
     newOption.active = true
     this.currentOption = name
-  }
-
-  public async logout() {
-    await this.userLogOut()
   }
 }
 </script>

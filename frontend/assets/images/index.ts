@@ -23,6 +23,7 @@ import {
   svgX,
   svgExclamationCircle,
   svgCheckCircle,
+  svgCheck,
   svgChevronLeft,
   svgChevronRight,
   svgChevronDown,
@@ -41,6 +42,7 @@ import {
   svgXCircle,
   svgTrash,
   svgUserGroup,
+  svgPencilAlt,
 } from "./icons"
 import { svgCoverAspectRatio } from "./cover-aspect-ratio"
 import { svgRingsSpinner, svgPuffSpinner, svgGridSpinner } from "./spinners"
@@ -90,6 +92,7 @@ export {
   svgX,
   svgExclamationCircle,
   svgCheckCircle,
+  svgCheck,
   svgChevronLeft,
   svgChevronRight,
   svgChevronDown,
@@ -108,4 +111,5 @@ export {
   svgXCircle,
   svgTrash,
   svgUserGroup,
+  svgPencilAlt,
 }

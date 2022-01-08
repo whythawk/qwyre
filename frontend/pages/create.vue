@@ -126,7 +126,7 @@ import { ICoilUserResourceResponse, IStripeIntent } from "@/interfaces"
 import { coil } from "@/api"
 
 @Component({
-  middleware: "anonymous",
+  middleware: "refresh-authentication",
   layout: "support",
 })
 export default class AuthoriseUserWebMonetization extends Vue {
@@ -277,6 +277,7 @@ export default class AuthoriseUserWebMonetization extends Vue {
         scope: this.$route.query.scope as string,
       }
       await this.initialiseUserBTP(payload)
+      if (this.coilSub) this.showAuthenticating = false
     }
     if (!this.coilSub) {
       const lastPage: string = this.$nuxt.context.from

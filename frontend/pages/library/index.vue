@@ -1,11 +1,7 @@
 <template>
   <div class="container min-h-screen mx-auto">
-    <div class="text-center py-16 px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-extrabold tracking-tight text-gray-900">
-        Reading collection
-      </h1>
-    </div>
-    <CollectionsLibrary collection="work" />
+    <TitleBar title="Library" />
+    <CollectionsLibrary />
   </div>
 </template>
 
@@ -13,7 +9,7 @@
 import { Component, Vue } from "nuxt-property-decorator"
 
 @Component({
-  middleware: "anonymous",
+  middleware: "refresh-authentication",
   layout: "working",
 })
 export default class Library extends Vue {

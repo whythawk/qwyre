@@ -3,7 +3,7 @@ title: Your privacy and creative rights
 description:
 ---
 
-> **Your creative work and rights:** Nothing is uploaded to the **Qwyre** server until you click the build button, and nothing will be saved on our servers. You maintain complete control of the build process. You are not giving up any of your rights over your work, and **Qwyre** is not acting as an agent, publisher, or distributor on your behalf. This is a free service for writers, and respects your property.
+> **Your creative work and rights:** Your work is not uploaded to the **Qwyre** server until you authorise it, and nothing will be saved on our servers unless you expressly decide to monetize your work via the app. You maintain complete control of the build process. You are not giving up any of your rights over your work, and **Qwyre** is not acting as an agent, publisher, or distributor on your behalf. This is a free service for writers, and respects your property.
 
 Qwyre.com ("our site" or "this site") is owned and operated by [Whythawk](https://whythawk.com), a data science consultancy specialising in open data and open access research.
 
@@ -30,29 +30,33 @@ We hope these terms cover everything you need to know, but if you still have any
 
 ## Your creative work
 
-You, or the original licensors, retain ownership of any creative work uploaded to Qwyre.com as part of your use of this site. These creative materials may include, without limitation, text, photographs and other images or graphics, video and audio. Your use of this site in no way grants Whythawk, or Qwyre.com, the right to use or re-use your creative work **except** for the limited and specific purpose of supporting your conversion of your creative work into the EPUB e-book file format. The EPUB format is defined and maintained by the [International Digital Publishing Forum](http://idpf.org/).
+You, or the original licensors, retain ownership of any creative work uploaded to Qwyre.com as part of your use of this site. These creative materials may include, without limitation, text, photographs and other images or graphics, video and audio. Your use of this site in no way grants Whythawk, or Qwyre.com, the right to use or re-use your creative work **except** for the limited and specific purpose of supporting your conversion of your creative work into the EPUB e-book file format, or for streaming your work to readers for the purposes of monetizing it on your behalf. The EPUB format is defined and maintained by the [International Digital Publishing Forum](http://idpf.org/).
 
 You also declare that any and all creative work uploaded to this site are:
 
 - your own, or that you possess all necessary rights to upload these materials to this site,
-- do not, and will not, infringe, missappropriate, use or disclose without appropriate authorisation, or violate any intellectual property or proprietary right of any other party,
-- not unlawful, fraudulent, threatening, abusive, libelous, defamatory, obscene or otherwise unethical.
+- do not, and will not, infringe, misappropriate, use or disclose without appropriate authorisation, or violate any intellectual property or proprietary right of any other party,
+- not unlawful, fraudulent, collusive, threatening, abusive, libellous, defamatory, obscene or otherwise unethical.
 
-This site is not an online data storage service and, on completion of the conversion of your creative work into an EPUB, all references and data uploaded to our servers will be deleted. You are responsible for the secure storage and distribution of your creative work. None of the creative work will be subject to any requirement or duty of confidentiality, attribution or otherwise, by this site and we will not be liable for any use or disclosure of any of the creative materials.
+None of the creative work uploaded to this service, whether for conversion or streaming and monetization, will be subject to any requirement or duty of confidentiality, attribution or otherwise, by this site and we will not be liable for any use or disclosure of any of the creative materials.
 
-Aside from conversion of your creative work into a standards compliant EPUB file format, this site will not deliberately edit text or images, replace content, or alter or remove any material. Any such redactions are likely to be inadvertant and a consequence of standards compliance errors during the conversion process.
+Aside from conversion of your creative work into a standards compliant EPUB or streaming file formats, this site will not deliberately edit text or images, replace content, or alter or remove any material. Any such redactions are likely to be inadvertent and a consequence of standards compliance errors during the conversion process.
 
-Qwyre.com reserves the right to publicise your use of Qwyre.com to generate your EPUB on the `colophon` and `title` pages of your work.
+This site is not an online data storage service and, on completion of the conversion of your creative work into an EPUB, all references and data uploaded to our servers will be deleted. You are responsible for the secure storage and distribution of your creative work. This also holds where we maintain a copy of your work for streaming distribution.
+
+Qwyre.com reserves the right to publicise your use of Qwyre.com to generate your EPUB on the `colophon` and `title` pages of your work should you choose to use our DOCX to EPUB conversion service.
 
 ## Your email address
 
-As with any other email, any and all email addresses sent to us as a result of correspondence, or saved as a consequence of you creating anaccount, results in us holding your email address and, if provided, your name, along with the content of your message.
+As with any other email, any and all email addresses sent to us as a result of correspondence, or saved as a consequence of you creating an account, results in us holding your email address and, if provided, your name, along with the content of your message.
 
 Your email address will not be used or collected for the purposes of reselling to a third party and will not be added to a bulk emailing list.
 
 Should you sign up to Qwyre.com - and you do not need to do so to access our services - we will only send you emails relating to an alert you have signed up for, or for other reasons that you specifically authorise.
 
 Should you create an account on this site, you do not need to provide an email address. However, should you lose access to your account then recognise that there is no way for you to regain access to it if you have not provided an email address as well. Ordinarily, this would only be a problem if you have purchased a membership associated with that account.
+
+Before you can act as an author or editor on this site, you will be required to provide an email address, and your control of this email address will be validated. This is to ensure good-faith interactions between parties.
 
 We will never give or sell your email addresses to anyone else, unless we are obliged to by law, or you ask us to.
 
@@ -78,27 +82,29 @@ We track three things:
 
 - The country where your IP address is based,
 - The specific pages on this site which you visit,
-- The `subject` topics you defined when uploading your creative work.
+- The `subject` topics and search terms with which you may interact.
 
 Our objective is to understand the type of work our users create, as well as the geographic distribution of our users.
 
-## Cookies and Advertising
+We are subject to EU tax law, and are required to collect the country of origin for any payments so that we may pay appropriate Value Added Tax (VAT).
 
-We do not present advertising on this site and all content is served directly by our servers and is not referred via any third-parties. For this reason, we only need to store four cookies on your computer. Each cookie is really just a random string of characters, and none are required unless you choose to connect your Coil account to Qwyre to stream micropayments.
+## Cookies, Browser Storage, and Advertising
 
-In that case, the cookies are there to protect your safety from fraudulent cross-site attacks (sometimes called 'man-in-the-middle' attacks). These cookies hold the token, and refresh token, required to transfer payements.
+We do not present advertising on this site and all content is served directly by our servers and is not referred via any third-parties. For this reason, we only need to store a small number of cookies on your computer. Each cookie is really just a random string of characters, and none are required unless you choose to connect your Coil account to Qwyre to stream micropayments.
+
+In that case, the cookies are there to protect your safety from fraudulent cross-site attacks (sometimes called 'man-in-the-middle' attacks). These cookies hold the token, and refresh token, required to transfer payments.
 
 No other cookies are presented by this site, and we do not host third-party trackers or advertisers.
 
-## Your site membership
+Your browser supports a database, called IndexedDB, which this site uses to store all the works in your library, including both EPUBs and streaming works. You can view this list by clicking on the `library` link in the menu bar. Should you delete a work there, it is automatically removed from the database as well. This is necessary to ensure that your work is available to read offline.
 
-Qwyre.com does not currently offer the ability to create an account, or become a site member. We may do so in the future.
+## Your site membership
 
 You are under no obligation to create an account or pay anything towards the upkeep and maintenance of this service. Should you choose to do so, and should you provide additional information about yourself, our access to that information will be subject to your ongoing consent.
 
 You may withdraw your consent at any time and delete your account.
 
-If you purchase any service or provide a financial contribution to this site then, as part of our company and fiduciary responsibilities, we will store details of your payment and indirectly associate this with your account. Such data will include your email address and actual IP address.
+If you purchase any service or provide a financial contribution to this site then, as part of our company and fiduciary responsibilities, we will store details of your payment and indirectly associate this with your account. Such data will include your email address and actual IP address, as well as the works you are streaming, and the current extent of the works you have streamed.
 
 If you choose to withdraw consent and delete your account, note that you are also ending your membership and forfeiting any fees paid and benefits of that membership.
 
@@ -122,7 +128,7 @@ In choosing to make use of this site, you are consenting to your data being proc
 
 You have the right to delete your account at any time. Doing so will automatically delete everything we know about you.
 
-You have the right to know what personal data we hold about you. If you have an account and are logged in, everything we know will always be presented on your profile page. If you do not have an account, we do not know anything about you as an individual and hold no personal data on you.
+You have the right to know what personal data we hold about you. If you have an account and are logged in, everything we know will always be presented on your profile and library pages. If you do not have an account, we do not know anything about you as an individual and hold no personal data on you.
 
 You have the right to complain if you believe that we have mishandled your personal data. The relevant supervisory body is the [Information Commissioner's Office](https://ico.org.uk/concerns/handling/). You can report a concern directly, but please contact us first, so that we may try and resolve your concern.
 
@@ -171,4 +177,5 @@ This is the entire agreement between us relating to your use of this site. These
 ## Acknowledgements and references
 
 - "Landing" page image courtesy of Pierre-Yves Beaudouin via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lutte_s%C3%A9n%C3%A9galaise_Bercy_2013_-_Mame_Balla-Pape_Mor_L%C3%B4_-_34.jpg)
+- "404" page image courtesy of George Brits via [Unsplash](https://unsplash.com/@georgebrits_cableandgrain)
 - "Support us" page image courtesy of Aaron Burden via [Unsplash](https://unsplash.com/@aaronburden)

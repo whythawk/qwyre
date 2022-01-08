@@ -24,11 +24,8 @@ export const prxy = {
       authHeaders(token)
     )
   },
-  async proxyGetBlob(token: string, proxy: string) {
-    return await axios.get(
-      `${process.env.apiUrl}/api/v1/proxy/${proxy}`,
-      authHeaders(token)
-    )
+  async proxyGetBlob(proxy: string) {
+    return await axios.get(`${process.env.apiUrl}/api/v1/proxy/blob/${proxy}`)
   },
   async proxyPost(token: string, proxy: string, data: object) {
     return await axios.post(
