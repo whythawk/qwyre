@@ -33,7 +33,7 @@ def send_email(
 
 def send_expression_of_interest_email(data: ReceiveExpressionOfInterest):
     subject = f"{settings.PROJECT_NAME} - {data.subject}"
-    link_root = f"http://localhost:3000"
+    link_root = f"https://qwyre.com"
     with open(Path(settings.EMAIL_TEMPLATES_DIR) / "creator_offer_response.html") as f:
         template_str = f.read()
     for email in data.emails:
@@ -54,7 +54,7 @@ def send_expression_of_interest_email(data: ReceiveExpressionOfInterest):
 
 def send_expression_of_interest_confirmation_email(data: ConfirmExpressionOfInterest):
     subject = f"{settings.PROJECT_NAME} - {data.subject}"
-    link_root = f"http://localhost:3000"
+    link_root = f"https://qwyre.com"
     with open(Path(settings.EMAIL_TEMPLATES_DIR) / "editor_offer_response.html") as f:
         template_str = f.read()
     send_email(
@@ -71,7 +71,7 @@ def send_expression_of_interest_confirmation_email(data: ConfirmExpressionOfInte
 
 def send_email_validation_email(data: EmailValidation) -> None:
     subject = f"{settings.PROJECT_NAME} - {data.subject}"
-    link = f"http://localhost:3000/creator?token={data.token}"
+    link = f"https://qwyre.com/creator?token={data.token}"
     with open(Path(settings.EMAIL_TEMPLATES_DIR) / "confirm_email.html") as f:
         template_str = f.read()
     send_email(
