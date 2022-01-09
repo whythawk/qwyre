@@ -1,5 +1,6 @@
 import logging
 
+from app.gdb.init_gdb import init_gdb
 from app.db.init_db import init_db
 from app.db.session import SessionLocal
 
@@ -15,6 +16,7 @@ def init() -> None:
 def main() -> None:
     logger.info("Creating initial data")
     init()
+    init_gdb()
     logger.info("Initial data created")
 
 
