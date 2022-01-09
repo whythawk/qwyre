@@ -6,9 +6,10 @@ import random
 
 from app.core.config import settings
 from app.crud.neo_base import NeoCRUDBase
+from app.crud.crud_spaces import spaces
 from app.models import Work, WorkMetadata, Contract, StateHistory, Creator
 from app.schemas import WorkCreate, WorkUpdate, WorkInDB, RevenueShare, StreamFirst, StreamSecond
-from app.schema_types import WorkStateType
+from app.schema_types import WorkStateType, ResourceType
 from app.schemas.bookmark import BookmarkUpdate
 
 
@@ -267,6 +268,11 @@ class CRUDWork(NeoCRUDBase[Work, WorkCreate, WorkUpdate]):
                 h.delete()
         except CardinalityViolation:
             pass
+        # Clear spaces
+        spaces.remove(filename=id, resource_type=ResourceType.COVER)
+        spaces.remove(filename=id, resource_type=ResourceType.THUMBNAIL)
+        spaces.remove(filename=id, resource_type=ResourceType.WORK)
+        # Finally
         obj = obj.delete()
         return obj
 

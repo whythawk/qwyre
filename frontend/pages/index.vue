@@ -212,7 +212,6 @@ export default class CoverPage extends Vue {
       this.libraryCollection = (await idb.getLatestPayloads(
         this.collection
       )) as ILibrary[]
-      console.log("refresh slider", this.libraryCollection.length)
     }
   }
 

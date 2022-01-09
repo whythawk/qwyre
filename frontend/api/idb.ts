@@ -46,13 +46,15 @@ export const idb = {
         // Create object stores for: epub files, works, anthologies and series
         const db: IDBDatabase = event.target.result
         IDB_OBJECT_STORES.forEach(([objectStore, key]) => {
-          if (key)
-            db.createObjectStore(objectStore, {
-              keyPath: "key",
-            })
-          else {
-            db.createObjectStore(objectStore)
-          }
+          try {
+            if (key)
+              db.createObjectStore(objectStore, {
+                keyPath: "key",
+              })
+            else {
+              db.createObjectStore(objectStore)
+            }
+          } catch (error) {}
         })
       }
     })
