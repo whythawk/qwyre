@@ -2,9 +2,16 @@
   <div class="relative bg-ochre-10">
     <!--Header-->
     <div
-      class="max-w-full mx-auto md:bg-support-the-qwyre md:bg-no-repeat bg-contain"
+      class="
+        max-w-full
+        mx-auto
+        md:bg-support-the-qwyre md:bg-no-repeat
+        bg-contain
+      "
     >
-      <NavigationCoverMenu />
+      <div class="bg-ochre-900">
+        <NavigationDefaultMenu />
+      </div>
       <!--Main Container-->
       <main>
         <Nuxt />
@@ -13,6 +20,15 @@
         <NotificationsBar />
         <FooterBar />
       </footer>
+      <div class="z-40 fixed inset-x-0 bottom-0 w-screen flex">
+        <div class="w-screen">
+          <div class="bg-ochre-900">
+            <div class="relative flex-1 px-4 sm:px-6">
+              <NavigationDefaultLowerMenu />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +49,11 @@ export default class SupportLayout extends Vue {
       process.client &&
       Object.prototype.hasOwnProperty.call(document, "coilMonetizationPolyfill")
     )
-      (document as any).coilMonetizationPolyfill.refreshBtpToken(this.btpToken)
+      try {
+        ;(document as any).coilMonetizationPolyfill.refreshBtpToken(
+          this.btpToken
+        )
+      } catch (error) {}
   }
 
   created() {

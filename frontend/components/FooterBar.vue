@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-ochre-10" aria-labelledby="footer-heading">
+  <div class="bg-ochre-10 mb-16" aria-labelledby="footer-heading">
     <h2 id="footer-heading" class="sr-only">Footer</h2>
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
       <div class="pb-8 xl:grid xl:grid-cols-5 xl:gap-8">
@@ -223,13 +223,15 @@ import { Component, Vue } from "nuxt-property-decorator"
 export default class FooterBar extends Vue {
   public navigationAbout = [
     { i18n: "about", to: "/about" },
+    { i18n: "fees", to: "/fees" },
     { i18n: "footer-rights", to: "/privacy-rights" },
     { i18n: "support", to: "/support-us" },
   ]
 
   public navigationConversion = [
     { i18n: "guide", to: "/get-started" },
-    { i18n: "conversion-collection", to: "/library/conversions" },
+    { i18n: "streaming", to: "/get-streaming" },
+    { i18n: "workshop", to: "/workshop" },
     { i18n: "library", to: "/library" },
   ]
 

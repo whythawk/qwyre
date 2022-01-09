@@ -3,3 +3,5 @@
 docker-stack.yml
 *.txt
 .env
+*.code-workspace
+.s3cfg

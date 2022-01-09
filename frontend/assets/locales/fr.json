@@ -1,11 +1,14 @@
 {
   "about": "Découvrez-nous",
+  "fees": "Nos tarifs",
   "roadmap": "Roadmap ouvert",
   "support": "Soutenez-nous",
   "footer-rights": "Votre privée & droits",
   "footer-feedback": "Commentaires",
   "guide": "Guide de transformation",
+  "streaming": "Guide du streaming",
   "conversion-collection": "Collection de conversion",
   "library": "Bibliothèque",
+  "workshop": "Atelier",
   "footer-licence": "Le contenu du site est par la licence"
 }

@@ -39,6 +39,7 @@ def login_access_token(db: Session = Depends(deps.get_db), form_data: OAuth2Pass
         "token_type": "bearer",
     }
 
+
 @router.post("/login/refresh-token", response_model=schemas.Token)
 def refresh_token(
     db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_refresh_user),
@@ -66,13 +67,13 @@ def revoke_token(
     """
     return {"msg": "Token revoked"}
 
+
 @router.post("/password-recovery/{email}", response_model=schemas.Msg)
 def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
     """
     Password Recovery
     """
     user = crud.user.get_by_email(db, email=email)
-
     if not user:
         raise HTTPException(
             status_code=404, detail="The user with this username does not exist in the system.",

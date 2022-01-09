@@ -1,3 +1,5 @@
+import { IContract, IWorkSearchSummary } from "@/interfaces"
+
 export default {
   setCollection(
     state,
@@ -29,10 +31,25 @@ export default {
   setCollectionWatcher(state, payload: string) {
     state.collectionWatcher = payload
   },
+  setLibraryCollection(state, payload: string) {
+    state.libraryCollection = payload
+  },
   restoreCollection(
     state,
     { collection, keyList }: { collection: string; keyList: string[] }
   ) {
     state[collection] = keyList.slice(0)
+  },
+  setPartyContributions(state, payload: IContract[]) {
+    state.partyContributions = payload
+  },
+  setOffers(state, payload: IContract[]) {
+    state.offers = payload
+  },
+  setOffer(state, payload: IContract) {
+    state.offer = payload
+  },
+  setSearch(state, payload: IWorkSearchSummary[]) {
+    state.search = payload
   },
 }

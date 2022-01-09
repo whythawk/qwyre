@@ -6,16 +6,32 @@
       </div>
       <main>
         <div class="container mx-auto">
-          <div class="min-h-screen flex justify-center mt-8">
-            <article class="max-w-none sm:w-3/5 prose">
+          <div class="min-h-screen flex justify-center">
+            <article
+              class="
+                max-w-none
+                sm:w-3/5
+                prose prose-reader-light prose-reader-base prose-reader-compact
+              "
+            >
               <Nuxt />
             </article>
           </div>
         </div>
       </main>
       <footer class="mt-12 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <NotificationsBar />
         <FooterBar />
       </footer>
+      <div class="z-40 fixed inset-x-0 bottom-0 w-screen flex">
+        <div class="w-screen">
+          <div class="bg-ochre-900">
+            <div class="relative flex-1 px-4 sm:px-6">
+              <NavigationDefaultLowerMenu />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,7 +52,11 @@ export default class ContentLayout extends Vue {
       process.client &&
       Object.prototype.hasOwnProperty.call(document, "coilMonetizationPolyfill")
     )
-      (document as any).coilMonetizationPolyfill.refreshBtpToken(this.btpToken)
+      try {
+        ;(document as any).coilMonetizationPolyfill.refreshBtpToken(
+          this.btpToken
+        )
+      } catch (error) {}
   }
 
   created() {

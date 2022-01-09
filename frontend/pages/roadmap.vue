@@ -1,7 +1,9 @@
 <template>
   <div>
-    <h1>{{ page.title }}</h1>
-    <nuxt-content :document="page" />
+    <TitleBar :title="page.title" />
+    <div class="-mt-12">
+      <nuxt-content :document="page" />
+    </div>
   </div>
 </template>
 
@@ -10,6 +12,7 @@ import { Component, Vue } from "nuxt-property-decorator"
 
 @Component({
   layout: "content",
+  middleware: "refresh-authentication",
 })
 export default class Roadmap extends Vue {
   async asyncData({ $content }) {

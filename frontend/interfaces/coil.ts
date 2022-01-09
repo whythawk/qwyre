@@ -48,3 +48,12 @@ export interface ICoilUserInfo {
 export interface ICoilUserBTP {
   btpToken: string
 }
+
+export interface ICoilMonetizationProgress {
+  paymentPointer: string
+  requestId: string
+  amount: string
+  assetCode: string
+  assetScale: number
+  receipt: string
+}

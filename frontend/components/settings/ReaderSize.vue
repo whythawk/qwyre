@@ -20,15 +20,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Getter, Mutation } from "nuxt-property-decorator"
+import {
+  Component,
+  Vue,
+  Getter,
+  Mutation,
+  Action,
+} from "nuxt-property-decorator"
 
 @Component
 export default class SettingsReaderSize extends Vue {
   @Getter("main/pageSize") pageSize
   @Mutation("main/setSize") setSize
+  @Action("main/storeThemeState") storeThemeState
 
-  public setReaderRangeOption({ target }) {
-    this.setSize(target.value)
+  public async setReaderRangeOption({ target }) {
+    await this.setSize(target.value)
+    await this.storeThemeState()
   }
 }
 </script>

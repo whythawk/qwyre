@@ -1,5 +1,12 @@
-import { AppNotification, PageSpacing, PageTheme, PageFont } from "./state"
-import { IUserProfile } from "@/interfaces"
+import { AppNotification } from "./state"
+import {
+  IUserProfile,
+  ICreatorSummary,
+  IPageTheme,
+  IPageSpacing,
+  IPageFont,
+  IThemeState,
+} from "@/interfaces"
 
 export default {
   setToken(state, payload: string) {
@@ -14,6 +21,9 @@ export default {
   setUserProfile(state, payload: IUserProfile) {
     state.userProfile = payload
   },
+  setCreatorProfile(state, payload: ICreatorSummary) {
+    state.creatorProfile = payload
+  },
   // Notifications
   addNotification(state, payload: AppNotification) {
     state.notifications.push(payload)
@@ -27,14 +37,20 @@ export default {
   setShowOptions(state, payload: boolean) {
     state.showOptions = payload
   },
+  setShowOptionsCall(state, payload: boolean) {
+    state.showOptionsCall = payload
+  },
   // Reader display options
-  setTheme(state, payload: PageTheme) {
+  setThemeState(state, payload: IThemeState) {
+    state.theme = payload
+  },
+  setTheme(state, payload: IPageTheme) {
     state.theme.theme = payload
   },
-  setFont(state, payload: PageFont) {
+  setFont(state, payload: IPageFont) {
     state.theme.font = payload
   },
-  setSpacing(state, payload: PageSpacing) {
+  setSpacing(state, payload: IPageSpacing) {
     state.theme.spacing = payload
   },
   setSize(state, payload: number) {

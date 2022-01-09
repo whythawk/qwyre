@@ -27,11 +27,7 @@
               />
             </div>
             <div v-else>
-              <SvgIcon
-                v-show="colorMatch === 'success'"
-                terms="animate-spin h-6 w-6"
-                icon="svgCog"
-              />
+              <SvgIcon terms="animate-spin h-6 w-6" icon="svgCog" />
             </div>
           </div>
         </div>

@@ -10,7 +10,7 @@ module.exports = {
   // https://devdojo.com/tnylea/custom-animations-in-tailwindcss
   theme: {
     extend: {
-      backgroundImage: theme => ({
+      backgroundImage: (theme) => ({
         "join-the-qwyre": "url('/join-the-qwyre.png')",
         "support-the-qwyre": "url('/aaron-burden-6jYoil2GhVk-unsplash.jpg')",
         "lost-the-qwyre": "url('/george-brits-wvO5tPfTpug-unsplash.jpg')",
@@ -109,6 +109,318 @@ module.exports = {
         "fade-out-down": "fade-out-down 0.5s ease-out",
         "fade-in-up": "fade-in-up 0.5s ease-out",
       },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            "h1,h2,h3,h4,h5,h6,hgroup": {
+              textAlign: "center",
+              marginTop: "3em",
+              marginRight: "0",
+              marginBottom: "3em",
+              marginLeft: "0",
+            },
+            "hgroup > *": {
+              fontWeight: "normal",
+              marginTop: "0",
+              marginRight: "0",
+              marginBottom: "0",
+              marginLeft: "0",
+            },
+            p: {
+              marginTop: "0",
+              marginRight: "0",
+              marginBottom: "0",
+              marginLeft: "0",
+              textIndent: "1em",
+            },
+            "p.continued,h1 + p,h2 + p,h3 + p,h4 + p,h5 + p,h6 + p,header + p,hr + p,hgroup + p,p.first-child,p:first-child":
+              {
+                hangingPunctuation: "first last",
+                textIndent: "0",
+              },
+            h2: {
+              marginTop: "2.28571429em",
+              marginBottom: "1.14285714em",
+            },
+            h3: {
+              marginTop: "1.33333333em",
+              marginBottom: "1.33333333em",
+            },
+            h4: {
+              marginTop: "1.5em",
+              marginBottom: "0",
+            },
+            header: {
+              textAlign: "center",
+            },
+            "header > * + p": {
+              textIndent: "0",
+            },
+            blockquote: {
+              margin: "1.5em 5%",
+              display: "block",
+              fontStyle: "italic",
+              textIndent: "2em",
+              borderLeftWidth: "0",
+              borderLeftColor: "transparent",
+            },
+            "blockquote p:first-child": {
+              textIndent: "1em",
+            },
+            a: {
+              textDecoration: "underline",
+              fontWeight: "700",
+              color: "inherit",
+              "-webkit-text-fill-color": "inherit",
+            },
+          },
+        },
+        "reader-light": {
+          css: {
+            "h1,h2,h3,h4,h5,h6,hgroup,p,a,ul,li,lo,b,i,strong,em,blockquote,header":
+              {
+                color: theme("colors.ochre[800]"),
+              },
+          },
+        },
+        "reader-dark": {
+          css: {
+            "h1,h2,h3,h4,h5,h6,hgroup,p,a,ul,li,lo,b,i,strong,em,blockquote,header":
+              {
+                color: theme("colors.ochre[10]"),
+              },
+          },
+        },
+        "reader-compact": {
+          css: {
+            "h2,h3,h4,h5,h6": {
+              textAlign: "left",
+              marginTop: "1.5rem",
+              marginBottom: "1rem",
+            },
+            h1: {
+              marginTop: "0",
+              marginBottom: "1.5rem",
+            },
+          },
+        },
+        "reader-5xl": {
+          css: {
+            h1: {
+              fontSize: "8rem",
+              lineHeight: "1",
+            },
+            h2: {
+              fontSize: "6rem",
+              lineHeight: "1",
+            },
+            h3: {
+              fontSize: "4.5rem",
+              lineHeight: "1",
+            },
+            h4: {
+              fontSize: "3.75rem",
+              lineHeight: "1",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "3rem",
+              lineHeight: "1",
+            },
+          },
+        },
+        "reader-4xl": {
+          css: {
+            h1: {
+              fontSize: "6rem",
+              lineHeight: "1",
+            },
+            h2: {
+              fontSize: "4.5rem",
+              lineHeight: "1",
+            },
+            h3: {
+              fontSize: "3.75rem",
+              lineHeight: "1",
+            },
+            h4: {
+              fontSize: "3rem",
+              lineHeight: "1",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "2.25rem",
+              lineHeight: "2.5rem",
+            },
+          },
+        },
+        "reader-3xl": {
+          css: {
+            h1: {
+              fontSize: "4.5rem",
+              lineHeight: "1",
+            },
+            h2: {
+              fontSize: "3.75rem",
+              lineHeight: "1",
+            },
+            h3: {
+              fontSize: "3rem",
+              lineHeight: "1",
+            },
+            h4: {
+              fontSize: "2.25rem",
+              lineHeight: "2.5rem",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "1.875rem",
+              lineHeight: "2.25rem",
+            },
+          },
+        },
+        "reader-2xl": {
+          css: {
+            h1: {
+              fontSize: "3.75rem",
+              lineHeight: "1",
+            },
+            h2: {
+              fontSize: "3rem",
+              lineHeight: "1",
+            },
+            h3: {
+              fontSize: "2.25rem",
+              lineHeight: "2.5rem",
+            },
+            h4: {
+              fontSize: "1.875rem",
+              lineHeight: "2.25rem",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "1.5rem",
+              lineHeight: "2rem",
+            },
+          },
+        },
+        "reader-xl": {
+          css: {
+            h1: {
+              fontSize: "3rem",
+              lineHeight: "1",
+            },
+            h2: {
+              fontSize: "2.25rem",
+              lineHeight: "2.5rem",
+            },
+            h3: {
+              fontSize: "1.875rem",
+              lineHeight: "2.25rem",
+            },
+            h4: {
+              fontSize: "1.5rem",
+              lineHeight: "2rem",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "1.25rem",
+              lineHeight: "1.75rem",
+            },
+          },
+        },
+        "reader-lg": {
+          css: {
+            h1: {
+              fontSize: "2.25rem",
+              lineHeight: "2.5rem",
+            },
+            h2: {
+              fontSize: "1.875rem",
+              lineHeight: "2.25rem",
+            },
+            h3: {
+              fontSize: "1.5rem",
+              lineHeight: "2rem",
+            },
+            h4: {
+              fontSize: "1.25rem",
+              lineHeight: "1.75rem",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "1.125rem",
+              lineHeight: "1.75rem",
+            },
+          },
+        },
+        "reader-base": {
+          css: {
+            h1: {
+              fontSize: "1.875rem",
+              lineHeight: "2.25rem",
+            },
+            h2: {
+              fontSize: "1.5rem",
+              lineHeight: "2rem",
+            },
+            h3: {
+              fontSize: "1.25rem",
+              lineHeight: "1.75rem",
+            },
+            h4: {
+              fontSize: "1.125rem",
+              lineHeight: "1.75rem",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "1rem",
+              lineHeight: "1.5rem",
+            },
+          },
+        },
+        "reader-sm": {
+          css: {
+            h1: {
+              fontSize: "1.5rem",
+              lineHeight: "2rem",
+            },
+            h2: {
+              fontSize: "1.25rem",
+              lineHeight: "1.75rem",
+            },
+            h3: {
+              fontSize: "1.125rem",
+              lineHeight: "1.75rem",
+            },
+            h4: {
+              fontSize: "1rem",
+              lineHeight: "1.5rem",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            },
+          },
+        },
+        "reader-xs": {
+          css: {
+            h1: {
+              fontSize: "1.25rem",
+              lineHeight: "1.75rem",
+            },
+            h2: {
+              fontSize: "1.125rem",
+              lineHeight: "1.75rem",
+            },
+            h3: {
+              fontSize: "1rem",
+              lineHeight: "1.5rem",
+            },
+            h4: {
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            },
+            "p,a,ul,li,lo,b,i,strong,em,blockquote": {
+              fontSize: "0.75rem",
+              lineHeight: "1rem",
+            },
+          },
+        },
+      }),
     },
   },
   variants: {
@@ -118,5 +430,6 @@ module.exports = {
     require("@tailwindcss/typography"),
     require("@tailwindcss/forms"),
     require("@tailwindcss/aspect-ratio"),
+    require("@tailwindcss/line-clamp"),
   ],
 }

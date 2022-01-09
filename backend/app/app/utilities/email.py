@@ -8,7 +8,7 @@ from emails.template import JinjaTemplate
 from jose import jwt
 
 from app.core.config import settings
-from app.schemas import EmailContent
+from app.schemas import EmailContent, EmailValidation, ConfirmExpressionOfInterest, ReceiveExpressionOfInterest
 
 
 def send_email(
@@ -29,6 +29,54 @@ def send_email(
         smtp_options["password"] = settings.SMTP_PASSWORD
     response = message.send(to=email_to, render=environment, smtp=smtp_options)
     logging.info(f"send email result: {response}")
+
+
+def send_expression_of_interest_email(data: ReceiveExpressionOfInterest):
+    subject = f"{settings.PROJECT_NAME} - {data.subject}"
+    link_root = f"http://localhost:3000"
+    with open(Path(settings.EMAIL_TEMPLATES_DIR) / "creator_offer_response.html") as f:
+        template_str = f.read()
+    for email in data.emails:
+        send_email(
+            email_to=email,
+            subject_template=subject,
+            html_template=template_str,
+            environment={
+                "creator_link": f"{link_root}{data.creator_link}",
+                "creator": data.creator,
+                "email": data.creator_email,
+                "contract_link": f"{link_root}{data.contract_link}",
+                "workspace_link": f"{link_root}{data.workspace_link}",
+                "work_title": data.work_title,
+            },
+        )
+
+
+def send_expression_of_interest_confirmation_email(data: ConfirmExpressionOfInterest):
+    subject = f"{settings.PROJECT_NAME} - {data.subject}"
+    link_root = f"http://localhost:3000"
+    with open(Path(settings.EMAIL_TEMPLATES_DIR) / "editor_offer_response.html") as f:
+        template_str = f.read()
+    send_email(
+        email_to=data.email,
+        subject_template=subject,
+        html_template=template_str,
+        environment={
+            "contract_link": f"{link_root}{data.contract_link}",
+            "workspace_link": f"{link_root}{data.workspace_link}",
+            "work_title": data.work_title,
+        },
+    )
+
+
+def send_email_validation_email(data: EmailValidation) -> None:
+    subject = f"{settings.PROJECT_NAME} - {data.subject}"
+    link = f"http://localhost:3000/creator?token={data.token}"
+    with open(Path(settings.EMAIL_TEMPLATES_DIR) / "confirm_email.html") as f:
+        template_str = f.read()
+    send_email(
+        email_to=data.email, subject_template=subject, html_template=template_str, environment={"link": link},
+    )
 
 
 def send_web_contact_email(data: EmailContent) -> None:
@@ -102,13 +150,13 @@ def generate_password_reset_token(email: str) -> str:
     now = datetime.utcnow()
     expires = now + delta
     exp = expires.timestamp()
-    encoded_jwt = jwt.encode({"exp": exp, "nbf": now, "sub": email}, settings.SECRET_KEY, algorithm="HS256",)
+    encoded_jwt = jwt.encode({"exp": exp, "nbf": now, "validate": email}, settings.SECRET_KEY, algorithm="HS256",)
     return encoded_jwt
 
 
 def verify_password_reset_token(token: str) -> Optional[str]:
     try:
         decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        return decoded_token["email"]
+        return decoded_token["validate"]
     except jwt.JWTError:
         return None

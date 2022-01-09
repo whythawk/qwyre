@@ -3,7 +3,7 @@
     <div v-if="showNew">
       <div v-if="collection === 'work'">
         <div class="aspect-h-16 aspect-w-10">
-          <CollectionsImportWork />
+          <CollectionsImportLibrary />
         </div>
         <div class="pt-10 pb-4 text-center">
           <h3 class="text-lg font-semibold text-ochre-800">
@@ -54,7 +54,13 @@
           />
           <p
             v-show="collectionFields.date_created"
-            class="col-span-3 text-right text-sm py-1 font-medium text-ochre-500"
+            class="
+              col-span-3
+              text-right text-sm
+              py-1
+              font-medium
+              text-ochre-500
+            "
           >
             {{ collectionFields.date_created }}
           </p>
@@ -67,7 +73,16 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "nuxt-property-decorator"
 import { idb } from "@/api"
-import { IOpinion, IAnthology, IConversion, ISeries, IWork } from "@/interfaces"
+import {
+  IOpinion,
+  IAnthology,
+  IConversion,
+  ISeries,
+  IWork,
+  IStream,
+  ICreatorSummary,
+  ISubject,
+} from "@/interfaces"
 
 @Component
 export default class CollectionsWorkPlateSummary extends Vue {
@@ -91,6 +106,8 @@ export default class CollectionsWorkPlateSummary extends Vue {
 
   public parseStringList(stringList: string[]): string {
     switch (stringList.length) {
+      case 0:
+        return ""
       case 1:
         return stringList[0]
       case 2:
@@ -102,30 +119,50 @@ export default class CollectionsWorkPlateSummary extends Vue {
     }
   }
 
+  public checkBy(name: string | null): string {
+    if (!name) return "Anonymous"
+    return name
+  }
+
   public async getCollectionFields() {
     if (this.showNew) return {}
     const c = (await idb.getPayload(this.collection, this.collectionKey)) as
       | IConversion
       | IWork
+      | IStream
       | IAnthology
       | ISeries
     let title = ""
-    let creator: string[] | string = []
+    let creator: string[] | string | ICreatorSummary[] = []
     let description: string | undefined
     /* eslint-disable camelcase */
     let date_created: string | undefined
-    let subjects: string[] | string | undefined
+    let subjects: string[] | string | ISubject[] | undefined
     let opinion: IOpinion | undefined
     if (Object.prototype.hasOwnProperty.call(c, "metadata")) {
-      title = (c as IConversion | IWork).metadata.title
-      creator = (c as IConversion | IWork).metadata.creator
+      title = (c as IConversion | IWork | IStream).metadata.title
+      creator = (c as IConversion | IWork | IStream).metadata.creator
       if (typeof creator === "string") {
         creator = [creator]
       }
-      description = (c as IConversion | IWork).metadata.description
-      subjects = (c as IConversion | IWork).metadata.subject
+      if (this.collection === "stream") {
+        const authors: string[] = []
+        for (const a of creator) {
+          authors.push(this.checkBy((a as ICreatorSummary).creator))
+        }
+        creator = authors
+      }
+      description = (c as IConversion | IWork | IStream).metadata.description
+      subjects = (c as IConversion | IWork | IStream).metadata.subject
       if (typeof subjects === "string") {
         subjects = [subjects]
+      }
+      if (subjects && this.collection === "stream") {
+        const terms: string[] = []
+        for (const t of subjects) {
+          terms.push((t as ISubject).term)
+        }
+        subjects = terms
       }
       if (
         Object.prototype.hasOwnProperty.call(
@@ -157,7 +194,7 @@ export default class CollectionsWorkPlateSummary extends Vue {
     if (Object.prototype.hasOwnProperty.call(c, "opinion"))
       opinion = (c as IAnthology | ISeries | IWork).opinion
     if (date_created) date_created = this.parseISOString(date_created as string)
-    if (creator) creator = this.parseStringList(creator)
+    if (creator) creator = this.parseStringList(creator as string[])
     if (subjects) subjects = this.parseStringList(subjects as string[])
     return {
       title,

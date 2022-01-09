@@ -1,8 +1,4 @@
-import { IUserProfile } from "@/interfaces"
-
-export type PageTheme = "light" | "dark"
-export type PageSpacing = "tight" | "default" | "double" | "source"
-export type PageFont = "serif" | "sans_serif" | "source"
+import { IUserProfile, ICreatorSummary, IThemeState } from "@/interfaces"
 
 export interface AppNotification {
   content: string
@@ -10,14 +6,7 @@ export interface AppNotification {
   showProgress?: boolean
 }
 
-export interface ThemeState {
-  theme: PageTheme
-  spacing: PageSpacing
-  font: PageFont
-  size: string
-}
-
-const defaultTheme: ThemeState = {
+const defaultTheme: IThemeState = {
   theme: "light",
   spacing: "default",
   font: "serif",
@@ -28,11 +17,13 @@ export interface MainState {
   token: string
   isLoggedIn: boolean | null
   logInError: boolean
+  creatorProfile: ICreatorSummary | null
   userProfile: IUserProfile | null
   notifications: AppNotification[]
   showOptions: boolean
+  showOptionsCall: boolean
   watchReaderCFI: string
-  theme: ThemeState
+  theme: IThemeState
   work?: string
   changeWatcher: string
 }
@@ -41,9 +32,11 @@ const defaultState: MainState = {
   isLoggedIn: null,
   token: "",
   logInError: false,
+  creatorProfile: null,
   userProfile: null,
   notifications: [],
   showOptions: false,
+  showOptionsCall: false,
   watchReaderCFI: "nothing",
   theme: defaultTheme,
   changeWatcher: "nowatch",

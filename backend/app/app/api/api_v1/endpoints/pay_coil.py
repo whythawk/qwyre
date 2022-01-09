@@ -28,17 +28,17 @@ async def proxy_post_request(*, path: str, request: Request) -> Any:
             "Content-Type": request.headers["Content-Type"],
             "Authorization": request.headers.get("Authorization"),
         }
-        print("____________________________________________________________________________")
-        print("POST REQUEST:", f"{URI}/{path}", headers)
-        print("____________________________________________________________________________")
+        # print("____________________________________________________________________________")
+        # print("POST REQUEST:", f"{URI}/{path}", headers)
+        # print("____________________________________________________________________________")
         async with httpx.AsyncClient() as client:
             proxy = await client.post(f"{URI}/{path}", headers=headers, data=data)
         response = Response(content=proxy.content, status_code=proxy.status_code)
         return response
     except Exception as e:
-        print("____________________________________________________________________________")
-        print("POST ERROR:", e)
-        print("____________________________________________________________________________")
+        # print("____________________________________________________________________________")
+        # print("POST ERROR:", e)
+        # print("____________________________________________________________________________")
         raise HTTPException(status_code=403, detail=str(e))
 
 
@@ -52,18 +52,18 @@ async def proxy_get_request(*, path: str, request: Request) -> Any:
             "Content-Type": request.headers.get("Content-Type", "application/x-www-form-urlencoded"),
             "Authorization": request.headers["Authorization"],
         }
-        print("____________________________________________________________________________")
-        print("GET REQUEST:", f"{URI}/{path}", headers)
-        print("____________________________________________________________________________")
+        # print("____________________________________________________________________________")
+        # print("GET REQUEST:", f"{URI}/{path}", headers)
+        # print("____________________________________________________________________________")
         async with httpx.AsyncClient() as client:
             proxy = await client.get(f"{URI}/{path}", headers=headers)
-        print("____________________________________________________________________________")
-        print("GET RESPONSE:", proxy.content)
-        print("____________________________________________________________________________")
+        # print("____________________________________________________________________________")
+        # print("GET RESPONSE:", proxy.content)
+        # print("____________________________________________________________________________")
         response = Response(content=proxy.content, status_code=proxy.status_code)
         return response
     except Exception as e:
-        print("____________________________________________________________________________")
-        print("GET:", e)
-        print("____________________________________________________________________________")
+        # print("____________________________________________________________________________")
+        # print("GET:", e)
+        # print("____________________________________________________________________________")
         raise HTTPException(status_code=403, detail=str(e))

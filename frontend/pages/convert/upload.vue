@@ -45,16 +45,44 @@
     <div class="flex flex-col md:flex-row mx-auto mt-8">
       <form ref="cover-form">
         <div
-          class="relative flex flex-col justify-center m-1 w-60 h-96 bg-ochre-400 hover:bg-ochre-700 text-ochre-50 filter drop-shadow-lg shadow transition ease-in duration-200"
+          class="
+            relative
+            flex flex-col
+            justify-center
+            m-1
+            w-60
+            h-96
+            bg-ochre-400
+            hover:bg-ochre-700
+            text-ochre-50
+            filter
+            drop-shadow-lg
+            shadow
+            transition
+            ease-in
+            duration-200
+          "
         >
           <img
             v-show="coverFileString"
             ref="preview-cover"
-            class="object-cover object-center min-h-full min-w-full animate-fade-in"
+            class="
+              object-cover object-center
+              min-h-full min-w-full
+              animate-fade-in
+            "
           />
           <label
             for="clickCoverUpload"
-            class="absolute text-center text-lg bg-ochre-600 bg-opacity-70 hover:bg-opacity-90 transition ease-in duration-200"
+            class="
+              absolute
+              text-center text-lg
+              bg-ochre-600 bg-opacity-70
+              hover:bg-opacity-90
+              transition
+              ease-in
+              duration-200
+            "
           >
             <span
               ref="new-cover-uploaded"
@@ -62,10 +90,27 @@
               class="absolute top-2 right-2"
             >
               <span
-                class="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-malachite-100 opacity-75"
+                class="
+                  animate-ping
+                  absolute
+                  inline-flex
+                  h-3
+                  w-3
+                  rounded-full
+                  bg-malachite-100
+                  opacity-75
+                "
               ></span>
               <span
-                class="relative inline-flex rounded-full mb-2 h-3 w-3 bg-malachite-200"
+                class="
+                  relative
+                  inline-flex
+                  rounded-full
+                  mb-2
+                  h-3
+                  w-3
+                  bg-malachite-200
+                "
               ></span>
             </span>
             <SvgIcon terms="h-16 w-16 mx-auto" icon="svgBookOpen" />
@@ -88,24 +133,69 @@
       </form>
       <form ref="work-form">
         <div
-          class="relative flex flex-col justify-center m-1 w-60 h-96 bg-woad-400 hover:bg-woad-700 text-ochre-50 filter drop-shadow-lg shadow transition ease-in duration-200"
+          class="
+            relative
+            flex flex-col
+            justify-center
+            m-1
+            w-60
+            h-96
+            bg-woad-400
+            hover:bg-woad-700
+            text-ochre-50
+            filter
+            drop-shadow-lg
+            shadow
+            transition
+            ease-in
+            duration-200
+          "
         >
           <img
             v-show="workFileString"
-            class="object-cover object-center min-h-full min-w-full animate-fade-in"
+            class="
+              object-cover object-center
+              min-h-full min-w-full
+              animate-fade-in
+            "
             src="/never-talk-to-strangers.jpg"
             alt=""
           />
           <label
             for="clickWorkUpload"
-            class="absolute text-center text-lg bg-woad-600 bg-opacity-70 hover:bg-opacity-90 transition ease-in duration-200"
+            class="
+              absolute
+              text-center text-lg
+              bg-woad-600 bg-opacity-70
+              hover:bg-opacity-90
+              transition
+              ease-in
+              duration-200
+            "
           >
             <span ref="new-work-uploaded" hidden class="absolute top-2 right-2">
               <span
-                class="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-malachite-100 opacity-75"
+                class="
+                  animate-ping
+                  absolute
+                  inline-flex
+                  h-3
+                  w-3
+                  rounded-full
+                  bg-malachite-100
+                  opacity-75
+                "
               ></span>
               <span
-                class="relative inline-flex rounded-full mb-2 h-3 w-3 bg-malachite-200"
+                class="
+                  relative
+                  inline-flex
+                  rounded-full
+                  mb-2
+                  h-3
+                  w-3
+                  bg-malachite-200
+                "
               ></span>
             </span>
             <SvgIcon terms="h-16 w-16 mx-auto" icon="svgDocumentText" />
@@ -150,7 +240,9 @@ import {
 } from "nuxt-property-decorator"
 import { idb } from "@/api"
 
-@Component
+@Component({
+  middleware: "refresh-authentication",
+})
 export default class UploadWork extends Vue {
   @Getter("conversions/conversionKey") conversionKey
   @Action("collections/storePayload") storePayload

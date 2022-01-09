@@ -2,10 +2,18 @@
   <mj-body>
     <mj-section>
       <mj-column>
-        <mj-image width="60px" src="https://qwyre.com/qwyre-logo.png"></mj-image>
+        <mj-image
+          width="60px"
+          src="https://qwyre.com/qwyre-icon.png"
+          href="https://qwyre.com"
+        ></mj-image>
         <mj-divider border-color="#3A5C84"></mj-divider>
-        <mj-text font-size="16px" font-weight="bold" color="#635246">Email from: {{ email }}</mj-text>
-        <mj-text font-size="16px" color="#635246" font-family="helvetica">{{ content }}</mj-text>
+        <mj-text font-size="16px" font-weight="bold" color="#635246"
+          >Email from: {{ email }}</mj-text
+        >
+        <mj-text font-size="16px" color="#635246" font-family="helvetica"
+          >{{ content }}</mj-text
+        >
       </mj-column>
     </mj-section>
   </mj-body>

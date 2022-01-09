@@ -2,7 +2,11 @@
   <div class="relative bg-ochre-10">
     <!--Header-->
     <div
-      class="max-w-full mx-auto md:bg-join-the-qwyre md:bg-no-repeat md:bg-contain"
+      class="
+        max-w-full
+        mx-auto
+        md:bg-join-the-qwyre md:bg-no-repeat md:bg-contain
+      "
     >
       <NavigationCoverMenu />
       <!--Main Container-->
@@ -33,7 +37,11 @@ export default class CoverLayout extends Vue {
       process.client &&
       Object.prototype.hasOwnProperty.call(document, "coilMonetizationPolyfill")
     )
-      (document as any).coilMonetizationPolyfill.refreshBtpToken(this.btpToken)
+      try {
+        ;(document as any).coilMonetizationPolyfill.refreshBtpToken(
+          this.btpToken
+        )
+      } catch (error) {}
   }
 
   created() {

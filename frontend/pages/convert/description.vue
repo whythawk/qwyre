@@ -409,7 +409,9 @@ const getLanguages = (): Promise<
   }[]
 > => import("@/assets/json/iso639-1.json")
 
-@Component
+@Component({
+  middleware: "refresh-authentication",
+})
 export default class CreateDescription extends Vue {
   @Getter("conversions/conversionKey") conversionKey
   @Mutation("conversions/setConversionKey") setConversionKey
@@ -512,10 +514,10 @@ export default class CreateDescription extends Vue {
     // Set description to work
     if (checkKey === 1) {
       // https://stackoverflow.com/a/53813384/295606
-      this.conversion = ((await idb.getPayload(
+      this.conversion = (await idb.getPayload(
         "conversion",
         this.conversionKey
-      )) as unknown) as IConversion
+      )) as unknown as IConversion
       this.work = this.conversion.metadata
     }
     // Set work language

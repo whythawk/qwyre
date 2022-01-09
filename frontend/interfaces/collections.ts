@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import { IOpinion, IWorkMetadata } from "@/interfaces"
+import { IOpinion, IWorkMetadata, IWorkMetadataSummary } from "@/interfaces"
 
 export interface IAnthology {
   key: string
@@ -18,6 +18,7 @@ export interface ISeries {
   date_created: Date
   opinion?: IOpinion
   anthologies?: string[]
+  works?: string[]
 }
 
 export interface IConversionState {
@@ -33,4 +34,31 @@ export interface IConversion {
   metadata: IWorkMetadata
   dedication: string
   conversionState: IConversionState
+}
+
+export interface IStream {
+  key: string
+  date_created?: Date
+  metadata: IWorkMetadataSummary
+  price?: number
+  spine?: string[]
+  first500: string
+  stream: string[][]
+  start_page: number
+  page: number
+  position: number
+  currentPage?: number
+  currentPosition?: number
+}
+
+export interface IStreamIn {
+  stream: string[][]
+  page: number
+  position: number
+}
+
+export interface ILibrary {
+  key: string
+  date_created: Date
+  collection: "work" | "stream"
 }

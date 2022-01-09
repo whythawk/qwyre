@@ -63,7 +63,9 @@ import { Component, Vue, Action, Getter } from "nuxt-property-decorator"
 import { idb } from "@/api"
 import { IConversion } from "@/interfaces"
 
-@Component
+@Component({
+  middleware: "refresh-authentication",
+})
 export default class CreateDedication extends Vue {
   @Getter("conversions/conversionKey") conversionKey
   @Action("collections/storeCollectionPayload") storeConversionPayload
@@ -75,10 +77,10 @@ export default class CreateDedication extends Vue {
     // Set description to work
     if (this.conversionKey) {
       // https://stackoverflow.com/a/53813384/295606
-      this.conversion = ((await idb.getPayload(
+      this.conversion = (await idb.getPayload(
         "conversion",
         this.conversionKey
-      )) as unknown) as IConversion
+      )) as unknown as IConversion
       this.dedication = this.conversion.dedication
     }
   }

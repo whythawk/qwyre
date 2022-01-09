@@ -42,6 +42,7 @@ import {
   svgX,
   svgExclamationCircle,
   svgCheckCircle,
+  svgCheck,
   svgChevronLeft,
   svgChevronRight,
   svgChevronDown,
@@ -60,6 +61,7 @@ import {
   svgXCircle,
   svgTrash,
   svgUserGroup,
+  svgPencilAlt,
 } from "@/assets/images"
 
 @Component
@@ -104,6 +106,7 @@ export default class SVGIcon extends Vue {
     svgX,
     svgExclamationCircle,
     svgCheckCircle,
+    svgCheck,
     svgChevronLeft,
     svgChevronRight,
     svgChevronDown,
@@ -122,6 +125,7 @@ export default class SVGIcon extends Vue {
     svgXCircle,
     svgTrash,
     svgUserGroup,
+    svgPencilAlt,
   }
 }
 </script>
