@@ -95,7 +95,7 @@ class Settings(BaseSettings):
 
     @validator("NEO4J_BOLT_URL", pre=True)
     def get_neo4j_bolt_url(cls, v: str, values: Dict[str, Any]) -> str:
-        return f"{values.get('NEO4J_BOLT')}{values.get('NEO4J_USERNAME')}:{values.get('NEO4J_PASSWORD')}@{values.get('NEO4J_SERVER')}:7687"
+        return f"{values.get('NEO4J_BOLT')}://{values.get('NEO4J_USERNAME')}:{values.get('NEO4J_PASSWORD')}@{values.get('NEO4J_SERVER')}:7687"
 
     # WORKING WITH DATA
     WORKING_PATH: str = "/app/working_data"
