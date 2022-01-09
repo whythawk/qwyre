@@ -88,13 +88,14 @@ class Settings(BaseSettings):
     NEO4J_USERNAME: str
     NEO4J_PASSWORD: str
     NEO4J_AUTH: str
+    NEO4J_BOLT: str
     NEO4J_BOLT_URL: Optional[str] = None
     NEO4J_SUGGESTION_LIMIT: int = 8
     NEO4J_RESULTS_LIMIT: int = 100
 
     @validator("NEO4J_BOLT_URL", pre=True)
     def get_neo4j_bolt_url(cls, v: str, values: Dict[str, Any]) -> str:
-        return f"bolt://{values.get('NEO4J_USERNAME')}:{values.get('NEO4J_PASSWORD')}@{values.get('NEO4J_SERVER')}:7687"
+        return f"{values.get('NEO4J_BOLT')}{values.get('NEO4J_USERNAME')}:{values.get('NEO4J_PASSWORD')}@{values.get('NEO4J_SERVER')}:7687"
 
     # WORKING WITH DATA
     WORKING_PATH: str = "/app/working_data"
