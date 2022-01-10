@@ -8,7 +8,6 @@ htmlcov
 *.ipynb
 *.code-workspace
 dist
-build
 eggs
 parts
 bin
