@@ -13,7 +13,7 @@ from app.schemas import EmailContent
 router = APIRouter()
 
 
-@router.post("/contact-us/", response_model=schemas.Msg, status_code=201)
+@router.post("/contact-us", response_model=schemas.Msg, status_code=201)
 def send_email(*, data: EmailContent) -> Any:
     """
     Standard app contact us.
