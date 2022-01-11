@@ -45,30 +45,30 @@ export const api = {
     )
   },
   async createMe(data: IUserOpenProfileCreate) {
-    return await axios.post(`${process.env.apiUrl}/api/v1/users`, data)
+    return await axios.post(`${process.env.apiUrl}/api/v1/users/`, data)
   },
   async getMe(token: string) {
     return await axios.get<ICreatorSummary>(
-      `${process.env.apiUrl}/api/v1/creators`,
+      `${process.env.apiUrl}/api/v1/creators/`,
       authHeaders(token)
     )
   },
   async getOfficialMe(token: string) {
     return await axios.get<IUserProfile>(
-      `${process.env.apiUrl}/api/v1/users`,
+      `${process.env.apiUrl}/api/v1/users/`,
       authHeaders(token)
     )
   },
   async updateMe(token: string, data: ICreatorSummary) {
     return await axios.put<ICreatorSummary>(
-      `${process.env.apiUrl}/api/v1/creators`,
+      `${process.env.apiUrl}/api/v1/creators/`,
       data,
       authHeaders(token)
     )
   },
   async updateOfficialMe(token: string, data: IUserProfileUpdate) {
     return await axios.put<IUserProfile>(
-      `${process.env.apiUrl}/api/v1/users`,
+      `${process.env.apiUrl}/api/v1/users/`,
       data,
       authHeaders(token)
     )
