@@ -5,8 +5,8 @@
       class="
         max-w-full
         mx-auto
-        md:bg-support-the-qwyre md:bg-no-repeat
-        bg-contain
+        md:bg-support-the-qwyre md:bg-no-repeat md:bg-contain
+        2xl:bg-cover 2xl:bg-center
       "
     >
       <div class="bg-ochre-900">

@@ -218,16 +218,18 @@ export default class Reader extends Vue {
   }
 
   async created() {
-    let key = this.firstCollection("library")
-    if (!key) {
-      await this.restoreCollection({ collection: "work" })
-      key = this.firstCollection("library")
+    if (process.client) {
+      let key = this.firstCollection("library")
+      if (!key) {
+        await this.restoreCollection({ collection: "work" })
+        key = this.firstCollection("library")
+      }
+      if (key) {
+        this.work = (await idb.getPayload("work", key)) as IWork
+      }
+      if (key && Object.keys(this.work).length !== 0) await this.initiliase()
+      else this.$router.push("/")
     }
-    if (key) {
-      this.work = (await idb.getPayload("work", key)) as IWork
-    }
-    if (key && Object.keys(this.work).length !== 0) await this.initiliase()
-    else this.$router.push("/")
   }
 }
 </script>

@@ -77,22 +77,23 @@ export default class NavigationDefaultMenu extends Vue {
   ]
 
   public async created() {
-    let libraryKey = await this.firstCollection("library")
-    if (!libraryKey) {
-      await this.restoreCollection({ collection: "library" })
-      libraryKey = await this.firstCollection("library")
-    }
-    if (libraryKey) {
-      try {
-        const cover = await idb.getPayload("cover", libraryKey)
-        if (cover && typeof cover !== "string" && Object.keys(cover).length) {
-          this.cover = (cover as IKeyable).data as string | null
-          this.readLink = `/stream/${libraryKey}`
-        } else this.cover = cover as string | null
-      } catch (error) {
-        this.readLink = "/"
+    this.readLink = "/"
+    if (process.client) {
+      let libraryKey = await this.firstCollection("library")
+      if (!libraryKey) {
+        await this.restoreCollection({ collection: "library" })
+        libraryKey = await this.firstCollection("library")
       }
-    } else this.readLink = "/"
+      if (libraryKey) {
+        try {
+          const cover = await idb.getPayload("cover", libraryKey)
+          if (cover && typeof cover !== "string" && Object.keys(cover).length) {
+            this.cover = (cover as IKeyable).data as string | null
+            this.readLink = `/stream/${libraryKey}`
+          } else this.cover = cover as string | null
+        } catch (error) {}
+      }
+    }
   }
 }
 </script>

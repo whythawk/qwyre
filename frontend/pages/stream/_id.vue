@@ -248,7 +248,6 @@ export default class Stream extends Vue {
   }
 
   public async watchSocket(response: ISocketResponse) {
-    // console.log(response.state)
     switch (response.state) {
       case "initialise":
         this.stream = (response.data as ISocketDataStream).stream as IStream
@@ -576,22 +575,24 @@ export default class Stream extends Vue {
   }
 
   async created() {
-    await this.getStreamingWork()
-    if (this.stream && Object.keys(this.stream).length !== 0) {
-      let key = this.firstCollection("library")
-      if (!key) {
-        await this.restoreCollection({ collection: "stream" })
-        key = this.firstCollection("library")
+    if (process.client) {
+      await this.getStreamingWork()
+      if (this.stream && Object.keys(this.stream).length !== 0) {
+        let key = this.firstCollection("library")
+        if (!key) {
+          await this.restoreCollection({ collection: "stream" })
+          key = this.firstCollection("library")
+        }
+        if (!key || key !== this.stream.key)
+          await this.storeCollectionPayload({
+            collection: "stream",
+            payload: this.stream,
+            key: this.$route.params.id,
+          })
       }
-      if (!key || key !== this.stream.key)
-        await this.storeCollectionPayload({
-          collection: "stream",
-          payload: this.stream,
-          key: this.$route.params.id,
-        })
+      await this.initiliase()
+      await this.setChangeWatcher(`newstream-${generateUUID()}`)
     }
-    await this.initiliase()
-    await this.setChangeWatcher(`newstream-${generateUUID()}`)
   }
 }
 </script>

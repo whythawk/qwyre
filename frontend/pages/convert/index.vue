@@ -338,7 +338,6 @@ export default class ConvertWork extends mixins(importWorkData) {
   }
 
   public submit(): void {
-    // await this.buildWorkMetadata()
     const jsonData: IKeyable = {
       metadata: {} as IKeyable,
       cover: "" as string,
@@ -348,12 +347,6 @@ export default class ConvertWork extends mixins(importWorkData) {
       save: false,
     }
     jsonData.metadata = JSON.parse(JSON.stringify(this.work)) as IKeyable
-    // console.log(jsonData.metadata.long_description)
-    // console.log(this.drawWorkMarkup(jsonData.metadata.long_description))
-    // if (this.work.long_description)
-    //   jsonData.metadata.long_description = this.drawWorkMarkup(
-    //     this.work.long_description
-    //   )
     jsonData.cover = this.workCover
     jsonData.text = this.workText
     jsonData.dedication =

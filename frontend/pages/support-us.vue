@@ -248,65 +248,67 @@ export default class AuthoriseUserWebMonetization extends Vue {
   }
 
   async created(): Promise<void> {
-    // <--- STRIPE SETUP --->
-    this.stripe = await loadStripe(process.env.stripeKey as string)
-    const elements = this.stripe.elements()
-    const style = {
-      base: {
-        color: "#635246",
-        fontFamily: "PTSerifRegular",
-        fontSmoothing: "antialiased",
-        fontSize: "16px",
-        "::placeholder": {
+    if (process.client) {
+      // <--- STRIPE SETUP --->
+      this.stripe = await loadStripe(process.env.stripeKey as string)
+      const elements = this.stripe.elements()
+      const style = {
+        base: {
           color: "#635246",
+          fontFamily: "PTSerifRegular",
+          fontSmoothing: "antialiased",
+          fontSize: "16px",
+          "::placeholder": {
+            color: "#635246",
+          },
         },
-      },
-      invalid: {
-        fontFamily: "PTSerifRegular",
-        color: "#da4000",
-        iconColor: "#da4000",
-      },
-    }
-    const card = elements.create("card", { style })
-    // Stripe injects an iframe into the DOM
-    card.mount("#card-element")
-    card.on("change", (event) => {
-      // Disable the Pay button if there are no card details in the Element
-      this.stripeButton.disabled = event.empty
-      if (event.error)
-        this.addNotification({
-          content: event.error.message,
-          color: "error",
-        })
-    })
-    this.stripePaymentForm.addEventListener("submit", (event) => {
-      event.preventDefault()
-      this.payWithCard(card)
-    })
-    // <--- WEB MONETIZATION SETUP --->
-    if (!this.coilSub) this.recoverCoilResourceState()
-    // if not, and there are route query terms, process auth 'n auth
-    if (
-      !this.coilSub &&
-      this.$route.query.code &&
-      this.$route.query.state &&
-      this.$route.query.scope
-    ) {
-      this.showAuthenticating = true
-      const payload: ICoilUserResourceResponse = {
-        code: this.$route.query.code as string,
-        state: this.$route.query.state as string,
-        scope: this.$route.query.scope as string,
+        invalid: {
+          fontFamily: "PTSerifRegular",
+          color: "#da4000",
+          iconColor: "#da4000",
+        },
       }
-      await this.initialiseUserBTP(payload)
-      if (this.coilSub) this.showAuthenticating = false
-    }
-    if (!this.coilSub) {
-      const lastPage: string = this.$nuxt.context.from
-        ? this.$nuxt.context.from.path
-        : "/"
-      await this.storeCoilResourceState({ coilRoute: lastPage })
-      this.coilRequestURI = coil.getUserResource(this.coilState)
+      const card = elements.create("card", { style })
+      // Stripe injects an iframe into the DOM
+      card.mount("#card-element")
+      card.on("change", (event) => {
+        // Disable the Pay button if there are no card details in the Element
+        this.stripeButton.disabled = event.empty
+        if (event.error)
+          this.addNotification({
+            content: event.error.message,
+            color: "error",
+          })
+      })
+      this.stripePaymentForm.addEventListener("submit", (event) => {
+        event.preventDefault()
+        this.payWithCard(card)
+      })
+      // <--- WEB MONETIZATION SETUP --->
+      if (!this.coilSub) this.recoverCoilResourceState()
+      // if not, and there are route query terms, process auth 'n auth
+      if (
+        !this.coilSub &&
+        this.$route.query.code &&
+        this.$route.query.state &&
+        this.$route.query.scope
+      ) {
+        this.showAuthenticating = true
+        const payload: ICoilUserResourceResponse = {
+          code: this.$route.query.code as string,
+          state: this.$route.query.state as string,
+          scope: this.$route.query.scope as string,
+        }
+        await this.initialiseUserBTP(payload)
+        if (this.coilSub) this.showAuthenticating = false
+      }
+      if (!this.coilSub) {
+        const lastPage: string = this.$nuxt.context.from
+          ? this.$nuxt.context.from.path
+          : "/"
+        await this.storeCoilResourceState({ coilRoute: lastPage })
+        this.coilRequestURI = coil.getUserResource(this.coilState)
+      }
     }
   }
 }

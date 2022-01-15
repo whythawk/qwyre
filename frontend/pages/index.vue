@@ -176,7 +176,7 @@ import {
   Getter,
   Vue,
 } from "nuxt-property-decorator"
-import { idb } from "@/api"
+import { idb, api } from "@/api"
 import { ILibrary } from "@/interfaces"
 import { generateUUID } from "@/utilities"
 
@@ -201,7 +201,7 @@ export default class CoverPage extends Vue {
   @Watch("collectionWatcher")
   public async refreshCollection() {
     if (
-      this.forceRefresh ||
+      (process.client && this.forceRefresh) ||
       (this.collectionWatcher &&
         ["library", "stream", "work"].includes(
           this.collectionWatcher.split("-")[0]
@@ -209,9 +209,11 @@ export default class CoverPage extends Vue {
     ) {
       this.libraryCollection = []
       this.forceRefresh = false
-      this.libraryCollection = (await idb.getLatestPayloads(
-        this.collection
-      )) as ILibrary[]
+      try {
+        this.libraryCollection = (await idb.getLatestPayloads(
+          this.collection
+        )) as ILibrary[]
+      } catch (e) {}
     }
   }
 

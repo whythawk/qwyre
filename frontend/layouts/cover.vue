@@ -6,6 +6,7 @@
         max-w-full
         mx-auto
         md:bg-join-the-qwyre md:bg-no-repeat md:bg-contain
+        2xl:bg-cover 2xl:bg-center
       "
     >
       <NavigationCoverMenu />

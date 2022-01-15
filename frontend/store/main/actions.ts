@@ -162,7 +162,6 @@ export default {
         color: "success",
       })
     } catch (error) {
-      // console.log(error.response)
       await dispatch("checkApiError", error)
     }
   },
@@ -202,7 +201,6 @@ export default {
     ;(this as any).$cookies.remove("refresh")
   },
   async checkApiError({ dispatch }, payload: AxiosError) {
-    // console.log(payload.response)
     if ([400, 401, 403].includes(payload.response!.status)) {
       await dispatch("logOut")
     }

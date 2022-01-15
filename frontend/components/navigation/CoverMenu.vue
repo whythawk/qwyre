@@ -19,7 +19,8 @@
         justify-center
         max-h-16
         py-1
-        bg-ochre-600 bg-opacity-40
+        bg-ochre-900 bg-opacity-100
+        md:bg-ochre-600 md:bg-opacity-40
       "
       aria-label="Global"
     >
@@ -101,22 +102,23 @@ export default class NavigationCoverMenu extends Vue {
   ]
 
   public async created() {
-    let libraryKey = await this.firstCollection("library")
-    if (!libraryKey) {
-      await this.restoreCollection({ collection: "library" })
-      libraryKey = await this.firstCollection("library")
-    }
-    if (libraryKey) {
-      try {
-        const cover = await idb.getPayload("cover", libraryKey)
-        if (cover && typeof cover !== "string" && Object.keys(cover).length) {
-          this.cover = (cover as IKeyable).data as string | null
-          this.readLink = `/stream/${libraryKey}`
-        } else this.cover = cover as string | null
-      } catch (error) {
-        this.readLink = "/"
+    this.readLink = "/"
+    if (process.client) {
+      let libraryKey = await this.firstCollection("library")
+      if (!libraryKey) {
+        await this.restoreCollection({ collection: "library" })
+        libraryKey = await this.firstCollection("library")
       }
-    } else this.readLink = "/"
+      if (libraryKey) {
+        try {
+          const cover = await idb.getPayload("cover", libraryKey)
+          if (cover && typeof cover !== "string" && Object.keys(cover).length) {
+            this.cover = (cover as IKeyable).data as string | null
+            this.readLink = `/stream/${libraryKey}`
+          } else this.cover = cover as string | null
+        } catch (error) {}
+      }
+    }
   }
 }
 </script>

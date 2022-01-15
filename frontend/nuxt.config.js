@@ -97,7 +97,7 @@ export default {
       author: "Gavin Chait",
       description:
         "Qwyre.com is a streaming payments platform for collaborative publishing, a simple ebook converter, and an ereader.",
-      theme_color: "#4974a5",
+      theme_color: "#211B17",
       ogHost: "https://qwyre.com/",
       twitterCard: "app",
       twitterSite: "@GavinChait",
