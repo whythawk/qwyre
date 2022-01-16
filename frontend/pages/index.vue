@@ -176,7 +176,7 @@ import {
   Getter,
   Vue,
 } from "nuxt-property-decorator"
-import { idb, api } from "@/api"
+import { idb } from "@/api"
 import { ILibrary } from "@/interfaces"
 import { generateUUID } from "@/utilities"
 
@@ -192,10 +192,15 @@ export default class CoverPage extends Vue {
   public libraryCollection: ILibrary[] = []
 
   public readMe() {
-    this.$router.push(
-      "/?import=https%3A%2F%2Fqwyre.com%2Fif-only-they-couldn't-talk.epub"
+    this.$router.push({
+      name: "",
+      query: {
+        import: "https%3A%2F%2Fqwyre.com%2Fif-only-they-couldn't-talk.epub",
+      },
+    })
+    this.setChangeWatcher(
+      `readme-https%3A%2F%2Fqwyre.com%2Fif-only-they-couldn't-talk.epub`
     )
-    this.setChangeWatcher(`readme-${generateUUID()}`)
   }
 
   @Watch("collectionWatcher")

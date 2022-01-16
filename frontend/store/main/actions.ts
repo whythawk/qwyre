@@ -30,6 +30,7 @@ export default {
         await commit("setLoggedIn", true)
         await commit("setLogInError", false)
         await dispatch("getUserProfile")
+        await dispatch("getCreatorProfile")
       } else {
         await dispatch("logOut")
       }
@@ -75,6 +76,7 @@ export default {
         await commit("setLoggedIn", true)
         await commit("setLogInError", false)
         await dispatch("getUserProfile")
+        await dispatch("getCreatorProfile")
       } else {
         await dispatch("logOut")
       }
@@ -166,7 +168,10 @@ export default {
     }
   },
   async refreshLoggedIn({ commit, dispatch, state }) {
-    let token = state.token
+    let token
+    if (process.client) {
+      token = state.token
+    }
     if (!token) {
       token = (this as any).$cookies.get("token")
     }
@@ -177,8 +182,8 @@ export default {
       } else {
         await commit("setToken", token)
         try {
-          await dispatch("getCreatorProfile")
           await dispatch("getUserProfile")
+          await dispatch("getCreatorProfile")
           await commit("setLoggedIn", true)
         } catch (error) {
           await dispatch("checkApiError", error)

@@ -23,12 +23,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Getter, Action } from "nuxt-property-decorator"
+import { Component, Vue } from "nuxt-property-decorator"
 
 @Component
 export default class NavigationDefaultLowerMenu extends Vue {
-  @Getter("collections/firstCollection") firstCollection
-  @Action("collections/restoreCollection") restoreCollection
   public monetizationDark: boolean = false
 
   public navigation = [

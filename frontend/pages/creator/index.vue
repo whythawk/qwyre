@@ -80,30 +80,33 @@ export default class Creator extends Vue {
     if (
       this.$route.query &&
       Object.keys(this.$route.query).length !== 0 &&
-      this.$route.query.constructor === Object
+      this.$route.query.constructor === Object &&
+      this.$route.query.token
     ) {
-      if (this.$route.query.token) {
-        const validation = this.$route.query.token as string
-        try {
-          const response = await api.validateEmail(this.token, validation)
-          if (response.data) {
-            this.addNotification({
-              content: "Your email has been validated.",
-              color: "success",
-            })
-          }
-        } catch (error) {
+      const validation = this.$route.query.token as string
+      try {
+        const response = await api.validateEmail(this.token, validation)
+        if (response.data) {
           this.addNotification({
-            content: "Invalid token. Check your email and resend validation.",
-            color: "error",
+            content: "Your email has been validated.",
+            color: "success",
           })
         }
+      } catch (error) {
+        this.addNotification({
+          content: "Invalid token. Check your email and resend validation.",
+          color: "error",
+        })
       }
     }
   }
 
-  async asyncData({ store }) {
+  async asyncData({ store, redirect }) {
     await store.dispatch("main/getUserProfile")
+    const creator = await store.getters["main/creatorProfile"]
+    if (!creator || creator.isBanned) {
+      redirect("/")
+    }
   }
 }
 </script>

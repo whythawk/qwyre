@@ -115,7 +115,10 @@ export default class NavigationCoverMenu extends Vue {
           if (cover && typeof cover !== "string" && Object.keys(cover).length) {
             this.cover = (cover as IKeyable).data as string | null
             this.readLink = `/stream/${libraryKey}`
-          } else this.cover = cover as string | null
+          } else {
+            this.cover = cover as string | null
+            this.readLink = "/read"
+          }
         } catch (error) {}
       }
     }

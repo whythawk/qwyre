@@ -60,13 +60,12 @@ def get_refresh_user(db: Session = Depends(get_db), token: str = Depends(reusabl
     if not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     # Check and revoke this refresh token
-    token_obj = crud.token.get(db, token=token, user=user)
+    token_obj = crud.token.get(token=token, user=user)
     if not token_obj:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Could not validate credentials",
         )
-    token_in = schemas.RefreshTokenUpdate(**{"token": token, "is_valid": False})
-    crud.token.update(db, db_obj=token_obj, obj_in=token_in)
+    crud.token.cancel_refresh_token(db, db_obj=token_obj)
     return user
 
 

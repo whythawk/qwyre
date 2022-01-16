@@ -214,11 +214,9 @@ export default class CollectionsImportLibrary extends mixins(importWorkData) {
   @Watch("changeWatcher")
   public async readMe() {
     if (this.changeWatcher.split("-")[0] === "readme") {
-      if (
-        this.$route.query.import &&
-        isValidHttpUrl(decodeURIComponent(this.$route.query.import as string))
-      ) {
-        this.workURL = decodeURIComponent(this.$route.query.import as string)
+      const term = this.changeWatcher.split("-").slice(1).join("-")
+      if (term && isValidHttpUrl(decodeURIComponent(term as string))) {
+        this.workURL = decodeURIComponent(term as string)
         await this.importLink()
       }
     }

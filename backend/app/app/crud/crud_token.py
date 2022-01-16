@@ -2,6 +2,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 from typing import List
 from sqlalchemy import and_
+from fastapi.encoders import jsonable_encoder
 
 from app.crud.base import CRUDBase
 from app.models import User, Token
@@ -19,6 +20,13 @@ class CRUDToken(CRUDBase[Token, RefreshTokenCreate, RefreshTokenUpdate]):
         db.commit()
         db.refresh(db_obj)
         user_obj.refresh_tokens.append(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def cancel_refresh_token(self, db: Session, *, db_obj: Token) -> Token:
+        setattr(db_obj, "is_valid", False)
+        db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj

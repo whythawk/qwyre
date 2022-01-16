@@ -75,10 +75,7 @@ def read_creator_summary_by_id(creator_id: UUID,) -> Any:
 
 @router.put("/", response_model=schemas.Creator)
 def update_creator_profile(
-    *,
-    db: Session = Depends(deps.get_db),
-    creator_in: schemas.CreatorUpdate,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    *, creator_in: schemas.CreatorUpdate, current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update creator profile.
@@ -102,9 +99,7 @@ def toggle_creator_privacy(*, current_user: models.User = Depends(deps.get_curre
 
 
 @router.get("/", response_model=schemas.Creator)
-def read_creator_profile(
-    db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
+def read_creator_profile(*, current_user: models.User = Depends(deps.get_current_active_user),) -> Any:
     """
     Get current creator.
     """

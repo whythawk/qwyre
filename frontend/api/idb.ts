@@ -33,7 +33,6 @@ export const idb = {
       }
       const request = window.indexedDB.open(IDB_NAME, IDB_VERSION)
       request.onerror = (event) => {
-        console.log("Error opening db", event)
         reject(new Error("Failed to open IndexedDB."))
       }
       request.onsuccess = (event: any) => {
