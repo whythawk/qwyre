@@ -180,12 +180,13 @@ import { Component, Getter, Mutation, mixins } from "nuxt-property-decorator"
 import { api } from "@/api"
 import importWorkData from "@/mixins/importWorkData"
 import { ISocketResponse } from "@/interfaces"
+import { generateUUID } from "@/utilities"
 
 @Component
 export default class CollectionsImportWork extends mixins(importWorkData) {
   @Mutation("main/addNotification") addNotification
   @Mutation("main/removeNotification") removeNotification
-  @Getter("main/token") token
+  @Mutation("main/setChangeWatcher") setChangeWatcher
   @Getter("collections/firstCollection") firstCollection
   public workURL: string = ""
   public blob: File = {} as File
@@ -231,6 +232,7 @@ export default class CollectionsImportWork extends mixins(importWorkData) {
         })
         this.wsp.close()
         this.cancel()
+        this.setChangeWatcher(generateUUID())
         break
     }
   }
@@ -241,11 +243,14 @@ export default class CollectionsImportWork extends mixins(importWorkData) {
     }
     try {
       if (this.blob) {
+        const token = (this as any).$cookies.get("token")
+          ? (this as any).$cookies.get("token")
+          : ""
         this.storeWork(this.blob, false)
         const newBlob = await this.getBase64FromFile(this.blob)
         const jsonData = {
           work: newBlob,
-          token: this.token,
+          token,
           save: true,
         }
         await this.wsp.open()

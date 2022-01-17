@@ -32,6 +32,7 @@ export default {
   env: {
     baseUrl: process.env.BASE_URL || "http://localhost:3000",
     appName: process.env.VUE_APP_NAME,
+    appEnv: process.env.VUE_APP_ENV,
     apiWS: process.env.VUE_APP_DOMAIN_WS,
     apiUrl: process.env.VUE_APP_DOMAIN_API,
     idbName: process.env.VUE_IDB_NAME,
@@ -52,7 +53,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ["~/plugins/init.client.ts", "~/plugins/vee-validate"],
+  plugins: ["~/plugins/vee-validate"],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,

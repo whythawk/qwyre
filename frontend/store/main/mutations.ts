@@ -9,9 +9,6 @@ import {
 } from "@/interfaces"
 
 export default {
-  setToken(state, payload: string) {
-    state.token = payload
-  },
   setLoggedIn(state, payload: boolean) {
     state.isLoggedIn = payload
   },

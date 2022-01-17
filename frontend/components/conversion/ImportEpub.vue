@@ -100,7 +100,6 @@ export default class ConversionImportEpub extends mixins(importWorkData) {
   @Mutation("main/addNotification") addNotification
   @Mutation("main/removeNotification") removeNotification
   @Mutation("main/setChangeWatcher") setChangeWatcher
-  @Getter("main/token") token
   @Getter("collections/firstCollection") firstCollection
   public workURL: string = ""
   public blob: File = {} as File
@@ -180,11 +179,14 @@ export default class ConversionImportEpub extends mixins(importWorkData) {
     }
     try {
       if (this.blob) {
+        const token = (this as any).$cookies.get("token")
+          ? (this as any).$cookies.get("token")
+          : ""
         this.storeWork(this.blob, false)
         const newBlob = await this.getBase64FromFile(this.blob)
         const jsonData = {
           work: newBlob,
-          token: this.token,
+          token,
           save: true,
         }
         await this.wsp.open()

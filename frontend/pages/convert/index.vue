@@ -285,12 +285,11 @@ import importWorkData from "@/mixins/importWorkData"
   middleware: "refresh-authentication",
 })
 export default class ConvertWork extends mixins(importWorkData) {
-  @Getter("main/isLoggedIn") isLoggedIn
-  @Getter("main/token") token
   @Getter("conversions/conversionKey") conversionKey
   @Action("collections/storePayload") storePayload
   @Action("collections/storeCollectionPayload") storeConversionPayload
   @Mutation("main/addNotification") addNotification
+  @Getter("main/isLoggedIn") isLoggedIn
 
   @Action("conversions/buildWorkMetadata") buildWorkMetadata
   public conversion: string | IConversion = ""
@@ -338,12 +337,15 @@ export default class ConvertWork extends mixins(importWorkData) {
   }
 
   public submit(): void {
+    const token = (this as any).$cookies.get("token")
+      ? (this as any).$cookies.get("token")
+      : ""
     const jsonData: IKeyable = {
       metadata: {} as IKeyable,
       cover: "" as string,
       text: "" as string,
       dedication: null as string[] | null,
-      token: null as string | null,
+      token,
       save: false,
     }
     jsonData.metadata = JSON.parse(JSON.stringify(this.work)) as IKeyable
@@ -353,8 +355,7 @@ export default class ConvertWork extends mixins(importWorkData) {
       this.workDedication === ""
         ? null
         : this.drawWorkLines(this.workDedication)
-    if (this.isLoggedIn && this.saveWork) {
-      jsonData.token = this.token
+    if (token && this.saveWork) {
       jsonData.save = this.saveWork
     }
     this.wsp

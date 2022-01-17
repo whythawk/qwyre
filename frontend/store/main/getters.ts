@@ -20,7 +20,6 @@ export default {
   loginError: (state) => state.logInError,
   creatorProfile: (state) => state.creatorProfile,
   userProfile: (state) => state.userProfile,
-  token: (state) => state.token,
   isLoggedIn: (state) => state.isLoggedIn,
   firstNotification: (state) =>
     state.notifications.length > 0 && state.notifications[0],

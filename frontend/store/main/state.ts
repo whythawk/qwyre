@@ -14,11 +14,10 @@ const defaultTheme: IThemeState = {
 }
 
 export interface MainState {
-  token: string
-  isLoggedIn: boolean | null
+  isLoggedIn: boolean
   logInError: boolean
-  creatorProfile: ICreatorSummary | null
-  userProfile: IUserProfile | null
+  creatorProfile: ICreatorSummary | {}
+  userProfile: IUserProfile | {}
   notifications: AppNotification[]
   showOptions: boolean
   showOptionsCall: boolean
@@ -29,11 +28,10 @@ export interface MainState {
 }
 
 const defaultState: MainState = {
-  isLoggedIn: null,
-  token: "",
+  isLoggedIn: false,
   logInError: false,
-  creatorProfile: null,
-  userProfile: null,
+  creatorProfile: {},
+  userProfile: {},
   notifications: [],
   showOptions: false,
   showOptionsCall: false,

@@ -69,7 +69,6 @@ export default class Creator extends Vue {
   @Getter("main/creatorProfile") creatorProfile
   @Getter("main/userProfile") userProfile
   @Mutation("main/addNotification") addNotification
-  @Getter("main/token") token
 
   public async logout() {
     await this.userLogOut()
@@ -78,6 +77,7 @@ export default class Creator extends Vue {
 
   async created() {
     if (
+      (this as any).$cookies.get("token") &&
       this.$route.query &&
       Object.keys(this.$route.query).length !== 0 &&
       this.$route.query.constructor === Object &&
@@ -85,7 +85,10 @@ export default class Creator extends Vue {
     ) {
       const validation = this.$route.query.token as string
       try {
-        const response = await api.validateEmail(this.token, validation)
+        const response = await api.validateEmail(
+          (this as any).$cookies.get("token"),
+          validation
+        )
         if (response.data) {
           this.addNotification({
             content: "Your email has been validated.",

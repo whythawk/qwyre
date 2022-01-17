@@ -1,15 +1,7 @@
 import { AxiosError } from "axios"
 import { AppNotification } from "./state"
 import { api } from "@/api"
-import {
-  saveLocalToken,
-  removeLocalToken,
-  saveRefreshToken,
-  removeRefreshToken,
-  tokenExpired,
-  getLocalSettings,
-  saveLocalSettings,
-} from "@/utilities"
+import { tokenExpired, getLocalSettings, saveLocalSettings } from "@/utilities"
 import { IUserOpenProfileCreate, IThemeState } from "@/interfaces"
 
 export default {
@@ -26,7 +18,7 @@ export default {
       const refresh = response.data.refresh_token
       if (token && refresh) {
         dispatch("setAllTokens", { token, refresh })
-        await commit("setToken", token)
+        // await commit("setToken", token)
         await commit("setLoggedIn", true)
         await commit("setLogInError", false)
         await dispatch("getUserProfile")
@@ -53,16 +45,10 @@ export default {
       // httpOnly: true,
       secure: true,
     })
-    if (process.client) {
-      saveLocalToken(payload.token)
-      saveRefreshToken(payload.refresh)
-    }
-  },
-  setLocalTokens() {
-    if (process.client) {
-      saveLocalToken((this as any).$cookies.get("token"))
-      saveRefreshToken((this as any).$cookies.get("refresh"))
-    }
+    // if (process.client) {
+    //   saveLocalToken(payload.token)
+    //   saveRefreshToken(payload.refresh)
+    // }
   },
   async refreshTokens({ commit, dispatch }) {
     try {
@@ -72,7 +58,7 @@ export default {
       refresh = response.data.refresh_token
       if (token && refresh) {
         dispatch("setAllTokens", { token, refresh })
-        await commit("setToken", token)
+        // await commit("setToken", token)
         await commit("setLoggedIn", true)
         await commit("setLogInError", false)
         await dispatch("getUserProfile")
@@ -85,69 +71,84 @@ export default {
       await dispatch("logOut")
     }
   },
-  async getUserProfile({ commit, dispatch, state }) {
-    try {
-      const response = await api.getOfficialMe(state.token)
-      if (response.data) {
+  async getUserProfile({ commit, dispatch }) {
+    const token = (this as any).$cookies.get("token")
+    if (token) {
+      try {
+        const response = await api.getOfficialMe(token)
+        if (response.data) {
+          await commit("setUserProfile", response.data)
+        }
+      } catch (error) {
+        await dispatch("checkApiError", error)
+      }
+    }
+  },
+  async getCreatorProfile({ commit, dispatch }) {
+    const token = (this as any).$cookies.get("token")
+    if (token) {
+      try {
+        const response = await api.getMe(token)
+        if (response.data) {
+          await commit("setCreatorProfile", response.data)
+        }
+      } catch (error) {
+        await dispatch("checkApiError", error)
+      }
+    }
+  },
+  async updateUserProfile({ commit, dispatch }, payload) {
+    const token = (this as any).$cookies.get("token")
+    if (token) {
+      try {
+        const loadingNotification = { content: "Saving...", showProgress: true }
+        await commit("addNotification", loadingNotification)
+        const response = await api.updateOfficialMe(token, payload)
         await commit("setUserProfile", response.data)
+        await commit("removeNotification", loadingNotification)
+        await commit("addNotification", {
+          content: "Profile successfully updated",
+          color: "success",
+        })
+      } catch (error) {
+        await dispatch("checkApiError", error)
       }
-    } catch (error) {
-      await dispatch("checkApiError", error)
     }
   },
-  async getCreatorProfile({ commit, dispatch, state }) {
-    try {
-      const response = await api.getMe(state.token)
-      if (response.data) {
+  async updateCreatorProfile({ commit, dispatch }, payload) {
+    const token = (this as any).$cookies.get("token")
+    if (token) {
+      try {
+        const loadingNotification = { content: "Saving...", showProgress: true }
+        await commit("addNotification", loadingNotification)
+        const response = await api.updateMe(token, payload)
         await commit("setCreatorProfile", response.data)
+        await commit("removeNotification", loadingNotification)
+        await commit("addNotification", {
+          content: "Profile successfully updated",
+          color: "success",
+        })
+      } catch (error) {
+        await dispatch("checkApiError", error)
       }
-    } catch (error) {
-      await dispatch("checkApiError", error)
     }
   },
-  async updateUserProfile({ commit, dispatch, state }, payload) {
-    try {
-      const loadingNotification = { content: "Saving...", showProgress: true }
-      await commit("addNotification", loadingNotification)
-      const response = await api.updateOfficialMe(state.token, payload)
-      await commit("setUserProfile", response.data)
-      await commit("removeNotification", loadingNotification)
-      await commit("addNotification", {
-        content: "Profile successfully updated",
-        color: "success",
-      })
-    } catch (error) {
-      await dispatch("checkApiError", error)
-    }
-  },
-  async updateCreatorProfile({ commit, dispatch, state }, payload) {
-    try {
-      const loadingNotification = { content: "Saving...", showProgress: true }
-      await commit("addNotification", loadingNotification)
-      const response = await api.updateMe(state.token, payload)
-      await commit("setCreatorProfile", response.data)
-      await commit("removeNotification", loadingNotification)
-      await commit("addNotification", {
-        content: "Profile successfully updated",
-        color: "success",
-      })
-    } catch (error) {
-      await dispatch("checkApiError", error)
-    }
-  },
-  async toggleCreatorPrivacy({ commit, dispatch, state }) {
-    try {
-      const loadingNotification = { content: "Saving...", showProgress: true }
-      await commit("addNotification", loadingNotification)
-      const response = await api.toggleCreatorPrivacy(state.token)
-      await commit("setCreatorProfile", response.data)
-      await commit("removeNotification", loadingNotification)
-      await commit("addNotification", {
-        content: "Profile successfully updated",
-        color: "success",
-      })
-    } catch (error) {
-      await dispatch("checkApiError", error)
+  async toggleCreatorPrivacy({ commit, dispatch }) {
+    const token = (this as any).$cookies.get("token")
+    if (token) {
+      try {
+        const loadingNotification = { content: "Saving...", showProgress: true }
+        await commit("addNotification", loadingNotification)
+        const response = await api.toggleCreatorPrivacy(token)
+        await commit("setCreatorProfile", response.data)
+        await commit("removeNotification", loadingNotification)
+        await commit("addNotification", {
+          content: "Profile successfully updated",
+          color: "success",
+        })
+      } catch (error) {
+        await dispatch("checkApiError", error)
+      }
     }
   },
   async createUserProfile(
@@ -167,20 +168,20 @@ export default {
       await dispatch("checkApiError", error)
     }
   },
-  async refreshLoggedIn({ commit, dispatch, state }) {
-    let token
-    if (process.client) {
-      token = state.token
-    }
-    if (!token) {
-      token = (this as any).$cookies.get("token")
-    }
+  async refreshLoggedIn({ commit, dispatch }) {
+    const token = (this as any).$cookies.get("token")
+    // if (process.client) {
+    //   token = state.token
+    // }
+    // if (!token) {
+    //   token = (this as any).$cookies.get("token")
+    // }
     if (token) {
       const hasExpired = tokenExpired(token)
       if (hasExpired) {
         dispatch("refreshTokens")
       } else {
-        await commit("setToken", token)
+        // await commit("setToken", token)
         try {
           await dispatch("getUserProfile")
           await dispatch("getCreatorProfile")
@@ -196,12 +197,12 @@ export default {
     }
   },
   async logOut({ commit }) {
-    removeLocalToken()
-    removeRefreshToken()
-    await commit("setToken", "")
+    // removeLocalToken()
+    // removeRefreshToken()
+    // await commit("setToken", "")
     await commit("setLoggedIn", false)
-    await commit("setUserProfile", null)
-    await commit("setCreatorProfile", null)
+    await commit("setUserProfile", {})
+    await commit("setCreatorProfile", {})
     ;(this as any).$cookies.remove("token")
     ;(this as any).$cookies.remove("refresh")
   },

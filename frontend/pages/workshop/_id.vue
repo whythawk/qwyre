@@ -24,7 +24,6 @@ export default class WorkshopEdit extends Vue {
   @Action("conversions/getContractToEdit") getContractToEdit
   @Getter("conversions/workEdit") workEdit
   @Getter("conversions/contractEdit") contractEdit
-  @Getter("main/token") token
   @Getter("main/changeWatcher") changeWatcher
   public cover: IDataSource = {} as IDataSource
   public showSummary: boolean = false
@@ -33,7 +32,7 @@ export default class WorkshopEdit extends Vue {
     let coverImage = {} as IDataSource
     try {
       const response = await api.getCoverAuthenticated(
-        this.token,
+        (this as any).$cookies.get("token"),
         sourceID,
         "cover"
       )

@@ -151,10 +151,8 @@ import { api } from "@/api"
 import {
   IContractCreate,
   IContractUpdate,
-  IContract,
   IPartyCreate,
   IPartyUpdate,
-  IWorkSummary,
   IDataSource,
 } from "@/interfaces"
 
@@ -172,7 +170,6 @@ export default class EditOffer extends Vue {
   @Getter("main/creatorProfile") creatorProfile
   @Getter("main/userProfile") userProfile
   @Getter("main/canMakeCreativeOffers") canMakeCreativeOffers
-  @Getter("main/token") token
   public toUpdate: boolean = false
   public cover: IDataSource = {} as IDataSource
   public creatorProportion: string = "95"
@@ -186,7 +183,7 @@ export default class EditOffer extends Vue {
     let coverImage = {} as IDataSource
     try {
       const response = await api.getCoverAuthenticated(
-        this.token,
+        (this as any).$cookies.get("token"),
         sourceID,
         "thumbnail"
       )

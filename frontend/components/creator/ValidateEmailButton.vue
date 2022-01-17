@@ -10,28 +10,31 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Mutation, Getter } from "nuxt-property-decorator"
+import { Component, Vue, Mutation } from "nuxt-property-decorator"
 import { api } from "@/api"
 
 @Component
 export default class CreatorValidateEmailButton extends Vue {
   @Mutation("main/addNotification") addNotification
-  @Getter("main/token") token
 
   public async submit() {
-    try {
-      const response = await api.requestValidationEmail(this.token)
-      if (response.data) {
+    if ((this as any).$cookies.get("token")) {
+      try {
+        const response = await api.requestValidationEmail(
+          (this as any).$cookies.get("token")
+        )
+        if (response.data) {
+          this.addNotification({
+            content: "Validation sent. Check your email and respond.",
+            color: "success",
+          })
+        }
+      } catch (error) {
         this.addNotification({
-          content: "Validation sent. Check your email and respond.",
-          color: "success",
+          content: "Please check your email and try again.",
+          color: "error",
         })
       }
-    } catch (error) {
-      this.addNotification({
-        content: "Please check your email and try again.",
-        color: "error",
-      })
     }
   }
 }

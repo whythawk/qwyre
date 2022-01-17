@@ -85,7 +85,6 @@ export default class ConversionUpdateEpub extends mixins(importWorkData) {
   @Ref("import-work") readonly openWork!: HTMLButtonElement
   @Mutation("main/addNotification") addNotification
   @Mutation("main/removeNotification") removeNotification
-  @Getter("main/token") token
   @Getter("collections/firstCollection") firstCollection
   public workURL: string = ""
   public blob: File = {} as File
@@ -162,12 +161,15 @@ export default class ConversionUpdateEpub extends mixins(importWorkData) {
     }
     try {
       if (this.blob) {
+        const token = (this as any).$cookies.get("token")
+          ? (this as any).$cookies.get("token")
+          : ""
         this.storeWork(this.blob)
         const newBlob = await this.getBase64FromFile(this.blob)
         // const newCover = await this.getCover()
         const jsonData = {
           work: newBlob,
-          token: this.token,
+          token,
           save: true,
         }
         await this.wsp.open()

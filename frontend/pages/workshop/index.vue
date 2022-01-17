@@ -119,7 +119,6 @@ export default class Workshop extends Vue {
   @Action("collections/getPartyContributions") getPartyContributions
   @Getter("conversions/workSummaries") workSummaries
   @Getter("collections/partyContributions") partyContributions
-  @Getter("main/token") token
   @Getter("main/changeWatcher") changeWatcher
   public selected: string = "CONVERSIONS"
   public tabs: object[] = [
@@ -145,10 +144,13 @@ export default class Workshop extends Vue {
   public contributorList: { work: IWorkLineSummary; cover: IDataSource }[] = []
 
   public async getCoverImage(sourceID: string): Promise<IDataSource> {
+    const token = (this as any).$cookies.get("token")
+      ? (this as any).$cookies.get("token")
+      : ""
     let coverImage = {} as IDataSource
     try {
       const response = await api.getCoverAuthenticated(
-        this.token,
+        token,
         sourceID,
         "thumbnail"
       )

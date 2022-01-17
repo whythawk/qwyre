@@ -197,13 +197,17 @@ export default {
     }
   },
   async getPartyContributions({ commit, dispatch, rootState }) {
-    try {
-      const response = await api.getPartyContributions(rootState.main.token)
-      if (response.data) {
-        await commit("setPartyContributions", response.data)
+    if ((this as any).$cookies.get("token")) {
+      try {
+        const response = await api.getPartyContributions(
+          (this as any).$cookies.get("token")
+        )
+        if (response.data) {
+          await commit("setPartyContributions", response.data)
+        }
+      } catch (error) {
+        await dispatch("main/addErrorNotification", error, { root: true })
       }
-    } catch (error) {
-      await dispatch("main/addErrorNotification", error, { root: true })
     }
   },
   async getSearch({ commit }, payload: string) {

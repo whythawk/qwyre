@@ -73,7 +73,6 @@ export default class Stream extends Vue {
   @Mutation("main/addNotification") addNotification
   @Mutation("main/setChangeWatcher") setChangeWatcher
   @Getter("main/isLoggedIn") isLoggedIn
-  @Getter("main/token") token
   @Getter("main/showOptions") showOptions
   @Mutation("main/setShowOptions") setShowOptions
   @Mutation("main/setShowOptionsCall") setShowOptionsCall
@@ -90,6 +89,7 @@ export default class Stream extends Vue {
   @Mutation("monetization/setMonetizationWatcher") setMonetizationWatcher
   @Action("monetization/startMonetizationStream") startMonetizationStream
   @Action("monetization/stopMonetizationStream") stopMonetizationStream
+  public token: string = ""
   public wsp: WebSocketAsPromised = {} as WebSocketAsPromised
   public stream: IStream = {} as IStream
   public streamIn: IStreamIn = {} as IStreamIn
@@ -576,6 +576,8 @@ export default class Stream extends Vue {
 
   async created() {
     if (process.client) {
+      if ((this as any).$cookies.get("token"))
+        this.token = (this as any).$cookies.get("token")
       await this.getStreamingWork()
       if (this.stream && Object.keys(this.stream).length !== 0) {
         let key = this.firstCollection("library")
