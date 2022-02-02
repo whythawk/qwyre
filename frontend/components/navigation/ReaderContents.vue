@@ -93,7 +93,7 @@ export default class NavigationReaderContents extends Vue {
 
   async initialise() {
     const key = await this.firstCollection("library")
-    this.bookmark = (await idb.getPayload("library", key)) as ILibrary
+    if (key) this.bookmark = (await idb.getPayload("library", key)) as ILibrary
     if (this.bookmark && this.bookmark.collection === "work") {
       this.work = (await idb.getPayload("work", key)) as IWork
       if (this.work.contents && this.work.contents.length)

@@ -3,16 +3,7 @@
     <TitleBar title="Workshop" />
     <div class="max-w-screen-md mx-auto">
       <div class="flex space-x-4 w-full justify-center">
-        <NuxtLink
-          to="/convert/description"
-          class="btn-woad-extended-sm flex items-center h-8"
-        >
-          <SvgIcon
-            terms="w-5 h-4 inline-block mr-1 mb-1"
-            icon="svgDocumentText"
-          />
-          <span class="text-sm">Convert .docx</span>
-        </NuxtLink>
+        <CollectionsConvertLink />
         <CollectionsImportWork />
         <CollectionsImportLink />
         <NuxtLink

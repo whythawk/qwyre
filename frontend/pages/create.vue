@@ -1,14 +1,36 @@
 <template>
   <div class="flex flex-col">
     <div
-      class="container relative max-w-full md:max-w-2xl mx-auto py-8 lg:py-16 text-center bg-ochre-900 md:bg-opacity-0 z-0"
+      class="
+        container
+        relative
+        max-w-full
+        md:max-w-2xl
+        mx-auto
+        py-8
+        lg:py-16
+        text-center
+        bg-ochre-900
+        md:bg-opacity-0
+        z-0
+      "
     >
       <div
-        class="mx-auto mt-12 py-8 px-6 sm:py-12 lg:px-0 flex flex-col items-center text-center"
+        class="
+          mx-auto
+          mt-12
+          py-8
+          px-6
+          sm:py-12
+          lg:px-0
+          flex flex-col
+          items-center
+          text-center
+        "
       >
-        <p class="mb-4 text-xl text-ochre-10">
+        <span class="mb-4 text-xl text-ochre-10">
           <SvgIcon terms="h-20 w-20" icon="qwyreLogo" />
-        </p>
+        </span>
         <h1
           class="inline-flex text-4xl font-extrabold text-ochre-10 lg:text-6xl"
         >
@@ -33,7 +55,7 @@
           <MonetizationAuthenticating v-if="showAuthenticating" />
           <MonetizationAuthComplete v-if="!showAuthenticating && coilSub" />
           <!--- STRIPE --->
-          <div class="flex justify-center px-4 sm:px-6 lg:px-8 mt-10 my-10">
+          <div class="flex justify-center px-4 sm:px-6 lg:px-8 mb-10">
             <div class="max-w-md w-full space-y-8">
               <p class="text-xl text-ochre-800">
                 <span class="font-semibold">If</span> you prefer a one-time
@@ -153,13 +175,13 @@ export default class AuthoriseUserWebMonetization extends Vue {
   public stripeDisabled: boolean = false
   public denominations = { usd: "$", gbp: "£", eur: "€" }
   public placeholderAmount: number =
-    ((process.env.stripeDefault as unknown) as number) / 100
+    (process.env.stripeDefault as unknown as number) / 100
 
   public stripeMinimumAmount: number =
-    ((process.env.stripeMinimum as unknown) as number) / 100
+    (process.env.stripeMinimum as unknown as number) / 100
 
   public stripeIntent: IStripeIntent = {
-    amount: ((process.env.stripeDefault as unknown) as number) / 100,
+    amount: (process.env.stripeDefault as unknown as number) / 100,
     currency: "usd",
   }
 
@@ -226,65 +248,67 @@ export default class AuthoriseUserWebMonetization extends Vue {
   }
 
   async created(): Promise<void> {
-    // <--- STRIPE SETUP --->
-    this.stripe = await loadStripe(process.env.stripeKey as string)
-    const elements = this.stripe.elements()
-    const style = {
-      base: {
-        color: "#635246",
-        fontFamily: "PTSerifRegular",
-        fontSmoothing: "antialiased",
-        fontSize: "16px",
-        "::placeholder": {
+    if (process.client) {
+      // <--- STRIPE SETUP --->
+      this.stripe = await loadStripe(process.env.stripeKey as string)
+      const elements = this.stripe.elements()
+      const style = {
+        base: {
           color: "#635246",
+          fontFamily: "PTSerifRegular",
+          fontSmoothing: "antialiased",
+          fontSize: "16px",
+          "::placeholder": {
+            color: "#635246",
+          },
         },
-      },
-      invalid: {
-        fontFamily: "PTSerifRegular",
-        color: "#da4000",
-        iconColor: "#da4000",
-      },
-    }
-    const card = elements.create("card", { style })
-    // Stripe injects an iframe into the DOM
-    card.mount("#card-element")
-    card.on("change", (event) => {
-      // Disable the Pay button if there are no card details in the Element
-      this.stripeButton.disabled = event.empty
-      if (event.error)
-        this.addNotification({
-          content: event.error.message,
-          color: "error",
-        })
-    })
-    this.stripePaymentForm.addEventListener("submit", (event) => {
-      event.preventDefault()
-      this.payWithCard(card)
-    })
-    // <--- WEB MONETIZATION SETUP --->
-    if (!this.coilSub) this.recoverCoilResourceState()
-    // if not, and there are route query terms, process auth 'n auth
-    if (
-      !this.coilSub &&
-      this.$route.query.code &&
-      this.$route.query.state &&
-      this.$route.query.scope
-    ) {
-      this.showAuthenticating = true
-      const payload: ICoilUserResourceResponse = {
-        code: this.$route.query.code as string,
-        state: this.$route.query.state as string,
-        scope: this.$route.query.scope as string,
+        invalid: {
+          fontFamily: "PTSerifRegular",
+          color: "#da4000",
+          iconColor: "#da4000",
+        },
       }
-      await this.initialiseUserBTP(payload)
-      if (this.coilSub) this.showAuthenticating = false
-    }
-    if (!this.coilSub) {
-      const lastPage: string = this.$nuxt.context.from
-        ? this.$nuxt.context.from.path
-        : "/"
-      await this.storeCoilResourceState({ coilRoute: lastPage })
-      this.coilRequestURI = coil.getUserResource(this.coilState)
+      const card = elements.create("card", { style })
+      // Stripe injects an iframe into the DOM
+      card.mount("#card-element")
+      card.on("change", (event) => {
+        // Disable the Pay button if there are no card details in the Element
+        this.stripeButton.disabled = event.empty
+        if (event.error)
+          this.addNotification({
+            content: event.error.message,
+            color: "error",
+          })
+      })
+      this.stripePaymentForm.addEventListener("submit", (event) => {
+        event.preventDefault()
+        this.payWithCard(card)
+      })
+      // <--- WEB MONETIZATION SETUP --->
+      if (!this.coilSub) this.recoverCoilResourceState()
+      // if not, and there are route query terms, process auth 'n auth
+      if (
+        !this.coilSub &&
+        this.$route.query.code &&
+        this.$route.query.state &&
+        this.$route.query.scope
+      ) {
+        this.showAuthenticating = true
+        const payload: ICoilUserResourceResponse = {
+          code: this.$route.query.code as string,
+          state: this.$route.query.state as string,
+          scope: this.$route.query.scope as string,
+        }
+        await this.initialiseUserBTP(payload)
+        if (this.coilSub) this.showAuthenticating = false
+      }
+      if (!this.coilSub) {
+        const lastPage: string = this.$nuxt.context.from
+          ? this.$nuxt.context.from.path
+          : "/"
+        await this.storeCoilResourceState({ coilRoute: lastPage })
+        this.coilRequestURI = coil.getUserResource(this.coilState)
+      }
     }
   }
 }

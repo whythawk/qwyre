@@ -39,7 +39,7 @@ export const coil = {
       scope: "simple_wm openid",
       client_id: process.env.coilID as unknown as string,
       state: coilState,
-      redirect_uri: `${process.env.baseUrl}/support-us`,
+      redirect_uri: `${process.env.baseUrl}/${process.env.coilRedirect}`,
       prompt: "login",
     }
     // const params = new URLSearchParams()
@@ -55,7 +55,7 @@ export const coil = {
     const data: ICoilUserTokenRequest = {
       code: coilCode,
       grant_type: "authorization_code",
-      redirect_uri: `${process.env.baseUrl}/support-us`,
+      redirect_uri: `${process.env.baseUrl}/${process.env.coilRedirect}`,
     }
     return await axios.post<ICoilUserTokenResponse>(
       `${process.env.apiUrl}/api/v1/coil/proxy/oauth/token`,
