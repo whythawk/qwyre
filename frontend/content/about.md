@@ -16,11 +16,11 @@ Finally, Qwyre is **a collaborative publishing platform**, allowing you **to ear
 
 ## Grant for the Web and streaming micropayments
 
-[Grant for the Web](https://www.grantfortheweb.org/) is a fund to boost open, fair, and inclusive standards and innovation in Web Monetization. In July 2021, we received a grant to support the development of Qwyre, and integrate streaming micropayments into our service. This is a program of the [Interledger Foundation](https://interledger.org/), and is funded and led by [Coil](https://coil.com/), working in collaboration with founding collaborators [Mozilla](https://foundation.mozilla.org/en/) and [Creative Commons](https://creativecommons.org/).
+[Grant for the Web](https://www.grantfortheweb.org/) is a program at the [Interledger Foundation](https://interledger.org/) to boost open, fair, and inclusive standards and innovation in Web Monetization. In July 2021, we received a grant to support the development of Qwyre, and integrate streaming micropayments into our service.
 
-Web Monetization - despite it's clumsy name - is the conversion of web traffic into revenue. There are multiple ways to fund web services, including advertising, paywalls, subscriptions, and data mining. At best, these models are inconvenient. At worst, they violate our privacy, expose us to malware, needlessly increase our data charges, and are nearly impossible to track.
+Web Monetization is the conversion of web traffic into revenue. There are multiple ways to fund web services, including advertising, paywalls, subscriptions, and data mining. At best, these models are inconvenient. At worst, they violate our privacy, expose us to malware, needlessly increase our data charges, and are nearly impossible to track.
 
-Grant for the Web and the Interledger Foundation envision a healthier ecosystem that builds micropayments natively into the web using open standards which will give all of us more independence and control over how we distribute and pay for content, and generate better, more privacy-centric business models for the web.
+Interledger Foundation envision a healthier ecosystem that builds micropayments natively into the web using open standards which will give all of us more independence and control over how we distribute and pay for content, and generate better, more privacy-centric business models for the web.
 
 [Learn more and support us](/support-us).
 
