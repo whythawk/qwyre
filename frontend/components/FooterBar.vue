@@ -236,6 +236,7 @@ export default class FooterBar extends Vue {
   ]
 
   public navigationRoadmap = [
+	{ i18n: "short-story", to: "/short-story-contest" },
     { i18n: "roadmap", to: "/roadmap" },
     { i18n: "footer-feedback", to: "/contact-us" },
   ]
