@@ -1,32 +1,35 @@
 ---
-title: Qwyre launches its first web-monetized African speculative fiction short-story competition
-description: Qwyre is a streaming payments platform for collaborative publishing, and an ereader. We are launching our first web-monetized African speculative fiction short-story competition.
-tags: grantreports, publishing, scifi, competitions
+title: Qwyre web-monetized African speculative fiction short-story fund
+description: Qwyre is a streaming payments platform for collaborative publishing, and an ereader. We have launched our first web-monetized African speculative fiction short-story fund.
 ---
-
-_postdate &mdash; 20220323_
 
 African speculative fiction is finally achieving recognition. Nnedi Okorafor and Tade Thompson have won all the awards. All of them. And amazing anthologies like _Dominion_ &mdash; edited by Oghenechovwe Donald Ekpeki and Zelda Knight &mdash; have introduced some amazing authors, like Dilman Dila and Mame Bougouma Diene, to a wider audience.
 
 We want to do more. We want to showcase awesome writers while also promoting real-time, direct payments for authors.
 
-**We are offering $50 to each of the ten best [**African speculative fiction**](#whatis-african-speculative-fiction) short-stories published on Qwyre.com by 30 April 2022**.
+**We have set up a $500 fund to offer $50 to each of the ten best [**African speculative fiction**](#whatis-african-speculative-fiction) short-stories published on Qwyre.com**.
 
 ![Our memory like dust — desert panarama](/content/m0gf1x1qkcu2yo70ng8g.jpg)
 
-**And &mdash; yes &mdash; any work published here will be eligible for nomination to next year's Nommo Awards for best African speculative fiction.**
+**And &mdash; yes &mdash; any work published here will be eligible for nomination to the Nommo Awards for best African speculative fiction.**
+
+---
 
 The rules are simple:
 
 - 5,000 words, but if your story works longer or shorter, do that. Don't let a word count get in the way of a good story.
 - Competition only open to [African speculative fiction](#whatis-african-speculative-fiction).
-- Multiple submissions are fine, but you can only win for one.
+- Multiple submissions are fine, but you can only win for one in any one month.
 - Original is preferred but &mdash; if you have rights to republish &mdash; a second publication is ok. This is especially welcomed if you've self-published elsewhere.
-- Abide by [Qwyre's rules](/get-streaming).
+- Abide by [Qwyre's creator's code](/creators-code).
 
-The contest will be judged by a small team of volunteers from the [African Speculative Fiction Society](https://www.africansfs.com/), including [me](#whois).
+The contest will be judged by a small team of volunteers from the [African Speculative Fiction Society](https://www.africansfs.com/), including [me](#whois). We will award a maximum of 10 short stories in any given month.
 
-Most fiction competitions end there, with the prize. But Qwyre can offer everyone &mdash; including those who aren't amongst the ten &mdash; the opportunity to earn direct from readers from the moment they're published.
+**Each month** we'll read all the works published on Qwyre and award $50 to the winning short-story collaborators in the ratio which they agreed in their contract. For as long as we can afford it, we'll top up the fund to ensure we can keep offering this award. If you want to support us, please [donate to the fund](/support-us) (you'll see a 'tip jar' at the bottom of the page).
+
+---
+
+Most fiction competitions end there, with the prize. But Qwyre can offer everyone &mdash; including those who aren't amongst the award-winners &mdash; the opportunity to earn direct from readers from the moment they're published.
 
 Qwyre supports streaming micropayments though a new web standard called [_web monetization_](https://webmonetization.org/). Readers pay a subscription which allows them to make per-second payments as they read here. Your work earns about 36 cents per hour, or 0.6 cents per minute.
 
@@ -66,21 +69,21 @@ Here's the workflow in greater detail:
 
 ### 1. Start at your new creator's workshop
 
-![Creator's workshop page](https://community.webmonetization.org/remoteimages/uploads/articles/9smriq708uutnjn9tikt.jpg)
+![Creator's workshop page](/content/workshop.jpg)
 
-Here you'll find links to the [_docx_ convertor](/convert/description), as well as panels to [review your works in progress](/workshop), and [offers for editors](/offers).
+Here you'll find links to the [_docx_ convertor](/write/describe), as well as panels to [review your works in progress](/workshop), and [offers for editors](/offers).
 
 ### 2. Convert your Word document _docx_ to an _epub_
 
-This is [a three step process](/convert/description) where you'll describe your work (title, author, publishing date, keywords, that sort of thing ...), upload the document and cover, and then build the standards-compliant epub. This allows Qwyre to stream your work to readers.
+This is [a three step process](/write/describe) where you'll describe your work (title, author, publishing date, keywords, that sort of thing ...), upload the document and cover, and then build the standards-compliant epub. This allows Qwyre to stream your work to readers.
 
-![Describe your work so we know what it is](https://community.webmonetization.org/remoteimages/uploads/articles/qe6cxlros1l8mluoqtvj.jpg)
+![Describe your work so we know what it is](/content/conversion-describe.jpg)
 
 ### 3. Import your _epub_
 
 You can do this either during the _docx_ conversion process or, if you've produced your _epub_ in some other way, direct into the platform:
 
-![Import an epub, either from a link or a local file](https://community.webmonetization.org/remoteimages/uploads/articles/y49pjci9b3lmot746kie.jpg)
+![Import an epub, either from a link or a local file](/content/conversion-import.jpg)
 
 This is intended to be as easy as possible. If you've got an external link or a local file, either can be imported.
 
@@ -90,7 +93,7 @@ This is intended to be as easy as possible. If you've got an external link or a 
 
 Check that metadata (your descriptions and keywords), the contents and sample text are presented as expected:
 
-![Review panel drawn direct from the epub](https://community.webmonetization.org/remoteimages/uploads/articles/00n85tuu8xgkmhc4zg9r.jpg)
+![Review panel drawn direct from the epub](/content/conversion-review.jpg)
 
 The metadata and text are derived entirely from the _epub_ you uploaded. If anything is incorrect it may be because of non-conformance to the epub standard, or because the text is wrong in the source. Correct that, upload a new epub, and ensure you're happy.
 
@@ -98,7 +101,7 @@ The metadata and text are derived entirely from the _epub_ you uploaded. If anyt
 
 Decide on what you want to offer as your revenue share between yourself and prospective editors. This is what will be shared between the author and editor during monetization. Remember that Amazon and agents often take 30%.
 
-![Attempting to claim ownership of 'The Magician' by W. Somerset Maugham](https://community.webmonetization.org/remoteimages/uploads/articles/2yfq8vwoyshg7e9wdnnf.jpg)
+![Prepare your offer for prospective editors.](/content/work-offer.jpg)
 
 **Anyone can be an editor** and I encourage writers to offer to edit other writers work. Not only does this help you improve as a writer, but you also have the opportunity to share in the revenue of a greater diversity of work. **Editors are paid too!**
 

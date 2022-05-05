@@ -55,12 +55,24 @@ async def create_work(*, db: Session = Depends(deps.get_db), websocket: WebSocke
         response["data"]["work"] = build_task.get()
         if response["data"]["work"] == "Build failed":
             response = {"state": "error", "error": "Build failed"}
-        await websocket.send_json(response)
+        # If saving for submission, build and get work identifier
         if creator and data.get("save") and response.get("data"):
+            # Get the work ID if exists
+            work_id = None
+            if "workID" in data:
+                work_id = data.pop("workID")
             # Save the work to the db
             data["work"] = response["data"]["work"]
             data["metadata"]["uid"] = data["metadata"].pop("identifier")
-            build_task = celery_app.send_task("app.worker.create_or_update_work", args=[data, creator.identifier])
+            build_task = celery_app.send_task(
+                "app.worker.create_or_update_work", args=[data, creator.identifier, work_id]
+            )
+            while build_task.state == "PENDING":
+                await asyncio.sleep(1)
+                await websocket.send_json({"state": "waiting", "data": {"identifier": identifier}})
+            work_obj = crud.work.get(id=build_task.get(), get_raw=True)
+            response["data"]["workIdentifier"] = str(UUID(work_obj.metadata.single().identifier))
+        await websocket.send_json(response)
         break
     if error_response:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)

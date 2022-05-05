@@ -1,68 +1,41 @@
 <template>
-  <!-- https://tailwindcomponents.com/component/steps-bar -->
-  <div v-show="currentStep" class="relative w-3/4 mx-auto py-10 pt-28">
-    <div class="flex">
-      <div v-for="step in steps" :key="`step-${step.key}`" class="w-1/4">
-        <div class="relative mb-2">
-          <div
-            v-show="step.key != 'description'"
-            class="
-              absolute
-              flex
-              align-center
-              items-center
-              align-middle
-              content-center
-            "
-            style="
-              width: calc(100% - 2.5rem - 1rem);
-              top: 50%;
-              transform: translate(-50%, -50%);
-            "
-          >
-            <div
-              class="
-                w-full
-                bg-ochre-100 bg-opacity-70
-                rounded
-                items-center
-                align-middle align-center
-                flex-1
-              "
-            >
-              <div
-                :class="`${step.linewidth} bg-malachite-200 py-1 rounded`"
-              ></div>
-            </div>
-          </div>
-          <div
-            :class="`w-10 h-10 mx-auto ${step.color} rounded-full text-lg text-ochre-50 flex items-center`"
-          >
-            <span class="text-center text-ochre-50 w-full">
-              <SvgIcon
-                terms="w-6 h-6 mx-auto my-auto"
-                :icon="svgIcons[step.key]"
-              />
-            </span>
-          </div>
-        </div>
-        <div
-          v-if="liveSteps[step.key]"
-          class="text-xs font-sans text-center md:text-sm"
+  <nav
+    v-show="currentStep"
+    class="flex items-center justify-center py-10 pt-28"
+    aria-label="Publishing process"
+  >
+    <p class="text-ochre-600 text-sm font-medium">{{ currentDescription }}</p>
+    <ol role="list" class="ml-8 flex items-center space-x-5">
+      <li v-for="step in steps" :key="`step-${step.key}`">
+        <NuxtLink
+          tag="button"
+          :to="step.to"
+          :class="`${
+            currentStep === step.key
+              ? 'relative flex items-center justify-center'
+              : step.complete
+              ? 'block w-2.5 h-2.5 rounded-full bg-malachite-200 hover:bg-malachite-400'
+              : 'block w-2.5 h-2.5 rounded-full bg-ochre-50 hover:bg-ochre-200'
+          }`"
+          :disabled="!step.complete"
         >
-          <NuxtLink
-            :to="`${
-              step.key === 'conversion' ? '/convert' : `/convert/${step.key}`
-            }`"
-            >{{ step.value }}</NuxtLink
+          <span
+            v-if="currentStep === step.key"
+            class="absolute w-5 h-5 p-px flex"
+            aria-hidden="true"
           >
-        </div>
-        <div v-else class="text-xs font-sans text-center md:text-sm">
-          {{ step.value }}
-        </div>
-      </div>
-    </div>
-  </div>
+            <span class="w-full h-full rounded-full bg-malachite-100"></span>
+          </span>
+          <span
+            v-if="currentStep === step.key"
+            class="relative block w-2.5 h-2.5 bg-malachite-400 rounded-full"
+            aria-hidden="true"
+          ></span>
+          <span class="sr-only">Step {{ step.step }}: {{ step.value }}</span>
+        </NuxtLink>
+      </li>
+    </ol>
+  </nav>
 </template>
 
 <script lang="ts">
@@ -74,27 +47,38 @@ import { IConversion } from "@/interfaces"
 export default class ConversionSteps extends Vue {
   @Getter("conversions/conversionKey") conversionKey
   @Getter("conversions/currentStep") currentStep
+  public currentDescription: string = "Step 1 of 4: Describe your work"
 
-  public steps: { [key: string]: string }[] = [
-    { key: "description", value: "Describe" },
-    { key: "upload", value: "Upload" },
-    { key: "dedication", value: "Dedicate" },
-    { key: "conversion", value: "Convert" },
+  public steps: { [key: string]: string | boolean }[] = [
+    {
+      key: "describe",
+      value: "Describe your work",
+      step: "1",
+      to: "/write/describe",
+      complete: false,
+    },
+    {
+      key: "attribute",
+      value: "Attribute artist & contributors",
+      step: "2",
+      to: "/write/attribute",
+      complete: false,
+    },
+    {
+      key: "convert",
+      value: "Build your epub",
+      step: "3",
+      to: "/write/convert",
+      complete: false,
+    },
+    {
+      key: "submit",
+      value: "Submit your work for editing",
+      step: "4",
+      to: "/write/convert",
+      complete: false,
+    },
   ]
-
-  public svgIcons: { [key: string]: string } = {
-    description: "svgAnnotation",
-    upload: "svgUpload",
-    dedication: "svgFire",
-    conversion: "svgCog",
-  }
-
-  public liveSteps: { [key: string]: boolean } = {
-    description: false,
-    upload: false,
-    dedication: false,
-    conversion: false,
-  }
 
   @Watch("currentStep")
   public async setSteps() {
@@ -106,20 +90,15 @@ export default class ConversionSteps extends Vue {
         "conversion",
         this.conversionKey
       )) as IConversion
-      this.liveSteps = { ...conversion.conversionState }
+      this.steps.forEach((element) => {
+        // element is current page ? blue : element is complete ? green : ochre
+        element.complete = conversion.conversionState.includes(
+          element.key as string
+        )
+        if (element.key === this.currentStep)
+          this.currentDescription = `Step ${element.step} of ${this.steps.length}: ${element.value}`
+      })
     }
-    this.liveSteps[this.currentStep] = true
-    this.steps.forEach((element) => {
-      // element is current page ? blue : element is complete ? green : ochre
-      element.color =
-        element.key === this.currentStep
-          ? "bg-woad-200"
-          : this.liveSteps[element.key]
-          ? "bg-malachite-200"
-          : "bg-ochre-200 bg-opacity-70"
-      // element is complete ? full : element is current page ? 2/5 : 0
-      element.linewidth = this.liveSteps[element.key] ? "w-full" : "w-0"
-    })
   }
 
   created() {

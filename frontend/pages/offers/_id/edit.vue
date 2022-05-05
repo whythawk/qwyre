@@ -1,5 +1,5 @@
 <template>
-  <div class="container min-h-screen mx-auto flex flex-col">
+  <div v-if="ready" class="container min-h-screen mx-auto flex flex-col">
     <TitleBar title="Edit Offer" />
     <div class="max-w-2xl mx-auto flex justify-between p-3 space-x-3">
       <div class="flex-1 line-clamp-5">
@@ -12,25 +12,6 @@
         <p class="mt-1 text-gray-500 text-sm line-clamp-5">
           {{ workEdit.metadata.description }}
         </p>
-        <NuxtLink
-          :to="`/workshop/${workEdit.metadata.identifier}`"
-          class="
-            relative
-            flex-1
-            inline-flex
-            items-center
-            justify-center
-            pt-4
-            text-sm text-gray-700
-            font-medium
-            border border-transparent
-            rounded-br-lg
-            hover:text-gray-500
-          "
-        >
-          <SvgIcon terms="w-5 h-5 text-gray-400" icon="svgPencilAlt" />
-          <span class="ml-3">Return to review</span>
-        </NuxtLink>
       </div>
       <SourcesCoverImage :src="cover.data" />
     </div>
@@ -116,7 +97,12 @@
           </div>
         </div>
         <!-- Call to action -->
-        <div class="mt-8 max-w-2xl mx-auto flex justify-center">
+        <div class="mt-8 max-w-2xl mx-auto flex space-x-4 justify-center">
+          <NuxtLink
+            :to="`/workshop/${workEdit.metadata.identifier}`"
+            class="btn-sinopia-extended flex items-center"
+            >Cancel
+          </NuxtLink>
           <button
             type="submit"
             class="btn-woad-extended flex items-center"
@@ -128,25 +114,70 @@
         </div>
       </form>
     </div>
-    <div v-else>
-      <p>
-        Before you can offer your work, you'll need to complete a few tasks:
-      </p>
-      <p v-if="!userProfile.email_validated">
-        Validate your email, or - if you prefer to use a different email address
-        - update your profile.
-      </p>
-      <CreatorValidateEmailButton />
-      <p v-if="creatorProfile.isPrivate">
-        You are welcome to remain anonymous, but you'll need to publish your
-        profile before others can see your offers.
-      </p>
+
+    <div
+      v-else
+      class="card card-compact rounded-md bg-base-100 shadow-sm lg:mx-10 mt-4"
+    >
+      <div class="card-body">
+        <p>
+          Before you can offer your work, you'll need to complete a few tasks:
+        </p>
+        <div v-if="!userProfile.email_validated" class="flex items-start">
+          <div class="flex-shrink-0">
+            <SvgIcon terms="h-6 w-6 text-ochre-600" icon="svgAtSymbol" />
+          </div>
+          <div class="ml-3 w-0 flex-1 pt-0.5">
+            <p class="mb-2">
+              Validate your email, or - if you prefer to use a different email
+              address - update your profile.
+            </p>
+            <CreatorValidateEmailButton />
+          </div>
+        </div>
+        <div
+          v-if="creatorProfile.isPrivate || !creatorProfile.wallet"
+          class="flex items-start"
+        >
+          <div class="flex-shrink-0">
+            <SvgIcon terms="h-6 w-6 text-ochre-600" icon="svgUser" />
+          </div>
+          <div class="ml-3 w-0 flex-1 pt-0.5">
+            <p v-if="creatorProfile.isPrivate" class="mb-2">
+              You are welcome to remain anonymous, but you will need to publish
+              your profile before others can see your offers.
+            </p>
+            <p v-if="!creatorProfile.wallet" class="mb-2">
+              Add your wallet payment pointer to your profile so you can be
+              paid.
+            </p>
+            <div class="flex">
+              <NuxtLink
+                to="/creator/edit"
+                class="btn-woad-extended-sm items-center h-8"
+              >
+                <SvgIcon
+                  terms="w-5 h-4 inline-block mr-1 mt-1"
+                  icon="svgUser"
+                />
+                <span>Edit profile</span>
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Action, Getter, Vue } from "nuxt-property-decorator"
+import {
+  Component,
+  Action,
+  Getter,
+  Mutation,
+  Vue,
+} from "nuxt-property-decorator"
 import { api } from "@/api"
 import {
   IContractCreate,
@@ -170,6 +201,8 @@ export default class EditOffer extends Vue {
   @Getter("main/creatorProfile") creatorProfile
   @Getter("main/userProfile") userProfile
   @Getter("main/canMakeCreativeOffers") canMakeCreativeOffers
+  @Mutation("main/addNotification") addNotification
+  public ready: boolean = false
   public toUpdate: boolean = false
   public cover: IDataSource = {} as IDataSource
   public creatorProportion: string = "95"
@@ -298,6 +331,10 @@ export default class EditOffer extends Vue {
           contractID: (this.contractUpdate as IContractUpdate).identifier,
         }
         this.updateWorkContract(payload)
+        this.addNotification({
+          content: "Successfully updated your contract.",
+          color: "success",
+        })
       } else {
         payload = {
           data: this.contractUpdate,
@@ -305,6 +342,16 @@ export default class EditOffer extends Vue {
         }
         this.createWorkContract(payload)
       }
+      this.$router.push(`/workshop/${this.workEdit.metadata.identifier}`)
+    } else {
+      this.addNotification({
+        content: "Please prepare a valid contract.",
+        color: "error",
+      })
+      this.addNotification({
+        content: "Successfully created your contract.",
+        color: "success",
+      })
     }
   }
 
@@ -317,6 +364,7 @@ export default class EditOffer extends Vue {
     if (this.workEdit && this.workEdit.identifier)
       this.cover = await this.getCoverImage(this.workEdit.identifier)
     this.reset()
+    this.ready = true
   }
 
   async asyncData({ store, redirect }) {

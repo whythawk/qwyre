@@ -32,16 +32,7 @@
             <span
               v-for="subject in work.metadata.subject"
               :key="`subject-${work.identifier}-${subject.identifier}`"
-              class="
-                flex-shrink-0
-                inline-block
-                px-2
-                py-0.5
-                text-woad-800 text-xs
-                font-medium
-                bg-woad-100
-                rounded-full
-              "
+              class="flex-shrink-0 inline-block px-2 py-0.5 text-woad-800 text-xs font-medium bg-woad-100 rounded-full"
               >{{ subject.term }}</span
             >
           </td>

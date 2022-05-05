@@ -1,6 +1,28 @@
 <template>
   <div class="container min-h-screen mx-auto flex flex-col">
     <TitleBar title="Edit" />
+    <div
+      v-if="!canMakeCreativeOffers"
+      class="card card-compact rounded-md bg-base-100 shadow-sm lg:mx-10 mb-4"
+    >
+      <div class="card-body">
+        <p>
+          Before you can offer your work, or edit the work of others, you'll
+          need to ensure your profile is public, that you've verified your email
+          address, and that you have a payout wallet saved.
+        </p>
+        <nuxt-link
+          class="flex flex-row text-woad-500 hover:text-woad-800 text-sm"
+          to="/get-paid"
+        >
+          <SvgIcon
+            terms="h-5 w-5 inline-flex mr-1"
+            icon="svgInformationCircle"
+          />
+          <p class="text-sm">Read the Guide to getting paid to learn more.</p>
+        </nuxt-link>
+      </div>
+    </div>
     <div class="container max-w-2xl mx-auto">
       <div class="flex items-start">
         <!-- Enabled: "bg-woad-600", Not Enabled: "bg-gray-200" -->
@@ -153,6 +175,7 @@ import { ICreatorSummary } from "@/interfaces"
   middleware: "authenticated",
 })
 export default class CreatorEditProfile extends Vue {
+  @Getter("main/canMakeCreativeOffers") canMakeCreativeOffers
   @Action("main/updateCreatorProfile") updateCreatorProfile
   @Action("main/toggleCreatorPrivacy") toggleCreatorPrivacy
   @Getter("main/creatorProfile") creatorProfile

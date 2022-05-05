@@ -53,16 +53,7 @@
                 <button
                   id="menu-button"
                   type="button"
-                  class="
-                    group
-                    inline-flex
-                    justify-center
-                    text-sm
-                    font-medium
-                    focus:outline-none
-                    text-ochre-600
-                    hover:text-ochre-800
-                  "
+                  class="group inline-flex justify-center text-sm font-medium focus:outline-none text-ochre-600 hover:text-ochre-800"
                   aria-expanded="false"
                   aria-haspopup="true"
                   @click="isFilterOpen = !isFilterOpen"
@@ -84,18 +75,7 @@
               >
                 <div
                   v-show="isFilterOpen"
-                  class="
-                    origin-top-right
-                    absolute
-                    right-0
-                    mt-2
-                    w-40
-                    rounded-md
-                    shadow-2xl
-                    bg-white
-                    ring-1 ring-black ring-opacity-5
-                    focus:outline-none
-                  "
+                  class="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="menu-button"
@@ -152,31 +132,12 @@
       <nav
         v-show="totalPages > 1"
         aria-label="Pagination"
-        class="
-          max-w-7xl
-          mx-auto
-          px-4
-          mt-6
-          flex
-          justify-between
-          text-sm
-          font-medium
-          text-gray-700
-          sm:px-6
-          lg:px-8
-        "
+        class="max-w-7xl mx-auto px-4 mt-6 flex justify-between text-sm font-medium text-gray-700 sm:px-6 lg:px-8"
       >
         <div class="min-w-0 flex-1">
           <a
             disabled="currentPage < 1"
-            class="
-              inline-flex
-              items-center
-              px-4
-              h-10
-              cursor-pointer
-              btn-ochre-extended-sm
-            "
+            class="inline-flex items-center px-4 h-10 cursor-pointer btn-ochre-extended-sm"
             @click="currentPage > 1 ? (currentPage -= 1) : (currentPage = 1)"
           >
             Previous
@@ -203,14 +164,7 @@
         <div class="min-w-0 flex-1 flex justify-end">
           <a
             disabled="currentPage === totalPages"
-            class="
-              inline-flex
-              items-center
-              px-4
-              h-10
-              cursor-pointer
-              btn-ochre-extended-sm
-            "
+            class="inline-flex items-center px-4 h-10 cursor-pointer btn-ochre-extended-sm"
             @click="
               currentPage < totalPages
                 ? (currentPage += 1)

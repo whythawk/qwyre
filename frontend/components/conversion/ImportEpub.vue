@@ -1,5 +1,15 @@
 <template>
   <div class="container min-h-screen mx-auto flex flex-col">
+    <div class="mt-8 max-w-2xl mx-auto">
+      <button
+        type="submit"
+        class="btn-malachite-extended"
+        @click.prevent="update"
+      >
+        <SvgIcon terms="w-5 h-4 inline-block mr-1" icon="svgBookOpen" />
+        <span>Update work</span>
+      </button>
+    </div>
     <!-- Import via URL -->
     <form @submit.prevent="submit">
       <div class="mt-8 max-w-2xl mx-auto">
@@ -27,24 +37,11 @@
     <div class="flex flex-col md:flex-row mx-auto mt-1">
       <div
         ref="import-work"
-        class="
-          grid grid-rows-6 grid-cols-0
-          gap-1
-          bg-malachite-100
-          rounded-lg
-          max-h-full
-          w-60
-          h-80
-        "
+        class="grid grid-rows-6 grid-cols-0 gap-1 bg-malachite-100 rounded-lg max-h-full w-60 h-80"
       >
         <img
           v-show="blob && Object.keys(blob).length"
-          class="
-            object-cover object-center
-            rounded-lg
-            min-h-full min-w-full
-            animate-fade-in
-          "
+          class="object-cover object-center rounded-lg min-h-full min-w-full animate-fade-in"
           src="/never-talk-to-strangers.jpg"
           alt=""
         />
@@ -96,7 +93,9 @@ import { ISocketResponse } from "@/interfaces"
 @Component
 export default class ConversionImportEpub extends mixins(importWorkData) {
   @Prop(String) readonly workId!: string
+  @Prop(String) readonly workUid!: string
   @Ref("import-work") readonly openWork!: HTMLButtonElement
+  @Mutation("conversions/setConversionKey") setConversionKey
   @Mutation("main/addNotification") addNotification
   @Mutation("main/removeNotification") removeNotification
   @Mutation("main/setChangeWatcher") setChangeWatcher
@@ -105,6 +104,18 @@ export default class ConversionImportEpub extends mixins(importWorkData) {
   public blob: File = {} as File
   public wsp: WebSocketAsPromised = {} as WebSocketAsPromised
   public hasSocket: boolean = false
+
+  public async update() {
+    let checkKey = 0
+    checkKey = await idb.hasKey("conversion", this.workUid)
+    if (checkKey === 1) this.setConversionKey(this.workUid)
+    this.$router.push({
+      path: "/write/describe",
+      query: {
+        work: this.workId,
+      },
+    })
+  }
 
   public reset() {
     this.workURL = ""

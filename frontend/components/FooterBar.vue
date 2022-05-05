@@ -7,13 +7,7 @@
           <div class="md:grid md:grid-cols-2 md:gap-8">
             <div>
               <h3
-                class="
-                  text-sm
-                  font-semibold
-                  text-ochre-400
-                  tracking-wider
-                  uppercase
-                "
+                class="text-sm font-semibold text-ochre-400 tracking-wider uppercase"
               >
                 Qwyre.com
               </h3>
@@ -34,15 +28,9 @@
             </div>
             <div class="mt-12 md:mt-0">
               <h3
-                class="
-                  text-sm
-                  font-semibold
-                  text-ochre-400
-                  tracking-wider
-                  uppercase
-                "
+                class="text-sm font-semibold text-ochre-400 tracking-wider uppercase"
               >
-                Sitemap
+                Guides
               </h3>
               <ul
                 v-for="(nav, i) in navigationConversion"
@@ -63,13 +51,7 @@
           <div class="md:grid md:grid-cols-2 md:gap-8">
             <div>
               <h3
-                class="
-                  text-sm
-                  font-semibold
-                  text-ochre-400
-                  tracking-wider
-                  uppercase
-                "
+                class="text-sm font-semibold text-ochre-400 tracking-wider uppercase"
               >
                 Roadmap
               </h3>
@@ -92,13 +74,7 @@
         </div>
         <div class="mt-12 xl:mt-0">
           <h3
-            class="
-              text-sm
-              font-semibold
-              text-ochre-400
-              tracking-wider
-              uppercase
-            "
+            class="text-sm font-semibold text-ochre-400 tracking-wider uppercase"
           >
             Language
           </h3>
@@ -108,24 +84,7 @@
               <div class="relative">
                 <select
                   v-model="$i18n.locale"
-                  class="
-                    appearance-none
-                    block
-                    w-full
-                    bg-none
-                    py-2
-                    pl-3
-                    pr-10
-                    text-xs
-                    font-sans
-                    rounded-md
-                    border border-woad-600
-                    shadow-sm
-                    border-none
-                    focus:outline-none
-                    focus:border-woad-300
-                    focus:ring-transparent
-                  "
+                  class="appearance-none block w-full bg-none py-2 pl-3 pr-10 text-xs font-sans rounded-md border border-woad-600 shadow-sm border-none focus:outline-none focus:border-woad-300 focus:ring-transparent"
                 >
                   <option
                     v-for="lang in $i18n.locales"
@@ -137,15 +96,7 @@
                 </select>
 
                 <div
-                  class="
-                    pointer-events-none
-                    absolute
-                    inset-y-0
-                    right-0
-                    px-2
-                    flex
-                    items-center
-                  "
+                  class="pointer-events-none absolute inset-y-0 right-0 px-2 flex items-center"
                 >
                   <SvgIcon
                     terms="h-4 w-4 inline-flex text-woad-700"
@@ -158,12 +109,7 @@
         </div>
       </div>
       <div
-        class="
-          mt-8
-          border-t border-ochre-100
-          pt-8
-          md:flex md:items-center md:justify-between
-        "
+        class="mt-8 border-t border-ochre-100 pt-8 md:flex md:items-center md:justify-between"
       >
         <div class="flex space-x-6 md:order-2">
           <a
@@ -231,12 +177,12 @@ export default class FooterBar extends Vue {
   public navigationConversion = [
     { i18n: "guide", to: "/get-started" },
     { i18n: "streaming", to: "/get-streaming" },
-    { i18n: "workshop", to: "/workshop" },
-    { i18n: "library", to: "/library" },
+    { i18n: "earning", to: "/get-paid" },
+    { i18n: "code", to: "/creators-code" },
   ]
 
   public navigationRoadmap = [
-	{ i18n: "short-story", to: "/short-story-contest" },
+    { i18n: "short-story", to: "/creators-fund" },
     { i18n: "roadmap", to: "/roadmap" },
     { i18n: "footer-feedback", to: "/contact-us" },
   ]

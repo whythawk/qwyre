@@ -1,32 +1,10 @@
 <template>
   <div class="flex flex-col">
     <div
-      class="
-        container
-        relative
-        max-w-full
-        md:max-w-2xl
-        mx-auto
-        py-8
-        lg:py-16
-        text-center
-        bg-ochre-900
-        md:bg-opacity-0
-        z-0
-      "
+      class="container relative max-w-full md:max-w-2xl mx-auto py-8 lg:py-16 text-center bg-ochre-900 md:bg-opacity-0 z-0"
     >
       <div
-        class="
-          mx-auto
-          mt-12
-          py-8
-          px-6
-          sm:py-12
-          lg:px-0
-          flex flex-col
-          items-center
-          text-center
-        "
+        class="mx-auto mt-12 py-8 px-6 sm:py-12 lg:px-0 flex flex-col items-center text-center"
       >
         <span class="mb-4 text-xl text-ochre-10">
           <SvgIcon terms="h-20 w-20" icon="qwyreLogo" />
@@ -303,9 +281,19 @@ export default class AuthoriseUserWebMonetization extends Vue {
         if (this.coilSub) this.showAuthenticating = false
       }
       if (!this.coilSub) {
-        const lastPage: string = this.$nuxt.context.from
+        let lastPage: string = this.$nuxt.context.from
           ? this.$nuxt.context.from.path
           : "/"
+        if (
+          this.$route.query &&
+          Object.keys(this.$route.query).length !== 0 &&
+          this.$route.query.constructor === Object
+        ) {
+          const query = Object.keys(this.$route.query)
+            .map((key) => key + "=" + this.$route.query[key])
+            .join("&")
+          lastPage = `${lastPage}?${query}`
+        }
         await this.storeCoilResourceState({ coilRoute: lastPage })
         this.coilRequestURI = coil.getUserResource(this.coilState)
       }

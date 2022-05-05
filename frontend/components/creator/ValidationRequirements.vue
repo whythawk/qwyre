@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="mt-1 text-gray-500 text-sm font-semibold italic">
+    <p class="text-gray-500 text-sm font-semibold italic">
       Before you can make offers:
     </p>
     <div v-if="!userProfile.email_validated">
@@ -15,10 +15,13 @@
         <CreatorValidateEmailButton />
       </div>
     </div>
-    <div v-if="creatorProfile.isPrivate">
-      <p class="mt-1 text-gray-500 text-sm">
+    <div v-if="creatorProfile.isPrivate || !creatorProfile.wallet">
+      <p v-if="creatorProfile.isPrivate" class="mt-1 text-gray-500 text-sm">
         You are welcome to remain anonymous, but you'll need to make your
         profile public.
+      </p>
+      <p v-if="!creatorProfile.wallet" class="mt-1 text-gray-500 text-sm">
+        Add your wallet payment pointer to your profile so you can be paid.
       </p>
       <div class="flex mx-auto justify-center my-2">
         <NuxtLink
@@ -26,7 +29,7 @@
           class="btn-woad-extended-sm flex items-center h-8"
         >
           <SvgIcon terms="w-5 h-4 inline-block mr-1 mb-1" icon="svgPencilAlt" />
-          <span class="text-sm">Set profile public</span>
+          <span class="text-sm">Update profile</span>
         </NuxtLink>
       </div>
     </div>

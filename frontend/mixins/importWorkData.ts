@@ -44,10 +44,10 @@ export default class ImportWorkData extends Vue {
         extensions: [".epub"],
       })
     } catch (e) {
-      this.addNotification({
-        content: "Please import a valid epub.",
-        color: "error",
-      })
+      // this.addNotification({
+      //   content: "Please import a valid epub.",
+      //   color: "error",
+      // })
     }
   }
 

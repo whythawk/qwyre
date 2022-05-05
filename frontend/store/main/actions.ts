@@ -177,6 +177,7 @@ export default {
     //   token = (this as any).$cookies.get("token")
     // }
     if (token) {
+      await commit("setLoggedIn", true)
       const hasExpired = tokenExpired(token)
       if (hasExpired) {
         dispatch("refreshTokens")
@@ -190,10 +191,6 @@ export default {
           await dispatch("checkApiError", error)
         }
       }
-    } else {
-      try {
-        await dispatch("logOut")
-      } catch {}
     }
   },
   async logOut({ commit }) {

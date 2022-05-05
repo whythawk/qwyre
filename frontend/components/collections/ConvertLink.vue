@@ -2,11 +2,11 @@
   <div>
     <button
       type="submit"
-      class="btn-woad-extended-sm flex items-center h-8"
+      class="btn-sinopia-extended flex items-center"
       @click.prevent="submit"
     >
-      <SvgIcon terms="w-5 h-4 inline-block mr-1 mb-1" icon="svgDocumentText" />
-      <span class="text-sm">Convert .docx</span>
+      <SvgIcon terms="w-5 h-4 inline-block mr-1 mb-1" icon="svgBookOpen" />
+      <span class="text-sm">Publish</span>
     </button>
   </div>
 </template>
@@ -20,7 +20,7 @@ export default class CollectionsConvertLink extends Vue {
 
   submit() {
     this.setConversionKey(null)
-    this.$router.push("/convert/description")
+    this.$router.push("/write/describe")
   }
 }
 </script>

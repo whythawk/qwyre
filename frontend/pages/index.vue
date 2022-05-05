@@ -1,63 +1,25 @@
 <template>
   <div class="flex flex-col">
     <div
-      class="
-        container
-        relative
-        max-w-full
-        md:max-w-2xl
-        mx-auto
-        pt-28
-        pb-12
-        md:pt-32 md:pb-16
-        text-center
-        break-normal
-        bg-ochre-900
-        md:bg-opacity-0
-        z-0
-      "
+      class="container relative max-w-full md:max-w-2xl mx-auto pt-28 pb-12 md:pt-32 md:pb-16 text-center break-normal bg-ochre-900 md:bg-opacity-0 z-0"
     >
       <!-- Quotation -->
       <blockquote>
         <p
-          class="
-            mt-2
-            text-center
-            italic
-            text-ochre-10 text-base
-            sm:text-lg
-            md:text-xl
-          "
+          class="mt-2 text-center italic text-ochre-10 text-base sm:text-lg md:text-xl"
         >
           Writing is easy. You simply sit down at the typewriter, <br />open
           your veins, and bleed.
         </p>
         <p
-          class="
-            text-right
-            mt-2
-            mr-10
-            text-xs
-            sm:text-sm
-            md:text-base
-            sm:mt-5
-            md:mt-5
-          "
+          class="text-right mt-2 mr-10 text-xs sm:text-sm md:text-base sm:mt-5 md:mt-5"
         >
           <cite class="text-malachite-100">Paul Gallico &amp; Red Smith</cite>
         </p>
       </blockquote>
       <!-- Header block -->
       <h1
-        class="
-          mt-8
-          sm:mt-12
-          text-3xl
-          sm:text-4xl
-          md:text-5xl
-          font-extrabold
-          text-ochre-10
-        "
+        class="mt-8 sm:mt-12 text-3xl sm:text-4xl md:text-5xl font-extrabold text-ochre-10"
       >
         <span class="inline">Join the</span>
         <span class="inline tracking-wide text-woad-500">Qwyre ...</span>
@@ -90,26 +52,14 @@
             >
               <!-- Slogan -->
               <p
-                class="
-                  mt-4
-                  text-lg text-center
-                  sm:text-xl
-                  md:text-3xl
-                  text-ochre-800
-                "
+                class="mt-4 text-lg text-center sm:text-xl md:text-3xl text-ochre-800"
               >
                 A simple ebook
                 <span class="text-malachite-500">reader</span> &amp;
                 <span class="text-malachite-500">collaborative publisher</span>
               </p>
               <p
-                class="
-                  mt-4
-                  text-md text-center
-                  sm:text-lg
-                  md:text-xl
-                  text-ochre-700
-                "
+                class="mt-4 text-md text-center sm:text-lg md:text-xl text-ochre-700"
               >
                 <span class="font-semibold">Go on ...</span> click this link and
                 <span class="font-semibold">see what happens.</span>
@@ -141,13 +91,7 @@
               >
                 <span>Library</span>
                 <span
-                  class="
-                    inline-flex
-                    text-right
-                    mr-4
-                    text-woad-500
-                    hover:text-woad-300
-                  "
+                  class="inline-flex text-right mr-4 text-woad-500 hover:text-woad-300"
                 >
                   <NuxtLink to="/library">... all</NuxtLink>
                   <SvgIcon
@@ -165,6 +109,68 @@
         <!--/Lead Card-->
       </div>
     </div>
+    <!-- Creators -->
+    <section class="container relative mx-auto max-w-7xl mt-12">
+      <div
+        class="bg-ochre-10 rounded bg-opacity-90 overflow-hidden md:shadow-lg mx-0 md:mx-6"
+      >
+        <div
+          class="mx-auto grid grid-cols-2 sm:gap-y-16 lg:gap-x-8 my-8 max-w-2xl"
+        >
+          <div
+            class="text-center md:flex md:items-start md:text-left lg:block lg:text-center"
+          >
+            <div class="md:flex-shrink-0">
+              <div class="flow-root">
+                <NuxtLink to="/creators-fund" class="btn-woad-lg flex mx-auto">
+                  <SvgIcon
+                    terms="w-8 h-8 inline-flex self-center mx-auto"
+                    icon="svgCash"
+                  />
+                </NuxtLink>
+              </div>
+            </div>
+            <div class="mt-6 md:mt-0 md:ml-4 lg:mt-6 lg:ml-0">
+              <h3
+                class="text-sm font-semibold tracking-wide uppercase text-gray-900"
+              >
+                Creator's fund
+              </h3>
+              <p class="mt-3 text-sm text-gray-500">
+                $50 to the best short stories every month.
+              </p>
+            </div>
+          </div>
+          <div
+            class="text-center md:flex md:items-start md:text-left lg:block lg:text-center"
+          >
+            <div class="md:flex-shrink-0">
+              <div class="flow-root">
+                <NuxtLink
+                  to="/write/describe"
+                  class="btn-sinopia-lg flex mx-auto"
+                >
+                  <SvgIcon
+                    terms="w-8 h-8 inline-flex self-center mx-auto"
+                    icon="svgPencilAlt"
+                  />
+                </NuxtLink>
+              </div>
+            </div>
+            <div class="mt-6 md:mt-0 md:ml-4 lg:mt-6 lg:ml-0">
+              <h3
+                class="text-sm font-semibold tracking-wide uppercase text-gray-900"
+              >
+                Publish
+              </h3>
+              <p class="mt-3 text-sm text-gray-500">
+                First things first. Write something.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -178,7 +184,6 @@ import {
 } from "nuxt-property-decorator"
 import { idb } from "@/api"
 import { ILibrary } from "@/interfaces"
-import { generateUUID } from "@/utilities"
 
 @Component({
   layout: "cover",

@@ -5,9 +5,11 @@
         <NavigationDefaultMenu />
       </div>
       <main>
-        <div class="sm:px-6 lg:px-8">
-          <div class="min-h-screen flex">
-            <Nuxt />
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+          <div class="container mx-auto lg:px-40">
+            <div class="min-h-screen flex">
+              <Nuxt />
+            </div>
           </div>
         </div>
       </main>

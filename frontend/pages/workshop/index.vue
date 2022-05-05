@@ -1,18 +1,34 @@
 <template>
   <div class="container min-h-screen mx-auto">
     <TitleBar title="Workshop" />
-    <div class="max-w-screen-md mx-auto">
-      <div class="flex space-x-4 w-full justify-center">
-        <CollectionsConvertLink />
-        <CollectionsImportWork />
-        <CollectionsImportLink />
-        <NuxtLink
-          to="/offers"
-          class="btn-ochre-extended-sm flex items-center h-8"
-        >
-          <SvgIcon terms="w-5 h-4 inline-block mr-1 mb-1" icon="svgSearchDoc" />
-          <span class="text-sm">Review offers</span>
-        </NuxtLink>
+    <div class="card card-compact rounded-md bg-base-100 shadow-sm -mt-5">
+      <div class="card-body">
+        <div class="flex justify-between lg:mx-6">
+          <div>
+            <div class="text-sm mb-2">
+              Convert & submit your work for publication. Collaborate on editing
+              submissions.
+            </div>
+            <div class="mx-auto">
+              <div class="flex space-x-4 w-full justify-center">
+                <CollectionsImportLink />
+                <NuxtLink
+                  to="/offers"
+                  class="btn-woad-extended-sm flex items-center h-8"
+                >
+                  <SvgIcon
+                    terms="w-5 h-4 inline-block mr-1 mb-1"
+                    icon="svgSearchDoc"
+                  />
+                  <span class="text-sm">Submissions</span>
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+          <div class="ml-4 flex-shrink-0 self-center">
+            <CollectionsConvertLink />
+          </div>
+        </div>
       </div>
     </div>
     <div class="border-b border-gray-200">

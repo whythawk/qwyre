@@ -1,12 +1,12 @@
 module.exports = {
-  purge: [
-    "./components/**/*.{vue,js,ts}",
+  content: [
+    "./components/**/*.{js,vue,ts}",
     "./layouts/**/*.vue",
     "./pages/**/*.vue",
     "./plugins/**/*.{js,ts}",
     "./nuxt.config.{js,ts}",
   ],
-  darkMode: false, // or 'media' or 'class'
+  // darkMode: false, // or 'media' or 'class'
   // https://devdojo.com/tnylea/custom-animations-in-tailwindcss
   theme: {
     extend: {
@@ -431,5 +431,35 @@ module.exports = {
     require("@tailwindcss/forms"),
     require("@tailwindcss/aspect-ratio"),
     require("@tailwindcss/line-clamp"),
+    require("daisyui"),
   ],
+  // config
+  daisyui: {
+    themes: [
+      {
+        rovuma: {
+          primary: "#3A5C84",
+          "primary-focus": "#6D8FB7",
+          "primary-content": "#ffffff",
+          secondary: "#5C843A",
+          "secondary-focus": "#8FB76D",
+          "secondary-content": "#ffffff",
+          accent: "#C43900",
+          "accent-focus": "#E88C66",
+          "accent-content": "#ffffff",
+          neutral: "#2a2e37",
+          "neutral-focus": "#8d929a",
+          "neutral-content": "#ffffff",
+          "base-100": "#ffffff",
+          "base-200": "#f9fafb",
+          "base-300": "#d1d5db",
+          "base-content": "#1f2937",
+          info: "#4974a5",
+          success: "#689441",
+          warning: "#ff9990",
+          error: "#da4000",
+        },
+      },
+    ],
+  },
 }

@@ -1,21 +1,12 @@
 <template>
   <div
-    class="
-      relative
-      max-w-3xl
-      mx-auto
-      px-6
-      py-10
-      flex flex-col
-      items-center
-      text-center
-      lg:px-0
-    "
+    class="relative max-w-3xl mx-auto px-6 py-10 flex flex-col items-center text-center lg:px-0"
   >
     <p class="text-xl text-ochre-800">
       <span class="font-semibold">Web Monetization</span> lets you stream
-      micropayments to creators. We would love for you to sign up with
-      <span class="font-semibold">Coil</span>, our payments provider.
+      micropayments to creators. We would love for you to subscribe to
+      <span class="font-semibold">Coil</span>, our payments provider (like
+      PayPal, but for micropayments).
     </p>
     <a class="mt-9" :href="uri"
       ><SvgIcon terms="w-56 h-10" icon="svgCoilWhite"

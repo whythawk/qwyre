@@ -14,7 +14,8 @@ export default {
       "conversion",
       conversionKey
     )) as unknown as IConversion
-    conversion.conversionState[conversionStep] = true
+    if (!conversion.conversionState.includes(conversionStep))
+      conversion.conversionState.push(conversionStep)
     // And can now save the conversion
     await dispatch(
       "collections/storeCollectionPayload",

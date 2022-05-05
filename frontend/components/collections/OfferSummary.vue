@@ -74,31 +74,14 @@
     <div v-if="offer.work" class="my-1 px-1 w-1/3 flex flex-col">
       <!-- Cover -->
       <div
-        class="
-          relative
-          mx-auto
-          my-5
-          w-60
-          h-96
-          filter
-          drop-shadow-lg
-          shadow
-          transition
-          ease-in
-          duration-200
-        "
+        class="relative mx-auto my-5 w-60 h-96 filter drop-shadow-lg shadow transition ease-in duration-200"
       >
         <img
           :src="cover.data"
-          class="
-            object-cover object-center
-            min-h-full min-w-full
-            animate-fade-in
-            rounded-lg
-          "
+          class="object-cover object-center min-h-full min-w-full animate-fade-in rounded-lg"
         />
       </div>
-      <div class="mt-8 flex mx-auto justify-center w-2/3">
+      <div class="mt-4 flex mx-auto justify-center w-2/3">
         <div v-if="canMakeCreativeOffers">
           <CreatorExpressOfferInterestButton :contract-id="offer.identifier" />
         </div>

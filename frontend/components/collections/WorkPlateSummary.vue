@@ -54,13 +54,7 @@
           />
           <p
             v-show="collectionFields.date_created"
-            class="
-              col-span-3
-              text-right text-sm
-              py-1
-              font-medium
-              text-ochre-500
-            "
+            class="col-span-3 text-right text-sm py-1 font-medium text-ochre-500"
           >
             {{ collectionFields.date_created }}
           </p>

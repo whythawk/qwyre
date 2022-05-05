@@ -12,7 +12,12 @@ export default {
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       // { name: "monetization", content: process.env.COIL_PAYMENT_POINTER },
-      { hid: "description", name: "description", content: "" },
+      {
+        hid: "description",
+        name: "description",
+        content:
+          "Qwyre.com is a streaming payments platform for collaborative publishing, a simple ebook converter, and an ereader.",
+      },
       { src: "https://js.stripe.com/v3", async: true },
       // { src: "https://cdn.coil.com/coil-oauth-wm.v7.beta.js", defer: true },
     ],
@@ -72,6 +77,10 @@ export default {
   // styleResources: {
   //   scss: ["@/assets/scss/_variables.scss"],
   // },
+
+  purgeCSS: {
+    // your settings here
+  },
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [

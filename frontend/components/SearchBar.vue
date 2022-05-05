@@ -27,7 +27,7 @@
               class="btn-ochre ml-2 h-10 mt-1"
               @click.prevent="importBook"
             >
-              <SvgIcon terms="w-6 h-6 mx-auto my-auto" icon="svgPlus" />
+              <SvgIcon terms="w-6 h-6 mx-auto my-auto" icon="svgUpload" />
             </button>
           </span>
         </label>
@@ -146,7 +146,7 @@ export default class CollectionsImportLibrary extends mixins(importWorkData) {
 
   public storeBook() {
     try {
-      if (this.blob) {
+      if (this.blob && Object.keys(this.blob).length) {
         this.storeWork(this.blob)
         this.addNotification({
           content: "Successfully imported your epub.",

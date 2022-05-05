@@ -60,5 +60,9 @@ export default class WorkshopEdit extends Vue {
   public async created() {
     await this.initialise()
   }
+
+  async asyncData({ store }): Promise<void> {
+    await store.commit("conversions/setCurrentStep", "review")
+  }
 }
 </script>

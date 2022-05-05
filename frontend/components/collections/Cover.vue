@@ -52,7 +52,7 @@ export default class CollectionCover extends Vue {
   public routerPaths: { [key: string]: string } = {
     stream: "/stream/",
     work: "/read",
-    conversion: "/convert/description",
+    conversion: "/write/describe",
     anthology: "/anthology",
     series: "/series",
   }

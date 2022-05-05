@@ -22,7 +22,7 @@ export interface ISeries {
 }
 
 export interface IConversionState {
-  description: boolean
+  describe: boolean
   upload: boolean
   dedication: boolean
   conversion: boolean
@@ -33,7 +33,7 @@ export interface IConversion {
   date_created: Date
   metadata: IWorkMetadata
   dedication: string
-  conversionState: IConversionState
+  conversionState: string[]
 }
 
 export interface IStream {

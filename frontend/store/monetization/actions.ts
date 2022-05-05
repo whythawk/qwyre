@@ -192,14 +192,14 @@ export default {
       await dispatch("stopStreamMonetization")
     } else {
       await commit("setRequestError", true)
+      await commit(
+        "main/addNotification",
+        {
+          content: "Error authorising web monetization.",
+          color: "error",
+        },
+        { root: true }
+      )
     }
-    await commit(
-      "main/addNotification",
-      {
-        content: "Error authorising web monetization.",
-        color: "error",
-      },
-      { root: true }
-    )
   },
 }

@@ -25,130 +25,128 @@
 }
 
 @layer components {
-  @variants responsive {
-    /* Subject tags */
-    .sbjct-tag {
-      @apply py-2 px-3 shadow-md m-1 no-underline rounded-full bg-woad-500 text-ochre-10 text-sm border-woad-500 hover:text-white hover:bg-woad-50 focus:outline-none animate-fade-in mr-1 ml-1;
-    }
-    /* Form components */
-    .inpt-label {
-      @apply text-ochre-700 font-light;
-    }
-    .inpt-span {
-      @apply inline-flex items-center w-full bg-ochre-100 rounded-full ring-ochre-600 border-ochre-10 border-2 focus:shadow-lg shadow animate-fade-in;
-    }
-    .inpt-icon {
-      @apply w-5 h-5 mr-3 ml-4;
-    }
-    .inpt-text {
-      @apply rounded-r-full w-full px-3 py-2 bg-ochre-50 placeholder-ochre-600 text-ochre-800 border-none focus:outline-none focus:border-woad-300 focus:ring-transparent;
-    }
-    .inpt-textarea {
-      @apply inpt-text rounded-xl;
-    }
-    .inpt-span-area {
-      @apply inpt-span rounded-xl;
-    }
-    /* Button: Woad */
-    .btn-woad {
-      @apply p-0 w-12 h-12 text-ochre-10 bg-woad-500 rounded-full hover:bg-woad-700 ring-2 ring-woad-600 border-ochre-10 border-2 shadow transition ease-in duration-200 focus:outline-none;
-    }
-    .btn-woad-extended {
-      @apply btn-woad px-4 w-auto;
-    }
-    .btn-woad-sm {
-      @apply btn-woad w-6 h-6;
-    }
-    .btn-woad-extended-sm {
-      @apply btn-woad-sm px-4 w-auto;
-    }
-    .btn-woad-lg {
-      @apply btn-woad w-16 h-16;
-    }
-    .btn-woad-extended-lg {
-      @apply btn-woad-lg px-4 w-auto;
-    }
-    /* Button: Ochre */
-    .btn-ochre {
-      @apply p-0 w-12 h-12 text-ochre-10 bg-ochre-500 rounded-full hover:bg-ochre-700 ring-2 ring-ochre-600 border-ochre-10 border-2 focus:shadow-lg shadow transition ease-in duration-200 focus:outline-none;
-    }
-    .btn-ochre-extended {
-      @apply btn-ochre px-4 w-auto;
-    }
-    .btn-ochre-sm {
-      @apply btn-ochre w-6 h-6;
-    }
-    .btn-ochre-extended-sm {
-      @apply btn-ochre-sm px-4 w-auto;
-    }
-    .btn-ochre-lg {
-      @apply btn-ochre w-16 h-16;
-    }
-    .btn-ochre-extended-lg {
-      @apply btn-ochre-lg px-4 w-auto;
-    }
-    /* Button: Ochre Light */
-    .btn-ochre-light {
-      @apply p-0 w-9 h-9 text-ochre-900 bg-ochre-100 rounded-full hover:bg-ochre-10 ring-2 ring-ochre-100 border-ochre-900 border-2 focus:shadow-lg shadow transition ease-in duration-200 focus:outline-none;
-    }
-    .btn-ochre-light-selected {
-      @apply p-0 w-9 h-9 text-ochre-900 bg-ochre-10 rounded-full hover:bg-ochre-100 ring-2 ring-ochre-10 border-ochre-900 border-2 focus:shadow-lg shadow transition ease-in duration-200 focus:outline-none;
-    }
-    .btn-ochre-light-extended {
-      @apply btn-ochre-light px-4 w-auto;
-    }
-    .btn-ochre-light-extended-selected {
-      @apply btn-ochre-light-selected px-4 w-auto;
-    }
-    .btn-ochre-light-sm {
-      @apply btn-ochre-light w-6 h-6;
-    }
-    .btn-ochre-light-selected-sm {
-      @apply btn-ochre-light-selected w-6 h-6;
-    }
-    .btn-ochre-light-extended-sm {
-      @apply btn-ochre-light-sm px-4 w-auto;
-    }
-    .btn-ochre-light-extended-selected-sm {
-      @apply btn-ochre-light-selected-sm px-4 w-auto;
-    }
-    /* Button: Sinopia */
-    .btn-sinopia {
-      @apply p-0 w-12 h-12 text-ochre-10 bg-sinopia-500 rounded-full hover:bg-sinopia-700 ring-2 ring-sinopia-600 border-ochre-10 border-2 shadow transition ease-in duration-200 focus:outline-none;
-    }
-    .btn-sinopia-extended {
-      @apply btn-sinopia px-4 w-auto;
-    }
-    .btn-sinopia-sm {
-      @apply btn-sinopia w-6 h-6;
-    }
-    .btn-sinopia-extended-sm {
-      @apply btn-sinopia-sm px-4 w-auto;
-    }
-    .btn-sinopia-lg {
-      @apply btn-sinopia w-16 h-16;
-    }
-    .btn-sinopia-extended-lg {
-      @apply btn-sinopia-lg px-4 w-auto;
-    }
-    /* Button: Malachite */
-    .btn-malachite {
-      @apply p-0 w-12 h-12 text-ochre-10 bg-malachite-500 rounded-full hover:bg-malachite-700 ring-2 ring-malachite-600 border-ochre-10 border-2 shadow transition ease-in duration-200 focus:outline-none;
-    }
-    .btn-malachite-extended {
-      @apply btn-malachite px-4 w-auto;
-    }
-    .btn-malachite-sm {
-      @apply btn-malachite w-6 h-6;
-    }
-    .btn-malachite-extended-sm {
-      @apply btn-malachite-sm px-4 w-auto;
-    }
-    .btn-malachite-lg {
-      @apply btn-malachite w-16 h-16;
-    }
-    .btn-malachite-extended-lg {
-      @apply btn-malachite-lg px-4 w-auto;
-    }
+  /* Subject tags */
+  .sbjct-tag {
+    @apply py-2 px-3 shadow-md m-1 no-underline rounded-full bg-woad-500 text-ochre-10 text-sm border-woad-500 hover:text-white hover:bg-woad-50 focus:outline-none animate-fade-in mr-1 ml-1;
+  }
+  /* Form components */
+  .inpt-label {
+    @apply text-ochre-700 font-light;
+  }
+  .inpt-span {
+    @apply inline-flex items-center w-full bg-ochre-100 rounded-full ring-ochre-600 border-ochre-10 border-2 focus:shadow-lg shadow animate-fade-in;
+  }
+  .inpt-icon {
+    @apply w-5 h-5 mr-3 ml-4;
+  }
+  .inpt-text {
+    @apply rounded-r-full w-full px-3 py-2 bg-ochre-50 placeholder-ochre-600 text-ochre-800 border-none focus:outline-none focus:border-woad-300 focus:ring-transparent;
+  }
+  .inpt-textarea {
+    @apply inpt-text rounded-xl;
+  }
+  .inpt-span-area {
+    @apply inpt-span rounded-xl;
+  }
+  /* Button: Woad */
+  .btn-woad {
+    @apply p-0 w-12 h-12 text-ochre-10 bg-woad-500 rounded-full hover:bg-woad-700 ring-2 ring-woad-600 border-ochre-10 border-2 shadow transition ease-in duration-200 focus:outline-none;
+  }
+  .btn-woad-extended {
+    @apply btn-woad px-4 w-auto;
+  }
+  .btn-woad-sm {
+    @apply btn-woad w-6 h-6;
+  }
+  .btn-woad-extended-sm {
+    @apply btn-woad-sm px-4 w-auto;
+  }
+  .btn-woad-lg {
+    @apply btn-woad w-16 h-16;
+  }
+  .btn-woad-extended-lg {
+    @apply btn-woad-lg px-4 w-auto;
+  }
+  /* Button: Ochre */
+  .btn-ochre {
+    @apply p-0 w-12 h-12 text-ochre-10 bg-ochre-500 rounded-full hover:bg-ochre-700 ring-2 ring-ochre-600 border-ochre-10 border-2 focus:shadow-lg shadow transition ease-in duration-200 focus:outline-none;
+  }
+  .btn-ochre-extended {
+    @apply btn-ochre px-4 w-auto;
+  }
+  .btn-ochre-sm {
+    @apply btn-ochre w-6 h-6;
+  }
+  .btn-ochre-extended-sm {
+    @apply btn-ochre-sm px-4 w-auto;
+  }
+  .btn-ochre-lg {
+    @apply btn-ochre w-16 h-16;
+  }
+  .btn-ochre-extended-lg {
+    @apply btn-ochre-lg px-4 w-auto;
+  }
+  /* Button: Ochre Light */
+  .btn-ochre-light {
+    @apply p-0 w-9 h-9 text-ochre-900 bg-ochre-100 rounded-full hover:bg-ochre-10 ring-2 ring-ochre-100 border-ochre-900 border-2 focus:shadow-lg shadow transition ease-in duration-200 focus:outline-none;
+  }
+  .btn-ochre-light-selected {
+    @apply p-0 w-9 h-9 text-ochre-900 bg-ochre-10 rounded-full hover:bg-ochre-100 ring-2 ring-ochre-10 border-ochre-900 border-2 focus:shadow-lg shadow transition ease-in duration-200 focus:outline-none;
+  }
+  .btn-ochre-light-extended {
+    @apply btn-ochre-light px-4 w-auto;
+  }
+  .btn-ochre-light-extended-selected {
+    @apply btn-ochre-light-selected px-4 w-auto;
+  }
+  .btn-ochre-light-sm {
+    @apply btn-ochre-light w-6 h-6;
+  }
+  .btn-ochre-light-selected-sm {
+    @apply btn-ochre-light-selected w-6 h-6;
+  }
+  .btn-ochre-light-extended-sm {
+    @apply btn-ochre-light-sm px-4 w-auto;
+  }
+  .btn-ochre-light-extended-selected-sm {
+    @apply btn-ochre-light-selected-sm px-4 w-auto;
+  }
+  /* Button: Sinopia */
+  .btn-sinopia {
+    @apply p-0 w-12 h-12 text-ochre-10 bg-sinopia-500 rounded-full hover:bg-sinopia-700 ring-2 ring-sinopia-600 border-ochre-10 border-2 shadow transition ease-in duration-200 focus:outline-none;
+  }
+  .btn-sinopia-extended {
+    @apply btn-sinopia px-4 w-auto;
+  }
+  .btn-sinopia-sm {
+    @apply btn-sinopia w-6 h-6;
+  }
+  .btn-sinopia-extended-sm {
+    @apply btn-sinopia-sm px-4 w-auto;
+  }
+  .btn-sinopia-lg {
+    @apply btn-sinopia w-16 h-16;
+  }
+  .btn-sinopia-extended-lg {
+    @apply btn-sinopia-lg px-4 w-auto;
+  }
+  /* Button: Malachite */
+  .btn-malachite {
+    @apply p-0 w-12 h-12 text-ochre-10 bg-malachite-500 rounded-full hover:bg-malachite-700 ring-2 ring-malachite-600 border-ochre-10 border-2 shadow transition ease-in duration-200 focus:outline-none;
+  }
+  .btn-malachite-extended {
+    @apply btn-malachite px-4 w-auto;
+  }
+  .btn-malachite-sm {
+    @apply btn-malachite w-6 h-6;
+  }
+  .btn-malachite-extended-sm {
+    @apply btn-malachite-sm px-4 w-auto;
+  }
+  .btn-malachite-lg {
+    @apply btn-malachite w-16 h-16;
+  }
+  .btn-malachite-extended-lg {
+    @apply btn-malachite-lg px-4 w-auto;
   }
 }

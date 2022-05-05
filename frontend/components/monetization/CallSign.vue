@@ -1,15 +1,6 @@
 <template>
   <div
-    class="
-      relative
-      mx-auto
-      p-3
-      sm:p-6
-      flex flex-col
-      items-center
-      text-center
-      lg:px-0
-    "
+    class="relative mx-auto p-3 sm:p-6 flex flex-col items-center text-center lg:px-0"
   >
     <div class="w-full flex justify-between px-2 sm:px-16 space-x-3">
       <div class="flex-1">
@@ -33,8 +24,8 @@
         <NuxtLink to="/login">Sign in, or create an account,</NuxtLink>
       </li>
       <li class="text-md text-ochre-800">
-        Sign in, or up,with
-        <span class="font-semibold">Coil</span> to stream per second payments.
+        Subscribe to <span class="font-semibold">Coil</span> to stream per
+        second micropayments.
       </li>
     </ul>
     <p v-if="isLoggedIn" class="mt-2 px-2 sm:px-3 text-md text-ochre-800">

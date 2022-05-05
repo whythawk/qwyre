@@ -1,9 +1,6 @@
 <template>
   <div>
-    <TitleBar :title="page.title" />
-    <div class="-mt-12">
-      <nuxt-content :document="page" />
-    </div>
+    <TitleBar title="Redirecting" />
   </div>
 </template>
 
@@ -15,11 +12,8 @@ import { Component, Vue } from "nuxt-property-decorator"
   middleware: "refresh-authentication",
 })
 export default class ShortStoryContent extends Vue {
-  async asyncData({ $content }) {
-    const page = await $content("short-story").fetch()
-    return {
-      page,
-    }
+  asyncData({ redirect }) {
+    redirect("/creators-fund")
   }
 }
 </script>

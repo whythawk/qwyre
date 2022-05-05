@@ -14,7 +14,8 @@ export default {
       !state.creatorProfile.isPrivate &&
       state.userProfile &&
       state.userProfile.email_validated &&
-      state.userProfile.is_active
+      state.userProfile.is_active &&
+      state.creatorProfile.wallet
     )
   },
   loginError: (state) => state.logInError,

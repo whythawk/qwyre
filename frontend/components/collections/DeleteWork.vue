@@ -5,16 +5,7 @@
   >
     <button
       type="submit"
-      class="
-        relative
-        flex-1
-        inline-flex
-        items-center
-        justify-center
-        border border-transparent
-        hover:text-gray-500
-        focus:outline-none
-      "
+      class="relative flex-1 inline-flex items-center justify-center border border-transparent hover:text-gray-500 focus:outline-none"
       @click.prevent="submit"
     >
       <SvgIcon terms="w-5 h-6 text-sinopia-700" icon="svgTrash" /><label
@@ -31,19 +22,7 @@
       aria-describedby="store-description"
       name="confirmDelete"
       type="checkbox"
-      class="
-        relative
-        inline-flex
-        items-center
-        justify-center
-        my-auto
-        focus:ring-sinopia-500
-        h-4
-        w-4
-        text-sinopia-600
-        border-gray-300
-        rounded
-      "
+      class="relative inline-flex items-center justify-center my-auto focus:ring-sinopia-500 h-4 w-4 text-sinopia-600 border-gray-300 rounded"
     />
   </div>
 </template>
