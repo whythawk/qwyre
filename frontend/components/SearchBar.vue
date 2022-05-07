@@ -146,7 +146,7 @@ export default class CollectionsImportLibrary extends mixins(importWorkData) {
 
   public storeBook() {
     try {
-      if (this.blob && Object.keys(this.blob).length) {
+      if (this.blob && this.blob instanceof Blob) {
         this.storeWork(this.blob)
         this.addNotification({
           content: "Successfully imported your epub.",

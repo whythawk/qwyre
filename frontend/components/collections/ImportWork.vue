@@ -128,6 +128,7 @@ export default class CollectionsImportWork extends mixins(importWorkData) {
   public blob: File = {} as File
   public wsp: WebSocketAsPromised = {} as WebSocketAsPromised
   public hasSocket: boolean = false
+  public saveWorkIdentifier: string = ""
 
   public cancel() {
     this.workURL = ""
@@ -160,6 +161,8 @@ export default class CollectionsImportWork extends mixins(importWorkData) {
         break
       case "complete":
         this.removeNotification(processingNotification)
+        this.saveWorkIdentifier = (response.data as any)
+          .workIdentifier as string
         this.addNotification({
           content: "Import process complete.",
           color: "success",
@@ -167,6 +170,7 @@ export default class CollectionsImportWork extends mixins(importWorkData) {
         this.wsp.close()
         this.cancel()
         this.setChangeWatcher(generateUUID())
+        this.$router.push(`/workshop/${this.saveWorkIdentifier}`)
         break
     }
   }

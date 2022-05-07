@@ -111,7 +111,10 @@ async def import_work(*, db: Session = Depends(deps.get_db), websocket: WebSocke
             await websocket.send_json(response)
         # Get the build response and return it
         try:
-            response = {"state": "complete", "data": {"identifier": str(UUID(build_task.get()))}}
+            identifier = str(UUID(build_task.get()))
+            work_obj = crud.work.get(id=identifier, get_raw=True)
+            workIdentifier = str(UUID(work_obj.metadata.single().identifier))
+            response = {"state": "complete", "data": {"identifier": identifier, "workIdentifier": workIdentifier}}
         except (ValueError, AttributeError):
             response = {"state": "error", "error": "Import failed"}
         await websocket.send_json(response)
@@ -150,7 +153,10 @@ async def update_work(*, db: Session = Depends(deps.get_db), work_id: UUID, webs
             await websocket.send_json(response)
         # Get the build response and return it
         try:
-            response = {"state": "complete", "data": {"identifier": str(UUID(build_task.get()))}}
+            identifier = str(UUID(build_task.get()))
+            work_obj = crud.work.get(id=identifier, get_raw=True)
+            workIdentifier = str(UUID(work_obj.metadata.single().identifier))
+            response = {"state": "complete", "data": {"identifier": identifier, "workIdentifier": workIdentifier}}
         except (ValueError, AttributeError, ValidationError):
             response = {"state": "error", "error": "Import failed"}
         await websocket.send_json(response)

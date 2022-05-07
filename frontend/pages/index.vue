@@ -146,15 +146,16 @@
           >
             <div class="md:flex-shrink-0">
               <div class="flow-root">
-                <NuxtLink
-                  to="/write/describe"
+                <button
+                  type="submit"
                   class="btn-sinopia-lg flex mx-auto"
+                  @click.prevent="publish"
                 >
                   <SvgIcon
                     terms="w-8 h-8 inline-flex self-center mx-auto"
                     icon="svgPencilAlt"
                   />
-                </NuxtLink>
+                </button>
               </div>
             </div>
             <div class="mt-6 md:mt-0 md:ml-4 lg:mt-6 lg:ml-0">
@@ -190,6 +191,7 @@ import { ILibrary } from "@/interfaces"
   middleware: "refresh-authentication",
 })
 export default class CoverPage extends Vue {
+  @Mutation("conversions/setConversionKey") setConversionKey
   @Mutation("main/setChangeWatcher") setChangeWatcher
   @Getter("collections/collectionWatcher") collectionWatcher
   public forceRefresh: boolean = false
@@ -198,7 +200,7 @@ export default class CoverPage extends Vue {
 
   public readMe() {
     this.$router.push({
-      name: "",
+      path: "",
       query: {
         import: "https%3A%2F%2Fqwyre.com%2Fif-only-they-couldn't-talk.epub",
       },
@@ -225,6 +227,11 @@ export default class CoverPage extends Vue {
         )) as ILibrary[]
       } catch (e) {}
     }
+  }
+
+  public publish() {
+    this.setConversionKey(null)
+    this.$router.push("/write/describe")
   }
 
   async mounted() {

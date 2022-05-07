@@ -83,7 +83,9 @@ export default class CollectionsSwipeLibrary extends Vue {
         },
       })
       setTimeout(() => {
-        this.swiper.update()
+        try {
+          this.swiper.updateSlides()
+        } catch {}
       }, 1)
     }
   }
