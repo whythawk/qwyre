@@ -1,14 +1,5 @@
 <template>
-  <div
-    class="
-      aspect-h-12
-      sm:aspect-h-11
-      md:aspect-h-14
-      lg:aspect-h-16
-      xl:aspect-h-11
-      aspect-w-10
-    "
-  >
+  <div>
     <NuxtLink
       :to="`/stream/${result.work}`"
       class="col-span-1 flex flex-col text-center bg-white rounded-lg shadow"
@@ -16,36 +7,17 @@
       <div class="w-full flex justify-between p-3 space-x-3">
         <div class="flex-1 line-clamp-5">
           <h3
-            class="
-              mt-1
-              text-ochre-900 text-xs
-              sm:text-sm
-              font-semibold
-              line-clamp-2
-            "
+            class="mt-1 text-ochre-900 text-xs sm:text-sm font-semibold line-clamp-2"
           >
             {{ result.title }}
           </h3>
           <p
-            class="
-              mt-1
-              text-ochre-700 text-xs
-              sm:text-sm
-              italic
-              line-clamp-1
-              sm:line-clamp-2
-            "
+            class="mt-1 text-ochre-700 text-xs sm:text-sm italic line-clamp-1 sm:line-clamp-2"
           >
             {{ parseStringList(result.creator) }}
           </p>
           <p
-            class="
-              mt-1
-              text-ochre-700 text-xs
-              sm:text-sm
-              line-clamp-4
-              sm:line-clamp-5
-            "
+            class="mt-1 text-ochre-700 text-xs sm:text-sm line-clamp-4 sm:line-clamp-5"
           >
             {{ result.description }}
           </p>
@@ -60,28 +32,12 @@
         >
       </div>
       <div
-        class="
-          m-1
-          space-x-1
-          line-clamp-1
-          sm:line-clamp-2
-          md:line-clamp-3
-          lg:line-clamp-4
-        "
+        class="m-1 space-x-1 line-clamp-1 sm:line-clamp-2 md:line-clamp-3 lg:line-clamp-4"
       >
         <span
           v-for="(subject, i) in result.subject"
           :key="`subject-${result.work.identifier}-${i}`"
-          class="
-            flex-shrink-0
-            inline-block
-            px-2
-            py-0.5
-            text-woad-800 text-xs
-            font-medium
-            bg-woad-100
-            rounded-full
-          "
+          class="flex-shrink-0 inline-block px-2 py-0.5 text-woad-800 text-xs font-medium bg-woad-100 rounded-full"
           >{{ subject }}</span
         >
       </div>
