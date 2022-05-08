@@ -26,10 +26,6 @@ The terms you use to describe your work are called _metadata_. **Qwyre** will au
 
 ![Describe your work so we know what it is](/content/conversion-describe.jpg)
 
-The terms you use to describe your work are called _metadata_ and are defined by international convention. [Dublin Core](https://www.dublincore.org/specifications/dublin-core/dces/) is a vocabulary of fifteen properties for use in resource description. In _epubs_, four of them - `title`, `identifier`, `language` and `rights` - are required.
-
-**Qwyre** will automatically provide an `identifier` and default `language` and `rights`, but only you can know your `title`. Your name, as `creator`, is also enforced.
-
 The more information you can include the better since these data are stored in your _epub_ and used by the distribution platforms you are likely to release your work on to help readers search for something to read.
 
 These are the list of terms available to you:

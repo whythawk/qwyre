@@ -9,6 +9,7 @@ import {
   getCoilRefresh,
   saveCoilRefresh,
   removeCoilRefresh,
+  tokenExpired,
 } from "@/utilities"
 import {
   ICoilUserResourceResponse,
@@ -27,10 +28,11 @@ export default {
     await commit("setCoilState", getCoilState())
     saveCoilRoute(coilRoute)
   },
-  async recoverCoilResourceState({ commit, dispatch }) {
+  async recoverCoilResourceState({ commit, dispatch, state }) {
     await commit("setCoilState", getCoilState())
     await commit("setCoilRoute", getCoilRoute())
-    if (getCoilRefresh()) await dispatch("refreshUserBTP")
+    if ((!state.coilToken || tokenExpired(state.coilToken)) && getCoilRefresh())
+      await dispatch("refreshUserBTP")
   },
   // START web monetization
   async startMonetizationStream({ commit, dispatch, state }) {
@@ -110,27 +112,35 @@ export default {
   async refreshUserBTP({ commit, dispatch, state }) {
     if (getCoilRefresh()) {
       try {
-        const response: AxiosResponse = await coil.getUserRefresh(
-          getCoilRefresh() as string
-        )
-        const data: ICoilUserTokenResponse = response.data
-        // https://stackoverflow.com/a/32108184/295606
-        if (
-          data &&
-          Object.keys(data).length !== 0 &&
-          data.constructor === Object
-        ) {
-          await commit("setCoilToken", data.access_token)
-          saveCoilRefresh(data.refresh_token)
-          if (!state.coilSub) await dispatch("getUserInfo")
-          if (!state.requestError) {
-            await dispatch("getUserBTP")
-            await commit("setRequestError", false)
+        if (!state.coilToken || tokenExpired(state.coilToken)) {
+          // console.log("------TRYING------refreshUserBTP--------------------")
+          // console.log("process.client", process.client)
+          const response: AxiosResponse = await coil.getUserRefresh(
+            getCoilRefresh() as string
+          )
+          const data: ICoilUserTokenResponse = response.data
+          // https://stackoverflow.com/a/32108184/295606
+          if (
+            data &&
+            Object.keys(data).length !== 0 &&
+            data.constructor === Object
+          ) {
+            // console.log(data)
+            await commit("setCoilToken", data.access_token)
+            saveCoilRefresh(data.refresh_token)
+          } else {
+            await commit("setRequestError", true)
           }
-        } else {
-          await commit("setRequestError", true)
+        }
+        if (!state.coilSub) await dispatch("getUserInfo")
+        if (!state.requestError) {
+          await dispatch("getUserBTP")
+          await commit("setRequestError", false)
         }
       } catch (error) {
+        // console.log("-----CATCH-----refreshUserBTP----------------------")
+        // console.log("process.client", process.client)
+        // console.log(error)
         await dispatch("checkCoilError", error)
       }
     } else {
@@ -152,11 +162,14 @@ export default {
     } else {
       try {
         try {
+          // console.log("-------------------getUserToken-------------------")
           const response: AxiosResponse = await coil.getUserToken(payload.code)
           const data: ICoilUserTokenResponse = response.data
           await commit("setCoilToken", data.access_token)
           saveCoilRefresh(data.refresh_token)
         } catch (error) {
+          // console.log("-----CATCH-----getUserToken----------------------")
+          // console.log(error)
           await dispatch("checkCoilError", error)
         }
       } catch (error) {

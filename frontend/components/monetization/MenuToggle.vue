@@ -98,7 +98,8 @@ export default class MonetizationMenuToggle extends Vue {
   }
 
   async mounted() {
-    await this.recoverCoilResourceState()
+    if (process.client && this.$nuxt.$route.path !== `/${this.linkRedirect}`)
+      await this.recoverCoilResourceState()
   }
 }
 </script>

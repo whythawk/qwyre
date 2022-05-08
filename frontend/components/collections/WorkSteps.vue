@@ -99,9 +99,9 @@ export default class CollectionsWorkSteps extends Vue {
           this.currentDescription = `Step ${element.step} of ${this.steps.length}: ${element.value}`
       })
     }
-    console.log("-------------------------------------------------------------")
-    console.log(this.conversionKey)
-    console.log("-------------------------------------------------------------")
+    // console.log("-------------------------------------------------------------")
+    // console.log(this.conversionKey)
+    // console.log("-------------------------------------------------------------")
   }
 
   created() {
