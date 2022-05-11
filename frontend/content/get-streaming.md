@@ -29,19 +29,3 @@ In practice, this implies _moderated publication_. There is no gatekeeping. We d
 
 3. **Finalise a contract** between you and the author to ensure each of you understands what you expect from the other. Only once your contract is in place and both of you have agreed and signed it should you each begin work on the edits.
 4. **Edit and improve their work**. Qwyre is not going to own the editorial process and the parties to the creative work should edit and review as they prefer. Be careful, though. You're an editor, not there to substantially rewrite the work. Once both parties have agreed the contract, and agreed the work is ready for publication, the author can release the work onto the platform.
-
-## Streaming and proportional revenue share
-
-Web Monetization is a per-second payment stream and it requires a per-second product. For text, and ebooks specifically, that means a stream of words. Except they also have to carry markup so they're formatted properly on arrival.
-
-Streaming means deliberately breaking data into chunks and streaming those in a format that permits live, iterative, building of the digital object from these chunks while also serving the content in that dynamic object.
-
-A reader will receive the first 500 words of your work for free, and then - as long as they stream micropayments - a steady stream of words building up to a complete work. They can stop and start as they like, and the words they've purchased are recorded to ensure they do not pay more than once.
-
-The tally is updated every second. The average person reads at 250 to 300 words per minute. A 10,000 word short-story can be read in about 40 minutes, while a 100,000 word novel will take about 6 to 7 hours.
-
-Every minute we switch payment pointers in proportion to your contractual agreement. If you agree a 90:10 author:editor share, then 9 minutes of streaming revenue are the author's to every 1 minute for the editor.
-
-These fees are paid direct. You'll see them arrive in your wallet in real time.
-
-All contracts also include a Qwyre share which you can see on our [fees](/fees) page.
