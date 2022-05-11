@@ -9,7 +9,7 @@ Qwyre supports streaming micropayments though a new web standard called [_web mo
 
 ## Web monetization for streaming micropayments
 
-Unlike most publishing services, we don't keep the money and then pay you out some time in the future. Payments here are direct and immediate.
+Unlike most publishing services, we don't keep the money you earn and then pay you out some time in the future. Payments here are direct and immediate.
 
 Your work earns about 36 cents per hour, or 0.6 cents per minute. A 5,000 word short-story would take about 12 minutes to read and earn 7.2 cents. You need to be read 700 times to earn $50.
 
