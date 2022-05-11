@@ -41,7 +41,7 @@ export default {
     })
     ;(this as any).$cookies.set("refresh", payload.refresh, {
       path: "/",
-      maxAge: 60 * 60 * 24 * 90,
+      maxAge: 60 * 60 * 24 * 900,
       // httpOnly: true,
       secure: true,
     })
@@ -71,29 +71,43 @@ export default {
       await dispatch("logOut")
     }
   },
-  async getUserProfile({ commit, dispatch }) {
-    const token = (this as any).$cookies.get("token")
-    if (token) {
-      try {
-        const response = await api.getOfficialMe(token)
-        if (response.data) {
-          await commit("setUserProfile", response.data)
+  async getUserProfile({ state, commit, dispatch }) {
+    if (
+      process.client &&
+      (!state.userProfile ||
+        Object.keys(state.userProfile).length === 0 ||
+        Object.getPrototypeOf(state.userProfile) !== Object.prototype)
+    ) {
+      const token = (this as any).$cookies.get("token")
+      if (token) {
+        try {
+          const response = await api.getOfficialMe(token)
+          if (response.data) {
+            await commit("setUserProfile", response.data)
+          }
+        } catch (error) {
+          await dispatch("checkApiError", error)
         }
-      } catch (error) {
-        await dispatch("checkApiError", error)
       }
     }
   },
-  async getCreatorProfile({ commit, dispatch }) {
-    const token = (this as any).$cookies.get("token")
-    if (token) {
-      try {
-        const response = await api.getMe(token)
-        if (response.data) {
-          await commit("setCreatorProfile", response.data)
+  async getCreatorProfile({ state, commit, dispatch }) {
+    if (
+      process.client &&
+      (!state.creatorProfile ||
+        Object.keys(state.creatorProfile).length === 0 ||
+        Object.getPrototypeOf(state.creatorProfile) !== Object.prototype)
+    ) {
+      const token = (this as any).$cookies.get("token")
+      if (token) {
+        try {
+          const response = await api.getMe(token)
+          if (response.data) {
+            await commit("setCreatorProfile", response.data)
+          }
+        } catch (error) {
+          await dispatch("checkApiError", error)
         }
-      } catch (error) {
-        await dispatch("checkApiError", error)
       }
     }
   },
@@ -191,6 +205,8 @@ export default {
           await dispatch("checkApiError", error)
         }
       }
+    } else {
+      await dispatch("logOut")
     }
   },
   async logOut({ commit }) {
