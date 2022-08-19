@@ -35,13 +35,13 @@ export default {
     // https://stackoverflow.com/a/43620820/295606
     ;(this as any).$cookies.set("token", payload.token, {
       path: "/",
-      maxAge: 60 * 60 * 24 * 8,
+      maxAge: 60 * 30,
       // httpOnly: true,
       secure: true,
     })
     ;(this as any).$cookies.set("refresh", payload.refresh, {
       path: "/",
-      maxAge: 60 * 60 * 24 * 900,
+      maxAge: 60 * 60 * 24 * 30,
       // httpOnly: true,
       secure: true,
     })
@@ -61,8 +61,8 @@ export default {
         // await commit("setToken", token)
         await commit("setLoggedIn", true)
         await commit("setLogInError", false)
-        await dispatch("getUserProfile")
-        await dispatch("getCreatorProfile")
+        // await dispatch("getUserProfile")
+        // await dispatch("getCreatorProfile")
       } else {
         await dispatch("logOut")
       }
@@ -182,37 +182,52 @@ export default {
       await dispatch("checkApiError", error)
     }
   },
-  async refreshLoggedIn({ commit, dispatch }) {
-    const token = (this as any).$cookies.get("token")
-    // if (process.client) {
-    //   token = state.token
-    // }
-    // if (!token) {
-    //   token = (this as any).$cookies.get("token")
-    // }
-    if (token) {
-      await commit("setLoggedIn", true)
-      const hasExpired = tokenExpired(token)
-      if (hasExpired) {
-        dispatch("refreshTokens")
-      } else {
-        // await commit("setToken", token)
-        try {
-          await dispatch("getUserProfile")
-          await dispatch("getCreatorProfile")
-          await commit("setLoggedIn", true)
-        } catch (error) {
-          await dispatch("checkApiError", error)
-        }
+  async refreshLoggedProfile({ state, dispatch }) {
+    /*
+      1) If logged in and online, refresh data
+    */
+    if (state.isLoggedIn) {
+      try {
+        await dispatch("getUserProfile")
+        await dispatch("getCreatorProfile")
+      } catch (error) {
+        await dispatch("checkApiError", error)
       }
-    } else {
-      await dispatch("logOut")
+    }
+  },
+  async refreshLoggedIn({ commit, dispatch }) {
+    /*
+      1) If token and token not expired, set logged in
+      2) Else if refresh and refresh not expired, set logged in
+    */
+    const token = (this as any).$cookies.get("token")
+    const hasExpired = token ? tokenExpired(token) : true
+    if (!hasExpired) await commit("setLoggedIn", true)
+    if (hasExpired) await dispatch("refreshTokens")
+  },
+  async refreshOffline({ state, commit, dispatch }) {
+    /*
+      1) If token and token not expired, set logged in
+      2) Else if refresh and refresh not expired, set logged in
+      3) If logged in and online, refresh data
+    */
+    let token = (this as any).$cookies.get("token")
+    let hasExpired = token ? tokenExpired(token) : true
+    if (!hasExpired) await commit("setLoggedIn", true)
+    else {
+      token = (this as any).$cookies.get("refresh")
+      hasExpired = token ? tokenExpired(token) : true
+      if (!hasExpired) await commit("setLoggedIn", true)
     }
   },
   async logOut({ commit }) {
     // removeLocalToken()
     // removeRefreshToken()
     // await commit("setToken", "")
+    try {
+      const refresh = (this as any).$cookies.get("refresh")
+      if (refresh) await api.revokeRefreshedToken(refresh)
+    } catch (e) {}
     await commit("setLoggedIn", false)
     await commit("setUserProfile", {})
     await commit("setCreatorProfile", {})

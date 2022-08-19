@@ -20,8 +20,10 @@ import { IDataSource } from "@/interfaces"
   middleware: "authenticated",
 })
 export default class WorkshopEdit extends Vue {
+  @Action("main/refreshLoggedProfile") refreshLoggedProfile
   @Action("conversions/getWorkToEdit") getWorkToEdit
   @Action("conversions/getContractToEdit") getContractToEdit
+  @Getter("main/creatorProfile") creatorProfile
   @Getter("conversions/workEdit") workEdit
   @Getter("conversions/contractEdit") contractEdit
   @Getter("main/changeWatcher") changeWatcher
@@ -58,6 +60,14 @@ export default class WorkshopEdit extends Vue {
   }
 
   public async created() {
+    if (this.$nuxt.isOffline)
+      return this.$nuxt.error({
+        statusCode: 404,
+      })
+    await this.refreshLoggedProfile()
+    if (!this.creatorProfile || this.creatorProfile.isBanned) {
+      this.$router.push("/")
+    }
     await this.initialise()
   }
 

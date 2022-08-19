@@ -1,33 +1,31 @@
 <template>
   <div class="container min-h-screen mx-auto flex flex-col">
-    <TitleBar v-if="creatorProfile.creator" :title="creatorProfile.creator" />
-    <TitleBar v-else title="Anonymous" />
-    <div class="max-w-screen-md mx-auto">
-      <div class="grid grid-cols-3 gap-2">
-        <div class="mx-auto flex">
-          <NuxtLink
-            to="/creator/edit"
-            class="btn-woad-extended-sm items-center h-8"
-          >
-            <SvgIcon terms="w-5 h-4 inline-block mr-1" icon="svgDocumentText" />
-            <span class="text-sm">Edit profile</span>
-          </NuxtLink>
-        </div>
-        <div class="mx-auto flex">
-          <NuxtLink
-            to="/creator/security"
-            class="btn-sinopia-extended-sm items-center h-8"
-          >
-            <SvgIcon terms="w-5 h-4 inline-block mr-1" icon="svgLockClosed" />
-            <span class="text-sm">Security &amp; mail</span>
-          </NuxtLink>
-        </div>
-        <div class="mx-auto flex">
-          <button class="btn-ochre-extended-sm h-8" @click.prevent="logout">
-            <SvgIcon terms="w-5 h-4 inline-block mr-1" icon="svgUser" />
-            <span class="text-sm">Logout</span>
-          </button>
-        </div>
+    <div
+      class="lg:flex lg:items-center lg:justify-between text-center pt-10 pb-8 sm:pt-16 sm:pb-14 px-4 sm:px-6 lg:px-8 mt-16"
+    >
+      <div class="flex-1 min-w-0">
+        <h1 class="text-4xl font-extrabold tracking-tight text-gray-900">
+          <span v-if="creatorProfile.creator">{{ creatorProfile.creator }}</span
+          ><span v-else>Anonymous</span>
+        </h1>
+      </div>
+      <div class="mt-5 flex justify-center space-x-2 lg:mt-0 lg:ml-4">
+        <NuxtLink
+          v-for="(t, i) in tabs"
+          :key="`tab-action-${i}`"
+          :to="t.to"
+          class="btn-ochre-sm inline-flex items-center h-7 w-7"
+          :aria-label="t.text"
+        >
+          <SvgIcon terms="w-5 h-5 mx-auto my-auto" :icon="t.icon" />
+        </NuxtLink>
+        <button
+          class="btn-sinopia-sm inline-flex items-center h-7 w-7"
+          aria-label="Logout"
+          @click.prevent="logout"
+        >
+          <SvgIcon terms="w-5 h-5 mx-auto my-auto" icon="svgLogout" />
+        </button>
       </div>
     </div>
     <div
@@ -74,7 +72,7 @@
               >
                 <SvgIcon
                   terms="w-5 h-4 inline-block mr-1 mt-1"
-                  icon="svgDocumentText"
+                  icon="svgPencil"
                 />
                 <span>Edit profile</span>
               </NuxtLink>
@@ -112,24 +110,38 @@ import {
   Getter,
 } from "nuxt-property-decorator"
 import { api } from "@/api"
+import { IKeyable } from "@/interfaces"
 
 @Component({
   layout: "working",
   middleware: "authenticated",
 })
 export default class Creator extends Vue {
+  @Action("main/refreshLoggedProfile") refreshLoggedProfile
   @Action("main/logOut") userLogOut
   @Getter("main/creatorProfile") creatorProfile
   @Getter("main/userProfile") userProfile
   @Getter("main/canMakeCreativeOffers") canMakeCreativeOffers
   @Mutation("main/addNotification") addNotification
+  public tabs: IKeyable[] = [
+    {
+      to: "/creator/edit",
+      icon: "svgPencil",
+      text: "Edit profile",
+    },
+    {
+      to: "/creator/security",
+      icon: "svgLockClosed",
+      text: "Edit security and email",
+    },
+  ]
 
   public async logout() {
     await this.userLogOut()
     this.$router.push("/")
   }
 
-  async created() {
+  async emailValidation() {
     if (
       (this as any).$cookies.get("token") &&
       this.$route.query &&
@@ -158,12 +170,16 @@ export default class Creator extends Vue {
     }
   }
 
-  async asyncData({ store, redirect }) {
-    await store.dispatch("main/getUserProfile")
-    const creator = await store.getters["main/creatorProfile"]
-    if (!creator || creator.isBanned) {
-      redirect("/")
+  async created() {
+    if (this.$nuxt.isOffline)
+      return this.$nuxt.error({
+        statusCode: 404,
+      })
+    await this.refreshLoggedProfile()
+    if (!this.creatorProfile || this.creatorProfile.isBanned) {
+      this.$router.push("/")
     }
+    await this.emailValidation()
   }
 }
 </script>

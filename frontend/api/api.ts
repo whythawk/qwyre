@@ -63,6 +63,13 @@ export const api = {
       authHeaders(token)
     )
   },
+  async revokeRefreshedToken(token: string) {
+    return await axios.post(
+      `${process.env.apiUrl}/api/v1/login/revoke-token`,
+      {},
+      authHeaders(token)
+    )
+  },
   async createMe(data: IUserOpenProfileCreate) {
     return await axios.post(`${process.env.apiUrl}/api/v1/users/`, data)
   },

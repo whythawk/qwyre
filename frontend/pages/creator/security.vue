@@ -164,6 +164,7 @@ import { IUserProfileUpdate } from "@/interfaces"
   middleware: "authenticated",
 })
 export default class CreatorEditSecurity extends Vue {
+  @Action("main/refreshLoggedProfile") refreshLoggedProfile
   @Action("main/updateUserProfile") updateUserProfile
   public email: string = ""
   public password1 = ""
@@ -185,8 +186,12 @@ export default class CreatorEditSecurity extends Vue {
     }
   }
 
-  async asyncData({ store }) {
-    await store.dispatch("main/getUserProfile")
+  async created() {
+    if (this.$nuxt.isOffline)
+      return this.$nuxt.error({
+        statusCode: 404,
+      })
+    await this.refreshLoggedProfile()
   }
 }
 </script>

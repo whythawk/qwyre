@@ -2,6 +2,12 @@ from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class UserRefresh(BaseModel):
+    refresh_token: str
 
 # Shared properties
 class UserBase(BaseModel):

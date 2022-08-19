@@ -86,6 +86,8 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     "@nuxtjs/axios",
+    // https://auth.nuxtjs.org/guide/
+    // "@nuxtjs/auth-next",
     // https://github.com/microcipcip/cookie-universal/tree/master/packages/cookie-universal-nuxt
     "cookie-universal-nuxt",
     // https://go.nuxtjs.dev/pwa

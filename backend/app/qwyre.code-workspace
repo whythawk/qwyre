@@ -1,12 +1,12 @@
 {
-  "folders": [
-	{
-		"path": "."
-	},
-	{
-		"path": "../../frontend"
-	}
-],
-  "remoteAuthority": "wsl+Ubuntu-20.04",
-  "settings": {}
+	"folders": [
+		{
+			"uri": "vscode-remote://wsl+ubuntu-20.04/home/bue/github/qwyre/backend/app"
+		},
+		{
+			"uri": "vscode-remote://wsl+ubuntu-20.04/home/bue/github/qwyre/frontend"
+		}
+	],
+	"remoteAuthority": "wsl+Ubuntu-20.04",
+	"settings": {}
 }

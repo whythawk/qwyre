@@ -8,11 +8,7 @@
         <div class="container mx-auto">
           <div class="min-h-screen flex justify-center">
             <article
-              class="
-                max-w-none
-                sm:w-3/5
-                prose prose-reader-light prose-reader-base prose-reader-compact
-              "
+              class="max-w-none sm:w-3/5 prose prose-reader-light prose-reader-base prose-reader-compact"
             >
               <Nuxt />
             </article>

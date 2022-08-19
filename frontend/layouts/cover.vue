@@ -1,5 +1,5 @@
 <template>
-  <div class="relative bg-ochre-10">
+  <div :class="`relative ${$nuxt.isOnline ? 'bg-ochre-10' : 'bg-ochre-900'}`">
     <!--Header-->
     <div
       class="max-w-full mx-auto md:bg-join-the-qwyre md:bg-no-repeat md:bg-contain 2xl:bg-cover 2xl:bg-center"
@@ -9,7 +9,7 @@
       <main>
         <Nuxt />
       </main>
-      <footer class="mt-12 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <footer class="mt-12 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 bg-ochre-10">
         <NotificationsBar />
         <FooterBar />
       </footer>

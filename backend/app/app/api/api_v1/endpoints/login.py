@@ -29,8 +29,8 @@ def login_access_token(db: Session = Depends(deps.get_db), form_data: OAuth2Pass
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(seconds=settings.ACCESS_TOKEN_EXPIRE_SECONDS)
+    refresh_token_expires = timedelta(seconds=settings.REFRESH_TOKEN_EXPIRE_SECONDS)
     refresh_token = security.create_refresh_token(user.id, expires_delta=refresh_token_expires)
     crud.token.create(db=db, obj_in=refresh_token, user_obj=user)
     return {
@@ -47,8 +47,8 @@ def refresh_token(
     """
     Refresh tokens for future requests
     """
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(seconds=settings.ACCESS_TOKEN_EXPIRE_SECONDS)
+    refresh_token_expires = timedelta(seconds=settings.REFRESH_TOKEN_EXPIRE_SECONDS)
     refresh_token = security.create_refresh_token(current_user.id, expires_delta=refresh_token_expires)
     crud.token.create(db=db, obj_in=refresh_token, user_obj=current_user)
     return {

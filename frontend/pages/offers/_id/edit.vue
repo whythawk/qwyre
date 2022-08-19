@@ -192,6 +192,7 @@ import {
   middleware: "authenticated",
 })
 export default class EditOffer extends Vue {
+  @Action("main/refreshLoggedProfile") refreshLoggedProfile
   @Action("conversions/getWorkToEdit") getWorkToEdit
   @Action("conversions/getContractToEdit") getContractToEdit
   @Action("conversions/createWorkContract") createWorkContract
@@ -356,6 +357,14 @@ export default class EditOffer extends Vue {
   }
 
   public async created() {
+    if (this.$nuxt.isOffline)
+      return this.$nuxt.error({
+        statusCode: 404,
+      })
+    await this.refreshLoggedProfile()
+    if (!this.creatorProfile || this.creatorProfile.isBanned) {
+      this.$router.push("/")
+    }
     if (this.canMakeCreativeOffers)
       await this.getContractToEdit(this.$route.params.id)
     if (this.contractEdit && Object.keys(this.contractEdit).length)
@@ -365,14 +374,6 @@ export default class EditOffer extends Vue {
       this.cover = await this.getCoverImage(this.workEdit.identifier)
     this.reset()
     this.ready = true
-  }
-
-  async asyncData({ store, redirect }) {
-    const creator = await store.getters["main/creatorProfile"]
-    if (!creator || creator.isBanned) {
-      redirect("/creator")
-    }
-    await store.dispatch("main/getUserProfile")
   }
 }
 </script>
