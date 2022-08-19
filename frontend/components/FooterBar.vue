@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-ochre-10 mb-16" aria-labelledby="footer-heading">
+  <div class="bg-ochre-10 pb-16" aria-labelledby="footer-heading">
     <h2 id="footer-heading" class="sr-only">Footer</h2>
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
       <div class="pb-8 xl:grid xl:grid-cols-5 xl:gap-8">

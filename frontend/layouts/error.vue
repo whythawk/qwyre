@@ -1,5 +1,5 @@
 <template>
-  <main class="min-h-screen bg-cover bg-top bg-lost-the-qwyre">
+  <main class="min-h-screen bg-cover bg-top bg-ochre-500 bg-lost-the-qwyre">
     <div
       class="max-w-7xl mx-auto px-4 py-10 text-center sm:px-6 sm:py-16 lg:px-8 lg:py-20"
     >
@@ -12,10 +12,14 @@
       <h1
         class="mt-2 text-4xl font-extrabold text-white tracking-tight sm:text-5xl"
       >
-        Oy, vey! Are you ever lost.
+        Oy, vey! Are you ever <span v-if="$nuxt.isOnline">lost</span
+        ><span v-else>offline</span>.
       </h1>
-      <p class="mt-2 text-lg font-medium text-ochre-50">
+      <p v-if="$nuxt.isOnline" class="mt-2 text-lg font-medium text-ochre-50">
         If you want the library, it's over there.
+      </p>
+      <p v-else class="mt-2 text-lg font-medium text-ochre-50">
+        You'll need to wait till you're a little less remote.
       </p>
       <div class="mt-6">
         <NuxtLink

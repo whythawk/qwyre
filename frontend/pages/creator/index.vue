@@ -118,6 +118,7 @@ import { api } from "@/api"
   middleware: "authenticated",
 })
 export default class Creator extends Vue {
+  @Action("main/refreshLoggedProfile") refreshLoggedProfile
   @Action("main/logOut") userLogOut
   @Getter("main/creatorProfile") creatorProfile
   @Getter("main/userProfile") userProfile
@@ -129,7 +130,7 @@ export default class Creator extends Vue {
     this.$router.push("/")
   }
 
-  async created() {
+  async emailValidation() {
     if (
       (this as any).$cookies.get("token") &&
       this.$route.query &&
@@ -158,12 +159,16 @@ export default class Creator extends Vue {
     }
   }
 
-  async asyncData({ store, redirect }) {
-    await store.dispatch("main/getUserProfile")
-    const creator = await store.getters["main/creatorProfile"]
-    if (!creator || creator.isBanned) {
-      redirect("/")
+  async created() {
+    if (this.$nuxt.isOffline)
+      return this.$nuxt.error({
+        statusCode: 404,
+      })
+    await this.refreshLoggedProfile()
+    if (!this.creatorProfile || this.creatorProfile.isBanned) {
+      this.$router.push("/")
     }
+    await this.emailValidation()
   }
 }
 </script>

@@ -1,7 +1,7 @@
 from .base_schema import BaseSchema, MetadataBaseSchema, MetadataBaseCreate, MetadataBaseUpdate, MetadataBaseInDBBase
 from .msg import Msg
 from .token import RefreshTokenCreate, RefreshTokenUpdate, RefreshToken, Token, TokenPayload
-from .user import User, UserCreate, UserInDB, UserUpdate
+from .user import User, UserCreate, UserInDB, UserUpdate, UserLogin, UserRefresh
 from .stripe import StripeIntentResponse, StripePaymentIntent
 from .emails import EmailContent, EmailValidation, ConfirmExpressionOfInterest, ReceiveExpressionOfInterest
 from .subject import SubjectCreate, SubjectUpdate, SubjectInDB, Subject

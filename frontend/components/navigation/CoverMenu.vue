@@ -1,54 +1,21 @@
 <template>
   <div
-    class="
-      z-40
-      absolute
-      inset-x-0
-      top-0
-      max-w-full
-      sm:max-w-screen
-      mx-auto
-      bg-ochre-900
-      md:bg-opacity-0
-    "
+    class="z-40 absolute inset-x-0 top-0 max-w-full sm:max-w-screen mx-auto bg-ochre-900 md:bg-opacity-0"
   >
     <nav
-      class="
-        relative
-        flex
-        justify-center
-        max-h-16
-        py-1
-        bg-ochre-900 bg-opacity-100
-        md:bg-ochre-600 md:bg-opacity-40
-      "
+      class="relative flex justify-center max-h-16 py-1 bg-ochre-900 bg-opacity-100 md:bg-ochre-600 md:bg-opacity-40"
       aria-label="Global"
     >
       <NuxtLink
         v-for="(nav, i) in navigation"
         :key="`nav-${i}`"
         :to="nav.centre && cover ? readLink : nav.to"
-        class="
-          text-xs
-          sm:text-sm
-          text-ochre-100
-          hover:text-ochre-500
-          px-3
-          sm:px-8
-          flex flex-col flex-shrink-0
-        "
+        class="text-xs sm:text-sm text-ochre-100 hover:text-ochre-500 px-3 sm:px-8 flex flex-col flex-shrink-0"
         >{{ nav.name }}
         <div v-if="nav.centre">
           <div v-if="cover">
             <img
-              class="
-                mx-auto
-                h-16
-                sm:h-20
-                border border-ochre-900
-                rounded-lg
-                shadow-xl
-              "
+              class="mx-auto h-16 sm:h-20 border border-ochre-900 rounded-lg shadow-xl"
               :src="cover"
             />
           </div>

@@ -176,6 +176,7 @@ import { ICreatorSummary } from "@/interfaces"
 })
 export default class CreatorEditProfile extends Vue {
   @Getter("main/canMakeCreativeOffers") canMakeCreativeOffers
+  @Action("main/refreshLoggedProfile") refreshLoggedProfile
   @Action("main/updateCreatorProfile") updateCreatorProfile
   @Action("main/toggleCreatorPrivacy") toggleCreatorPrivacy
   @Getter("main/creatorProfile") creatorProfile
@@ -196,12 +197,13 @@ export default class CreatorEditProfile extends Vue {
     this.$router.push("/creator")
   }
 
-  created() {
+  async created() {
+    if (this.$nuxt.isOffline)
+      return this.$nuxt.error({
+        statusCode: 404,
+      })
+    await this.refreshLoggedProfile()
     this.reset()
-  }
-
-  async asyncData({ store }) {
-    await store.dispatch("main/getUserProfile")
   }
 }
 </script>

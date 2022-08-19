@@ -12,9 +12,16 @@ from app.schemas import RefreshTokenCreate, RefreshTokenUpdate
 class CRUDToken(CRUDBase[Token, RefreshTokenCreate, RefreshTokenUpdate]):
     # Everything is user-dependent
     def create(self, db: Session, *, obj_in: str, user_obj: User) -> User:
-        db_obj = self.get(user=user_obj, token=obj_in)
-        if db_obj:
+        db_obj = db.query(self.model).filter(self.model.token == obj_in).first()
+        if db_obj and db_obj.authenticates == user_obj:
+            # In case the token was invalidated, then recreated with the same token key
+            setattr(db_obj, "is_valid", True)
+            db.add(db_obj)
+            db.commit()
+            db.refresh(db_obj)
             return db_obj
+        if db_obj and db_obj.authenticates != user_obj:
+            raise ValueError(f"Token mismatch between key and user.") 
         db_obj = Token(token=obj_in)
         db.add(db_obj)
         db.commit()

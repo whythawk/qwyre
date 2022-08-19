@@ -1,4 +1,7 @@
 import boto3
+from botocore.client import Config
+from botocore.response import StreamingBody
+from botocore.exceptions import ClientError
 from uuid import UUID
 import base64
 from typing import BinaryIO
@@ -15,8 +18,10 @@ class CRUDSpaces:
         # https://docs.digitalocean.com/products/spaces/resources/s3-sdk-examples/
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#object
         """
+        config = Config(connect_timeout=5, retries={"max_attempts": 0})
         self.space = boto3.resource(
             "s3",
+            config=config,
             region_name=settings.SPACES_REGION_NAME,
             endpoint_url=settings.SPACES_ENDPOINT_URL,
             aws_access_key_id=settings.SPACES_ACCESS_KEY,
