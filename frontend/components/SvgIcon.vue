@@ -62,6 +62,8 @@ import {
   svgTrash,
   svgUserGroup,
   svgPencilAlt,
+  svgPencil,
+  svgLogout,
 } from "@/assets/images"
 
 @Component
@@ -126,6 +128,8 @@ export default class SVGIcon extends Vue {
     svgTrash,
     svgUserGroup,
     svgPencilAlt,
+    svgPencil,
+    svgLogout,
   }
 }
 </script>

@@ -43,6 +43,8 @@ import {
   svgTrash,
   svgUserGroup,
   svgPencilAlt,
+  svgPencil,
+  svgLogout,
 } from "./icons"
 import { svgCoverAspectRatio } from "./cover-aspect-ratio"
 import { svgRingsSpinner, svgPuffSpinner, svgGridSpinner } from "./spinners"
@@ -112,4 +114,6 @@ export {
   svgTrash,
   svgUserGroup,
   svgPencilAlt,
+  svgPencil,
+  svgLogout,
 }
