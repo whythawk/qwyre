@@ -356,7 +356,7 @@ export default class CollectionsWorkSummary extends Vue {
       })
     if (
       this.isWorkCreator &&
-      ["submitted", "updated", "offered", "contracted"].includes(
+      ["submitted", "updated", "offered", "contracted", "edited"].includes(
         this.work.state
       )
     )
