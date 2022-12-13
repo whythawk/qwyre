@@ -1,4 +1,4 @@
-FROM node:lts AS build
+FROM node:16 AS build
 ENV NODE_ENV=development NUXT_HOST=${NUXT_HOST:-0.0.0.0} NUXT_PORT=${NUXT_PORT:-3000} NUXT_TELEMETRY_DISABLED=1
 COPY . /app
 WORKDIR /app
@@ -15,7 +15,7 @@ ENV NODE_ENV=production
 ENTRYPOINT ["yarn"]
 CMD ["start"]
 
-FROM node:lts-alpine AS run-minimal
+FROM node:16-alpine AS run-minimal
 ARG NUXT_VERSION=^2.15
 ARG VEE_VERSION=^3.4.14
 ARG NUXT_CONTENT_VERSION=^1.14.0
