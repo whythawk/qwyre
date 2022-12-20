@@ -125,7 +125,7 @@ class CRUDWork(NeoCRUDBase[Work, WorkCreate, WorkUpdate]):
         return self.update_state(db_objs=db_obj, history_obj=history_obj, get_raw=get_raw)
 
     @db.read_transaction
-    def get_stream_first(self, *, id: UUID) -> Optional[StreamFirst]:
+    def get_stream_initial(self, *, id: UUID) -> Optional[StreamFirst]:
         id = self._hexify(id)
         db_obj = self.model.nodes.get_or_none(identifier=id)
         if not db_obj:
@@ -195,8 +195,7 @@ class CRUDWork(NeoCRUDBase[Work, WorkCreate, WorkUpdate]):
             page = stream_in.start_page
         stream = stream_in.stream[:page]
         if bookmark_in and (
-            bookmark_in.page
-            and bookmark_in.position
+            bookmark_in.position
             and bookmark_in.page < last_page
             and bookmark_in.position <= longest_position
         ):
