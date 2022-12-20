@@ -67,10 +67,10 @@ def create_or_update_work(data: BuildData, creator_id: UUID, work_id: Optional[U
             work_in.dedication = data.get("dedication")
         work = crud.work.update(obj_in=work_in, get_raw=True)
         # And update any contract as a result of this change
-        # try:
-        #     crud.contract.reset_on_change(db_obj=work.contract.single())
-        # except CardinalityViolation:
-        #     pass
+        try:
+            crud.contract.reset_on_change(db_obj=work.contract.single())
+        except CardinalityViolation:
+            pass
     else:
         work_in = WorkCreate(**{"dedication": data.get("dedication"), "state": WorkStateType.SUBMITTED,})
         work = crud.work.create(obj_in=work_in, get_raw=True)

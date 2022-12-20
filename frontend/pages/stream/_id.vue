@@ -219,6 +219,7 @@ export default class Stream extends Vue {
       !Object.prototype.hasOwnProperty.call(this.streamIn, "stream")
     )
       return
+    if (this.stream.page === null || typeof this.stream.page === 'undefined') this.stream.page = 0
     if (this.streamIn.stream.length && this.streamIn.stream[0].length) {
       this.stream.stream[this.stream.page] = this.stream.stream[
         this.stream.page

@@ -178,14 +178,11 @@ class CRUDContract(NeoCRUDBase[Contract, ContractCreate, ContractUpdate]):
 
     @db.write_transaction
     def reset_on_change(self, *, db_obj: Contract, get_raw: bool = False) -> Contract:
-        # TOFIX: This doesn't work, it doesn't work, and it wouldn't work as expected
-        # It's supposed to reset publication approval, but it doesn't do that at all.
         for party in db_obj.parties:
             party_in = crud_party.get_relationships(db_objs=party)
-            party_in = PartyUpdate(**PartyInDB.from_orm(party_in).dict())
-            party_in.isApproved = False
-            party_in.publicationApproved = False
+            party_in = PartyUpdate.from_orm(party_in)
             party_in_data = party_in.as_neo_dict
+            party_in_data["publicationApproved"] = False
             Party.create_or_update(party_in_data)
         return self._response(db_objs=db_obj, get_raw=get_raw)
 
