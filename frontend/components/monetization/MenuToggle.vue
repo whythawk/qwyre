@@ -75,15 +75,21 @@ export default class MonetizationMenuToggle extends Vue {
   }
 
   @Watch("monetizationWatcher")
-  public setMonetizationTag() {
+  public async setMonetizationTag() {
     // https://github.com/Techgethr/webmonvuejs/blob/main/index.js
     // https://webmonetization.org/docs/start-stop/
     const monetizationTag = document.querySelector('meta[name="monetization"]')
-    if (!monetizationTag && this.coilPointer) {
-      const meta = document.createElement("meta")
-      meta.name = "monetization"
-      meta.content = this.coilPointer
-      document.getElementsByTagName("head")[0].appendChild(meta)
+    if (this.coilPointer) {
+      if (!monetizationTag) {
+        const meta = document.createElement("meta")
+        meta.name = "monetization"
+        meta.content = this.coilPointer
+        document.getElementsByTagName("head")[0].appendChild(meta)
+      } else {
+        monetizationTag.setAttribute("content", this.coilPointer)
+      }
+      // Stops monetization on change, so restart
+      await this.startMonetizationStream()
     }
     if (monetizationTag && !this.coilPointer) {
       monetizationTag.remove()
@@ -91,8 +97,8 @@ export default class MonetizationMenuToggle extends Vue {
   }
 
   public async toggleMonetizationStreaming() {
-    if (!this.isStreaming) await this.startMonetizationStream()
-    else await this.stopMonetizationStream()
+    if (!this.isStreaming) await this.startMonetizationStream(true)
+    else await this.stopMonetizationStream(true)
     if (this.isStreaming) await this.setShowOptionsCall(false)
     this.setMonetizationTag()
   }

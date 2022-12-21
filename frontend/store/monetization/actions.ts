@@ -35,33 +35,38 @@ export default {
       await dispatch("refreshUserBTP")
   },
   // START web monetization
-  async startMonetizationStream({ commit, dispatch, state }) {
+  async startMonetizationStream({ commit, dispatch, state }, showNotification: boolean = false) {
     await dispatch("refreshUserBTP")
     if (!state.requestError) {
       await commit("setIsStreaming", true)
-      await commit("setCoilPointer", process.env.coilPointer as string)
+      const coilPointer: string = state.coilPointer ? state.coilPointer : process.env.coilPointer as string
+      await commit("setCoilPointer", coilPointer)
+      if (showNotification) {
+        await commit(
+          "main/addNotification",
+          {
+            content: "You have started web monetization.",
+            color: "success",
+          },
+          { root: true }
+        )
+      }
+    }
+  },
+  // STOP web monetization
+  async stopMonetizationStream({ commit }, showNotification: boolean = false) {
+    await commit("setIsStreaming", false)
+    await commit("setCoilPointer", "")
+    if (showNotification) {
       await commit(
         "main/addNotification",
         {
-          content: "You have started web monetization.",
+          content: "You have stopped web monetization.",
           color: "success",
         },
         { root: true }
       )
     }
-  },
-  // STOP web monetization
-  async stopMonetizationStream({ commit }) {
-    await commit("setIsStreaming", false)
-    await commit("setCoilPointer", "")
-    await commit(
-      "main/addNotification",
-      {
-        content: "You have stopped web monetization.",
-        color: "success",
-      },
-      { root: true }
-    )
   },
   // REVOKE web monetization
   async revokeMonetization({ commit, dispatch, state }) {
