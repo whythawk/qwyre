@@ -1,6 +1,9 @@
 Qwyre
 =====
 
+> [!WARNING]
+> This repository is deprecated and kept as a historical record. Qwyre is being redeveloped on [Hop Sauna](https://codeberg.org/whythawk/hopsauna).
+
 Qwyre is a platform for self-publishing, selling and distributing electronic novels. It is built on Whyqd, an object-based wiki bringing revision control, content presentation, branching and embedding to any type of digital object. The current simplified implementation was developed to present and distribute my science-fiction novel, [Lament for the Fallen](https://lamentforthefallen.com).
 
 Features:
